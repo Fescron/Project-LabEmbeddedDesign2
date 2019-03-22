@@ -1,0 +1,6 @@
+(sym_lib_table
+  (lib (name SparkFun-Connectors)(type Legacy)(uri ${KIPRJMOD}/library/SparkFun-KiCad-Libraries-master/Libraries/SparkFun-Connectors.lib)(options "")(descr ""))
+  (lib (name SparkFun-PowerSymbols)(type Legacy)(uri ${KIPRJMOD}/library/SparkFun-KiCad-Libraries-master/Libraries/SparkFun-PowerSymbols.lib)(options "")(descr ""))
+  (lib (name MCU_SiliconLabs-extra)(type Legacy)(uri ${KIPRJMOD}/library/MCU_SiliconLabs-extra.lib)(options "")(descr ""))
+  (lib (name Sensor_Breakout)(type Legacy)(uri ${KIPRJMOD}/library/Sensor_Breakout.lib)(options "")(descr ""))
+)
