@@ -1,5 +1,11 @@
 # Project-LabEmbeddedDesign2
 
+![GitHub Release Date](https://img.shields.io/github/release-date/Fescron/Project-LabEmbeddedDesign2.svg)
+![GitHub release](https://img.shields.io/github/release/Fescron/Project-LabEmbeddedDesign2.svg)
+![GitHub last commit](https://img.shields.io/github/last-commit/Fescron/Project-LabEmbeddedDesign2.svg)
+![Target device](https://img.shields.io/badge/target%20device-EFM32HG322F64G-yellow.svg)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Fescron/Project-LabEmbeddedDesign2.svg)
+
 <br/>
 
 ### PCB-etching files
