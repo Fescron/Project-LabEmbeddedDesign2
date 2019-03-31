@@ -1,0 +1,1202 @@
+Archive member included to satisfy reference by file (symbol)
+
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivsi3.o)
+                              ./src/main.o (__aeabi_uidiv)
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_dvmd_tls.o)
+                              /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivsi3.o) (__aeabi_idiv0)
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_clzsi2.o)
+                              ./emlib/em_cmu.o (__clzsi2)
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_aeabi_uldivmod.o)
+                              ./emlib/em_usart.o (__aeabi_uldivmod)
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_muldi3.o)
+                              ./emlib/em_usart.o (__aeabi_lmul)
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivmoddi4.o)
+                              /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_aeabi_uldivmod.o) (__udivmoddi4)
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_clzdi2.o)
+                              /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivmoddi4.o) (__clzdi2)
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-exit.o)
+                              /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/crt0.o (exit)
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-impure.o)
+                              /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-exit.o) (_global_impure_ptr)
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-init.o)
+                              /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/crt0.o (__libc_init_array)
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-memset.o)
+                              /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/crt0.o (memset)
+/home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libnosys.a(_exit.o)
+                              /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-exit.o) (_exit)
+
+Allocating common symbols
+Common symbol       size              file
+
+dbpointer           0x4               ./dbprint-scr/dbprint.o
+dbprint_rx_buffer   0x50              ./dbprint-scr/dbprint.o
+msTicks             0x4               ./src/util.o
+dbprint_tx_buffer   0x50              ./dbprint-scr/dbprint.o
+
+Discarded input sections
+
+ .text          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crti.o
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crti.o
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crti.o
+ .data          0x0000000000000000        0x4 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtbegin.o
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/crt0.o
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/crt0.o
+ .ARM.extab     0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/crt0.o
+ .text          0x0000000000000000        0x0 ./src/accel.o
+ .data          0x0000000000000000        0x0 ./src/accel.o
+ .bss           0x0000000000000000        0x0 ./src/accel.o
+ .bss.XYZDATA   0x0000000000000000        0x3 ./src/accel.o
+ .text.testADXL
+                0x0000000000000000       0xf0 ./src/accel.o
+ .text.readValuesADXL
+                0x0000000000000000       0xd8 ./src/accel.o
+ .text.readADXL_XYZDATA
+                0x0000000000000000       0x6c ./src/accel.o
+ .text.convertGRangeToGValue
+                0x0000000000000000       0x60 ./src/accel.o
+ .text          0x0000000000000000        0x0 ./src/main.o
+ .data          0x0000000000000000        0x0 ./src/main.o
+ .bss           0x0000000000000000        0x0 ./src/main.o
+ .text          0x0000000000000000        0x0 ./emlib/em_assert.o
+ .data          0x0000000000000000        0x0 ./emlib/em_assert.o
+ .bss           0x0000000000000000        0x0 ./emlib/em_assert.o
+ .text          0x0000000000000000        0x0 ./emlib/em_cmu.o
+ .data          0x0000000000000000        0x0 ./emlib/em_cmu.o
+ .bss           0x0000000000000000        0x0 ./emlib/em_cmu.o
+ .text.BUS_RegMaskedWrite
+                0x0000000000000000       0x26 ./emlib/em_cmu.o
+ .text.CMU_DivToLog2
+                0x0000000000000000       0x48 ./emlib/em_cmu.o
+ .text.CMU_Log2ToDiv
+                0x0000000000000000       0x34 ./emlib/em_cmu.o
+ .text.CMU_AUXHFRCOBandGet
+                0x0000000000000000       0x1c ./emlib/em_cmu.o
+ .text.CMU_AUXHFRCOBandSet
+                0x0000000000000000       0xa4 ./emlib/em_cmu.o
+ .rodata.CMU_AUXHFRCOBandSet
+                0x0000000000000000       0x20 ./emlib/em_cmu.o
+ .text.CMU_Calibrate
+                0x0000000000000000       0xb8 ./emlib/em_cmu.o
+ .rodata.CMU_Calibrate
+                0x0000000000000000       0x18 ./emlib/em_cmu.o
+ .text.CMU_CalibrateConfig
+                0x0000000000000000      0x11c ./emlib/em_cmu.o
+ .rodata.CMU_CalibrateConfig
+                0x0000000000000000       0x30 ./emlib/em_cmu.o
+ .text.CMU_CalibrateCountGet
+                0x0000000000000000       0x38 ./emlib/em_cmu.o
+ .text.CMU_ClockDivGet
+                0x0000000000000000      0x108 ./emlib/em_cmu.o
+ .rodata.CMU_ClockDivGet
+                0x0000000000000000       0x28 ./emlib/em_cmu.o
+ .text.CMU_ClockDivSet
+                0x0000000000000000      0x1ec ./emlib/em_cmu.o
+ .rodata.CMU_ClockDivSet
+                0x0000000000000000       0x28 ./emlib/em_cmu.o
+ .text.CMU_FreezeEnable
+                0x0000000000000000       0x38 ./emlib/em_cmu.o
+ .text.CMU_HFRCOBandGet
+                0x0000000000000000       0x1c ./emlib/em_cmu.o
+ .text.CMU_HFRCOBandSet
+                0x0000000000000000       0xd8 ./emlib/em_cmu.o
+ .rodata.CMU_HFRCOBandSet
+                0x0000000000000000       0x14 ./emlib/em_cmu.o
+ .text.CMU_HFRCOStartupDelayGet
+                0x0000000000000000       0x18 ./emlib/em_cmu.o
+ .text.CMU_HFRCOStartupDelaySet
+                0x0000000000000000       0x50 ./emlib/em_cmu.o
+ .text.CMU_HFXOInit
+                0x0000000000000000       0x78 ./emlib/em_cmu.o
+ .text.CMU_LCDClkFDIVGet
+                0x0000000000000000        0xc ./emlib/em_cmu.o
+ .text.CMU_LCDClkFDIVSet
+                0x0000000000000000       0x10 ./emlib/em_cmu.o
+ .text.CMU_LFXOInit
+                0x0000000000000000       0x80 ./emlib/em_cmu.o
+ .text.CMU_OscillatorTuningGet
+                0x0000000000000000       0x80 ./emlib/em_cmu.o
+ .text.CMU_OscillatorTuningSet
+                0x0000000000000000      0x118 ./emlib/em_cmu.o
+ .text.CMU_PCNTClockExternalGet
+                0x0000000000000000       0x34 ./emlib/em_cmu.o
+ .text.CMU_PCNTClockExternalSet
+                0x0000000000000000       0x54 ./emlib/em_cmu.o
+ .text.CMU_USHFRCOBandGet
+                0x0000000000000000       0x1c ./emlib/em_cmu.o
+ .text.CMU_USHFRCOBandSet
+                0x0000000000000000      0x108 ./emlib/em_cmu.o
+ .text          0x0000000000000000        0x0 ./emlib/em_core.o
+ .data          0x0000000000000000        0x0 ./emlib/em_core.o
+ .bss           0x0000000000000000        0x0 ./emlib/em_core.o
+ .text.__NVIC_GetPriority
+                0x0000000000000000       0x7c ./emlib/em_core.o
+ .text.CORE_CriticalDisableIrq
+                0x0000000000000000        0xc ./emlib/em_core.o
+ .text.CORE_CriticalEnableIrq
+                0x0000000000000000        0xc ./emlib/em_core.o
+ .text.CORE_YieldCritical
+                0x0000000000000000       0x24 ./emlib/em_core.o
+ .text.CORE_AtomicDisableIrq
+                0x0000000000000000        0xc ./emlib/em_core.o
+ .text.CORE_AtomicEnableIrq
+                0x0000000000000000        0xc ./emlib/em_core.o
+ .text.CORE_EnterAtomic
+                0x0000000000000000       0x1c ./emlib/em_core.o
+ .text.CORE_ExitAtomic
+                0x0000000000000000       0x18 ./emlib/em_core.o
+ .text.CORE_YieldAtomic
+                0x0000000000000000       0x24 ./emlib/em_core.o
+ .text.CORE_EnterNvicMask
+                0x0000000000000000       0x38 ./emlib/em_core.o
+ .text.CORE_NvicDisableMask
+                0x0000000000000000       0x2c ./emlib/em_core.o
+ .text.CORE_NvicEnableMask
+                0x0000000000000000       0x2c ./emlib/em_core.o
+ .text.CORE_YieldNvicMask
+                0x0000000000000000       0x58 ./emlib/em_core.o
+ .rodata        0x0000000000000000       0x6b ./emlib/em_core.o
+ .text.CORE_NvicMaskSetIRQ
+                0x0000000000000000       0x6c ./emlib/em_core.o
+ .text.CORE_NvicMaskClearIRQ
+                0x0000000000000000       0x6c ./emlib/em_core.o
+ .text.CORE_InIrqContext
+                0x0000000000000000       0x1c ./emlib/em_core.o
+ .text.CORE_IrqIsBlocked
+                0x0000000000000000       0xa4 ./emlib/em_core.o
+ .text.CORE_IrqIsDisabled
+                0x0000000000000000       0x22 ./emlib/em_core.o
+ .text.CORE_GetNvicEnabledMask
+                0x0000000000000000       0x2c ./emlib/em_core.o
+ .text.CORE_GetNvicMaskDisableState
+                0x0000000000000000       0x38 ./emlib/em_core.o
+ .text.CORE_NvicIRQDisabled
+                0x0000000000000000       0x68 ./emlib/em_core.o
+ .text.CORE_GetNvicRamTableHandler
+                0x0000000000000000       0x54 ./emlib/em_core.o
+ .text.CORE_SetNvicRamTableHandler
+                0x0000000000000000       0x58 ./emlib/em_core.o
+ .text.CORE_InitNvicVectorTable
+                0x0000000000000000      0x128 ./emlib/em_core.o
+ .text          0x0000000000000000        0x0 ./emlib/em_emu.o
+ .data          0x0000000000000000        0x0 ./emlib/em_emu.o
+ .bss           0x0000000000000000        0x0 ./emlib/em_emu.o
+ .text.EMU_Unlock
+                0x0000000000000000       0x18 ./emlib/em_emu.o
+ .text.EMU_EnterEM3
+                0x0000000000000000       0x78 ./emlib/em_emu.o
+ .text.EMU_Save
+                0x0000000000000000       0x10 ./emlib/em_emu.o
+ .text.EMU_Restore
+                0x0000000000000000       0x10 ./emlib/em_emu.o
+ .text.EMU_EnterEM4
+                0x0000000000000000       0x60 ./emlib/em_emu.o
+ .text.EMU_MemPwrDown
+                0x0000000000000000       0x10 ./emlib/em_emu.o
+ .text.EMU_RamPowerDown
+                0x0000000000000000       0x24 ./emlib/em_emu.o
+ .text.EMU_RamPowerUp
+                0x0000000000000000        0xa ./emlib/em_emu.o
+ .text.EMU_UpdateOscConfig
+                0x0000000000000000       0x10 ./emlib/em_emu.o
+ .text.EMU_EM23Init
+                0x0000000000000000       0x34 ./emlib/em_emu.o
+ .text          0x0000000000000000        0x0 ./emlib/em_gpio.o
+ .data          0x0000000000000000        0x0 ./emlib/em_gpio.o
+ .bss           0x0000000000000000        0x0 ./emlib/em_gpio.o
+ .text.GPIO_EM4SetPinRetention
+                0x0000000000000000       0x28 ./emlib/em_gpio.o
+ .text.GPIO_DbgLocationSet
+                0x0000000000000000       0x10 ./emlib/em_gpio.o
+ .text.GPIO_DriveModeSet
+                0x0000000000000000       0x90 ./emlib/em_gpio.o
+ .text.GPIO_PinModeGet
+                0x0000000000000000       0xe8 ./emlib/em_gpio.o
+ .text.GPIO_EM4EnablePinWakeup
+                0x0000000000000000       0x9c ./emlib/em_gpio.o
+ .text          0x0000000000000000        0x0 ./emlib/em_usart.o
+ .data          0x0000000000000000        0x0 ./emlib/em_usart.o
+ .bss           0x0000000000000000        0x0 ./emlib/em_usart.o
+ .text.prsIrInput
+                0x0000000000000000       0x2a ./emlib/em_usart.o
+ .text.prsTriggerInput
+                0x0000000000000000       0x2a ./emlib/em_usart.o
+ .text.USART_BaudrateCalc
+                0x0000000000000000      0x128 ./emlib/em_usart.o
+ .text.USART_BaudrateGet
+                0x0000000000000000       0x64 ./emlib/em_usart.o
+ .text.USARTn_InitIrDA
+                0x0000000000000000       0xac ./emlib/em_usart.o
+ .text.USART_InitI2s
+                0x0000000000000000       0xb8 ./emlib/em_usart.o
+ .text.USART_InitPrsTrigger
+                0x0000000000000000       0x60 ./emlib/em_usart.o
+ .text.USART_RxDouble
+                0x0000000000000000       0x24 ./emlib/em_usart.o
+ .text.USART_RxDoubleExt
+                0x0000000000000000       0x22 ./emlib/em_usart.o
+ .text.USART_RxExt
+                0x0000000000000000       0x22 ./emlib/em_usart.o
+ .text.USART_TxDouble
+                0x0000000000000000       0x2a ./emlib/em_usart.o
+ .text.USART_TxDoubleExt
+                0x0000000000000000       0x24 ./emlib/em_usart.o
+ .text.USART_TxExt
+                0x0000000000000000       0x2a ./emlib/em_usart.o
+ .data          0x0000000000000000        0x0 ./CMSIS/EFM32HG/startup_efm32hg.o
+ .bss           0x0000000000000000        0x0 ./CMSIS/EFM32HG/startup_efm32hg.o
+ .text          0x0000000000000000        0x0 ./CMSIS/EFM32HG/system_efm32hg.o
+ .data          0x0000000000000000        0x0 ./CMSIS/EFM32HG/system_efm32hg.o
+ .bss           0x0000000000000000        0x0 ./CMSIS/EFM32HG/system_efm32hg.o
+ .text.SystemHFXOClockGet
+                0x0000000000000000       0x14 ./CMSIS/EFM32HG/system_efm32hg.o
+ .text.SystemHFXOClockSet
+                0x0000000000000000       0x30 ./CMSIS/EFM32HG/system_efm32hg.o
+ .text.SystemLFXOClockSet
+                0x0000000000000000       0x30 ./CMSIS/EFM32HG/system_efm32hg.o
+ .text          0x0000000000000000        0x0 ./BSP/bsp_stk_leds.o
+ .data          0x0000000000000000        0x0 ./BSP/bsp_stk_leds.o
+ .bss           0x0000000000000000        0x0 ./BSP/bsp_stk_leds.o
+ .text.BUS_RegBitRead
+                0x0000000000000000       0x20 ./BSP/bsp_stk_leds.o
+ .rodata        0x0000000000000000       0x6c ./BSP/bsp_stk_leds.o
+ .text.GPIO_PinOutClear
+                0x0000000000000000       0xac ./BSP/bsp_stk_leds.o
+ .text.GPIO_PinOutGet
+                0x0000000000000000       0xac ./BSP/bsp_stk_leds.o
+ .text.GPIO_PinOutSet
+                0x0000000000000000       0xac ./BSP/bsp_stk_leds.o
+ .text.GPIO_PinOutToggle
+                0x0000000000000000       0xac ./BSP/bsp_stk_leds.o
+ .rodata.ledArray
+                0x0000000000000000       0x10 ./BSP/bsp_stk_leds.o
+ .text.BSP_LedsInit
+                0x0000000000000000       0x60 ./BSP/bsp_stk_leds.o
+ .text.BSP_LedsGet
+                0x0000000000000000       0x68 ./BSP/bsp_stk_leds.o
+ .text.BSP_LedsSet
+                0x0000000000000000       0x70 ./BSP/bsp_stk_leds.o
+ .text.BSP_LedClear
+                0x0000000000000000       0x44 ./BSP/bsp_stk_leds.o
+ .text.BSP_LedGet
+                0x0000000000000000       0x48 ./BSP/bsp_stk_leds.o
+ .text.BSP_LedSet
+                0x0000000000000000       0x44 ./BSP/bsp_stk_leds.o
+ .text.BSP_LedToggle
+                0x0000000000000000       0x44 ./BSP/bsp_stk_leds.o
+ .debug_info    0x0000000000000000     0x1056 ./BSP/bsp_stk_leds.o
+ .debug_abbrev  0x0000000000000000      0x25d ./BSP/bsp_stk_leds.o
+ .debug_loc     0x0000000000000000      0x2a0 ./BSP/bsp_stk_leds.o
+ .debug_aranges
+                0x0000000000000000       0x78 ./BSP/bsp_stk_leds.o
+ .debug_ranges  0x0000000000000000       0x68 ./BSP/bsp_stk_leds.o
+ .debug_line    0x0000000000000000      0x5f6 ./BSP/bsp_stk_leds.o
+ .debug_str     0x0000000000000000      0xb18 ./BSP/bsp_stk_leds.o
+ .comment       0x0000000000000000       0x7f ./BSP/bsp_stk_leds.o
+ .debug_frame   0x0000000000000000      0x190 ./BSP/bsp_stk_leds.o
+ .ARM.attributes
+                0x0000000000000000       0x32 ./BSP/bsp_stk_leds.o
+ .text          0x0000000000000000        0x0 ./dbprint-scr/dbprint.o
+ .data          0x0000000000000000        0x0 ./dbprint-scr/dbprint.o
+ .bss           0x0000000000000000        0x0 ./dbprint-scr/dbprint.o
+ .text.dbAlert  0x0000000000000000       0x1c ./dbprint-scr/dbprint.o
+ .text.dbClear  0x0000000000000000       0x1c ./dbprint-scr/dbprint.o
+ .text.dbinfoInt_hex
+                0x0000000000000000       0x38 ./dbprint-scr/dbprint.o
+ .text.dbwarnInt_hex
+                0x0000000000000000       0x40 ./dbprint-scr/dbprint.o
+ .text.dbcritInt_hex
+                0x0000000000000000       0x40 ./dbprint-scr/dbprint.o
+ .text.dbprintlnInt
+                0x0000000000000000       0x34 ./dbprint-scr/dbprint.o
+ .text.dbprintInt_hex
+                0x0000000000000000       0x34 ./dbprint-scr/dbprint.o
+ .text.dbprintlnInt_hex
+                0x0000000000000000       0x34 ./dbprint-scr/dbprint.o
+ .text.dbReadChar
+                0x0000000000000000       0x1c ./dbprint-scr/dbprint.o
+ .text.dbReadLine
+                0x0000000000000000       0x5c ./dbprint-scr/dbprint.o
+ .text.uint32_to_charHex
+                0x0000000000000000      0x368 ./dbprint-scr/dbprint.o
+ .text.charDec_to_uint32
+                0x0000000000000000       0x64 ./dbprint-scr/dbprint.o
+ .text.charHex_to_uint32
+                0x0000000000000000       0xc0 ./dbprint-scr/dbprint.o
+ .text          0x0000000000000000        0x0 ./emlib/em_rtc.o
+ .data          0x0000000000000000        0x0 ./emlib/em_rtc.o
+ .bss           0x0000000000000000        0x0 ./emlib/em_rtc.o
+ .text.RTC_CompareGet
+                0x0000000000000000       0x4c ./emlib/em_rtc.o
+ .text.RTC_FreezeEnable
+                0x0000000000000000       0x30 ./emlib/em_rtc.o
+ .text.RTC_Reset
+                0x0000000000000000       0x34 ./emlib/em_rtc.o
+ .text          0x0000000000000000        0x0 ./src/handlers.o
+ .data          0x0000000000000000        0x0 ./src/handlers.o
+ .bss           0x0000000000000000        0x0 ./src/handlers.o
+ .text          0x0000000000000000        0x0 ./src/util.o
+ .data          0x0000000000000000        0x0 ./src/util.o
+ .bss           0x0000000000000000        0x0 ./src/util.o
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivsi3.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivsi3.o)
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_dvmd_tls.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_dvmd_tls.o)
+ .text          0x0000000000000000       0x3c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_clzsi2.o)
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_clzsi2.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_clzsi2.o)
+ .ARM.attributes
+                0x0000000000000000       0x1e /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_clzsi2.o)
+ .text          0x0000000000000000       0x40 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_aeabi_uldivmod.o)
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_aeabi_uldivmod.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_aeabi_uldivmod.o)
+ .ARM.attributes
+                0x0000000000000000       0x1e /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_aeabi_uldivmod.o)
+ .text          0x0000000000000000       0x54 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_muldi3.o)
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_muldi3.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_muldi3.o)
+ .debug_frame   0x0000000000000000       0x34 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_muldi3.o)
+ .ARM.attributes
+                0x0000000000000000       0x2c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_muldi3.o)
+ .text          0x0000000000000000      0x184 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivmoddi4.o)
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivmoddi4.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivmoddi4.o)
+ .ARM.extab     0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivmoddi4.o)
+ .ARM.exidx     0x0000000000000000        0x8 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivmoddi4.o)
+ .debug_frame   0x0000000000000000       0x3c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivmoddi4.o)
+ .ARM.attributes
+                0x0000000000000000       0x2c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivmoddi4.o)
+ .text          0x0000000000000000       0x18 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_clzdi2.o)
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_clzdi2.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_clzdi2.o)
+ .ARM.attributes
+                0x0000000000000000       0x1e /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_clzdi2.o)
+ .text          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-exit.o)
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-exit.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-exit.o)
+ .text          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-impure.o)
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-impure.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-impure.o)
+ .data._impure_ptr
+                0x0000000000000000        0x4 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-impure.o)
+ .text          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-init.o)
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-init.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-init.o)
+ .text          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-memset.o)
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-memset.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-memset.o)
+ .text          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libnosys.a(_exit.o)
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libnosys.a(_exit.o)
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libnosys.a(_exit.o)
+ .text          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtend.o
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtend.o
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtend.o
+ .text          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtn.o
+ .data          0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtn.o
+ .bss           0x0000000000000000        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtn.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x0000000000000000 0x0000000000010000 xr
+RAM              0x0000000020000000 0x0000000000002000 xrw
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crti.o
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtbegin.o
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/crt0.o
+LOAD ./src/accel.o
+LOAD ./src/main.o
+LOAD ./emlib/em_assert.o
+LOAD ./emlib/em_cmu.o
+LOAD ./emlib/em_core.o
+LOAD ./emlib/em_emu.o
+LOAD ./emlib/em_gpio.o
+LOAD ./emlib/em_usart.o
+LOAD ./CMSIS/EFM32HG/startup_efm32hg.o
+LOAD ./CMSIS/EFM32HG/system_efm32hg.o
+LOAD ./BSP/bsp_stk_leds.o
+LOAD ./dbprint-scr/dbprint.o
+LOAD ./emlib/em_rtc.o
+LOAD ./src/handlers.o
+LOAD ./src/util.o
+START GROUP
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libnosys.a
+END GROUP
+START GROUP
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libg_nano.a
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a
+END GROUP
+START GROUP
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a
+END GROUP
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtend.o
+LOAD /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtn.o
+
+.text           0x0000000000000000     0x44e4
+ *(.vectors)
+ .vectors       0x0000000000000000       0x94 ./CMSIS/EFM32HG/startup_efm32hg.o
+                0x0000000000000000                __Vectors
+                0x0000000000000094                __Vectors_End = .
+                0x0000000000000094                __Vectors_Size = (__Vectors_End - __Vectors)
+                0x0000000000000094                __end__ = .
+ *(.text*)
+ .text          0x0000000000000094       0x48 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtbegin.o
+ .text          0x00000000000000dc       0x78 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/crt0.o
+                0x00000000000000dc                _mainCRTStartup
+                0x00000000000000dc                _start
+ .text.GPIO_PinOutClear
+                0x0000000000000154       0xac ./src/accel.o
+ .text.GPIO_PinOutSet
+                0x0000000000000200       0xac ./src/accel.o
+ .text.initADXL_VCC
+                0x00000000000002ac       0x2c ./src/accel.o
+                0x00000000000002ac                initADXL_VCC
+ .text.powerADXL
+                0x00000000000002d8       0x48 ./src/accel.o
+                0x00000000000002d8                powerADXL
+ .text.enableSPIpinsADXL
+                0x0000000000000320       0x7e ./src/accel.o
+                0x0000000000000320                enableSPIpinsADXL
+ *fill*         0x000000000000039e        0x2 
+ .text.initADXL_SPI
+                0x00000000000003a0       0xe0 ./src/accel.o
+                0x00000000000003a0                initADXL_SPI
+ .text.resetHandlerADXL
+                0x0000000000000480       0xf8 ./src/accel.o
+                0x0000000000000480                resetHandlerADXL
+ .text.readADXL
+                0x0000000000000578       0x58 ./src/accel.o
+                0x0000000000000578                readADXL
+ .text.writeADXL
+                0x00000000000005d0       0x54 ./src/accel.o
+                0x00000000000005d0                writeADXL
+ .text.configADXL_ODR
+                0x0000000000000624      0x178 ./src/accel.o
+                0x0000000000000624                configADXL_ODR
+ .text.configADXL_range
+                0x000000000000079c       0xd8 ./src/accel.o
+                0x000000000000079c                configADXL_range
+ .text.configADXL_activity
+                0x0000000000000874       0xd0 ./src/accel.o
+                0x0000000000000874                configADXL_activity
+ .text.measureADXL
+                0x0000000000000944       0x90 ./src/accel.o
+                0x0000000000000944                measureADXL
+ .text.softResetADXL
+                0x00000000000009d4       0x12 ./src/accel.o
+                0x00000000000009d4                softResetADXL
+ .text.checkID_ADXL
+                0x00000000000009e6       0x1a ./src/accel.o
+                0x00000000000009e6                checkID_ADXL
+ .text.__NVIC_EnableIRQ
+                0x0000000000000a00       0x34 ./src/main.o
+ .text.__NVIC_ClearPendingIRQ
+                0x0000000000000a34       0x38 ./src/main.o
+ .text.__NVIC_SetPriority
+                0x0000000000000a6c       0xdc ./src/main.o
+ .text.SysTick_Config
+                0x0000000000000b48       0x48 ./src/main.o
+ .text.SYSTEM_GetProdRev
+                0x0000000000000b90       0x18 ./src/main.o
+ .text.GPIO_IntConfig
+                0x0000000000000ba8       0x48 ./src/main.o
+ .text.CHIP_Init
+                0x0000000000000bf0       0x4c ./src/main.o
+ .text.RTC_IntEnable
+                0x0000000000000c3c       0x20 ./src/main.o
+ .text.initGPIOwakeup
+                0x0000000000000c5c       0x7c ./src/main.o
+                0x0000000000000c5c                initGPIOwakeup
+ .text.initRTCcomp
+                0x0000000000000cd8       0x78 ./src/main.o
+                0x0000000000000cd8                initRTCcomp
+ .text.main     0x0000000000000d50       0xd8 ./src/main.o
+                0x0000000000000d50                main
+ .text.assertEFM
+                0x0000000000000e28        0xc ./emlib/em_assert.o
+                0x0000000000000e28                assertEFM
+ .text.BUS_RegBitWrite
+                0x0000000000000e34       0x3c ./emlib/em_cmu.o
+ .text.BUS_RegBitRead
+                0x0000000000000e70       0x20 ./emlib/em_cmu.o
+ .text.SYSTEM_GetProdRev
+                0x0000000000000e90       0x18 ./emlib/em_cmu.o
+ .text.auxClkGet
+                0x0000000000000ea8       0xc0 ./emlib/em_cmu.o
+ .text.dbgClkGet
+                0x0000000000000f68       0x5c ./emlib/em_cmu.o
+ .text.flashWaitStateControl
+                0x0000000000000fc4       0x54 ./emlib/em_cmu.o
+ .text.flashWaitStateMax
+                0x0000000000001018       0x44 ./emlib/em_cmu.o
+ .text.CMU_UpdateWaitStates
+                0x000000000000105c       0x48 ./emlib/em_cmu.o
+                0x000000000000105c                CMU_UpdateWaitStates
+ .text.lfClkGet
+                0x00000000000010a4      0x12c ./emlib/em_cmu.o
+ .text.syncReg  0x00000000000011d0       0x2c ./emlib/em_cmu.o
+ .text.usbCClkGet
+                0x00000000000011fc       0x6c ./emlib/em_cmu.o
+ .text.hfperClkSafePrescaler
+                0x0000000000001268        0xa ./emlib/em_cmu.o
+ .text.hfperClkOptimizedPrescaler
+                0x0000000000001272        0xa ./emlib/em_cmu.o
+ .text.CMU_ClockEnable
+                0x000000000000127c       0xc4 ./emlib/em_cmu.o
+                0x000000000000127c                CMU_ClockEnable
+ .text.CMU_ClockFreqGet
+                0x0000000000001340      0x154 ./emlib/em_cmu.o
+                0x0000000000001340                CMU_ClockFreqGet
+ .text.CMU_ClockSelectGet
+                0x0000000000001494      0x1f0 ./emlib/em_cmu.o
+                0x0000000000001494                CMU_ClockSelectGet
+ .text.CMU_ClockSelectSet
+                0x0000000000001684      0x2a8 ./emlib/em_cmu.o
+                0x0000000000001684                CMU_ClockSelectSet
+ .text.CMU_OscillatorEnable
+                0x000000000000192c       0xe4 ./emlib/em_cmu.o
+                0x000000000000192c                CMU_OscillatorEnable
+ .text.CORE_EnterCritical
+                0x0000000000001a10       0x1c ./emlib/em_core.o
+                0x0000000000001a10                CORE_EnterCritical
+ .text.CORE_ExitCritical
+                0x0000000000001a2c       0x18 ./emlib/em_core.o
+                0x0000000000001a2c                CORE_ExitCritical
+ .text.SystemCoreClockUpdate
+                0x0000000000001a44        0xe ./emlib/em_emu.o
+ *fill*         0x0000000000001a52        0x2 
+ .text.CMU_Lock
+                0x0000000000001a54       0x18 ./emlib/em_emu.o
+ .text.CMU_Unlock
+                0x0000000000001a6c       0x1c ./emlib/em_emu.o
+ .text.emState  0x0000000000001a88       0xe4 ./emlib/em_emu.o
+ .text.EMU_EnterEM2
+                0x0000000000001b6c       0x5c ./emlib/em_emu.o
+                0x0000000000001b6c                EMU_EnterEM2
+ .text.BUS_RegBitWrite
+                0x0000000000001bc8       0x3c ./emlib/em_gpio.o
+ .text.BUS_RegMaskedWrite
+                0x0000000000001c04       0x26 ./emlib/em_gpio.o
+ *fill*         0x0000000000001c2a        0x2 
+ .text.GPIO_IntClear
+                0x0000000000001c2c       0x20 ./emlib/em_gpio.o
+ .text.GPIO_PinOutClear
+                0x0000000000001c4c       0xac ./emlib/em_gpio.o
+ .text.GPIO_PinOutSet
+                0x0000000000001cf8       0xac ./emlib/em_gpio.o
+ .text.GPIO_ExtIntConfig
+                0x0000000000001da4      0x150 ./emlib/em_gpio.o
+                0x0000000000001da4                GPIO_ExtIntConfig
+ .text.GPIO_PinModeSet
+                0x0000000000001ef4      0x1b4 ./emlib/em_gpio.o
+                0x0000000000001ef4                GPIO_PinModeSet
+ .text.prsRxInput
+                0x00000000000020a8       0x26 ./emlib/em_usart.o
+ *fill*         0x00000000000020ce        0x2 
+ .text.USART_BaudrateAsyncSet
+                0x00000000000020d0      0x16c ./emlib/em_usart.o
+                0x00000000000020d0                USART_BaudrateAsyncSet
+ .text.USART_BaudrateSyncSet
+                0x000000000000223c       0x80 ./emlib/em_usart.o
+                0x000000000000223c                USART_BaudrateSyncSet
+ .text.USART_Enable
+                0x00000000000022bc       0x64 ./emlib/em_usart.o
+                0x00000000000022bc                USART_Enable
+ .text.USART_InitAsync
+                0x0000000000002320       0xb8 ./emlib/em_usart.o
+                0x0000000000002320                USART_InitAsync
+ .text.USART_InitSync
+                0x00000000000023d8       0xec ./emlib/em_usart.o
+                0x00000000000023d8                USART_InitSync
+ .text.USART_Reset
+                0x00000000000024c4       0xac ./emlib/em_usart.o
+                0x00000000000024c4                USART_Reset
+ .text.USART_Rx
+                0x0000000000002570       0x22 ./emlib/em_usart.o
+                0x0000000000002570                USART_Rx
+ .text.USART_SpiTransfer
+                0x0000000000002592       0x3c ./emlib/em_usart.o
+                0x0000000000002592                USART_SpiTransfer
+ .text.USART_Tx
+                0x00000000000025ce       0x2a ./emlib/em_usart.o
+                0x00000000000025ce                USART_Tx
+ .text          0x00000000000025f8       0x30 ./CMSIS/EFM32HG/startup_efm32hg.o
+                0x00000000000025f8                Reset_Handler
+                0x0000000000002624                TIMER2_IRQHandler
+                0x0000000000002624                I2C0_IRQHandler
+                0x0000000000002624                HardFault_Handler
+                0x0000000000002624                PendSV_Handler
+                0x0000000000002624                NMI_Handler
+                0x0000000000002624                MSC_IRQHandler
+                0x0000000000002624                ADC0_IRQHandler
+                0x0000000000002624                LEUART0_IRQHandler
+                0x0000000000002624                TIMER0_IRQHandler
+                0x0000000000002624                TIMER1_IRQHandler
+                0x0000000000002624                Default_Handler
+                0x0000000000002624                PCNT0_IRQHandler
+                0x0000000000002624                USB_IRQHandler
+                0x0000000000002624                ACMP0_IRQHandler
+                0x0000000000002624                SVC_Handler
+                0x0000000000002624                CMU_IRQHandler
+                0x0000000000002624                AES_IRQHandler
+                0x0000000000002624                VCMP_IRQHandler
+                0x0000000000002624                DMA_IRQHandler
+ .text.SystemCoreClockGet
+                0x0000000000002628       0x38 ./CMSIS/EFM32HG/system_efm32hg.o
+                0x0000000000002628                SystemCoreClockGet
+ .text.SystemMaxCoreClockGet
+                0x0000000000002660       0x10 ./CMSIS/EFM32HG/system_efm32hg.o
+                0x0000000000002660                SystemMaxCoreClockGet
+ .text.SystemHFClockGet
+                0x0000000000002670       0xfc ./CMSIS/EFM32HG/system_efm32hg.o
+                0x0000000000002670                SystemHFClockGet
+ .text.SystemInit
+                0x000000000000276c       0x18 ./CMSIS/EFM32HG/system_efm32hg.o
+                0x000000000000276c                SystemInit
+ .text.SystemLFRCOClockGet
+                0x0000000000002784        0xe ./CMSIS/EFM32HG/system_efm32hg.o
+                0x0000000000002784                SystemLFRCOClockGet
+ .text.SystemULFRCOClockGet
+                0x0000000000002792        0xe ./CMSIS/EFM32HG/system_efm32hg.o
+                0x0000000000002792                SystemULFRCOClockGet
+ .text.SystemLFXOClockGet
+                0x00000000000027a0       0x14 ./CMSIS/EFM32HG/system_efm32hg.o
+                0x00000000000027a0                SystemLFXOClockGet
+ .text.__NVIC_EnableIRQ
+                0x00000000000027b4       0x34 ./dbprint-scr/dbprint.o
+ .text.GPIO_PinOutSet
+                0x00000000000027e8       0xac ./dbprint-scr/dbprint.o
+ .text.USART_IntClear
+                0x0000000000002894       0x18 ./dbprint-scr/dbprint.o
+ .text.USART_IntEnable
+                0x00000000000028ac       0x1e ./dbprint-scr/dbprint.o
+ .text.USART_IntGet
+                0x00000000000028ca       0x14 ./dbprint-scr/dbprint.o
+ .text.USART_IntSet
+                0x00000000000028de       0x18 ./dbprint-scr/dbprint.o
+ *fill*         0x00000000000028f6        0x2 
+ .text.dbprint_INIT
+                0x00000000000028f8      0x35c ./dbprint-scr/dbprint.o
+                0x00000000000028f8                dbprint_INIT
+ .text.dbprint  0x0000000000002c54       0x40 ./dbprint-scr/dbprint.o
+                0x0000000000002c54                dbprint
+ .text.dbprintln
+                0x0000000000002c94       0x34 ./dbprint-scr/dbprint.o
+                0x0000000000002c94                dbprintln
+ .text.dbprint_color
+                0x0000000000002cc8      0x108 ./dbprint-scr/dbprint.o
+                0x0000000000002cc8                dbprint_color
+ .text.dbprintln_color
+                0x0000000000002dd0       0x40 ./dbprint-scr/dbprint.o
+                0x0000000000002dd0                dbprintln_color
+ .text.dbinfo   0x0000000000002e10       0x24 ./dbprint-scr/dbprint.o
+                0x0000000000002e10                dbinfo
+ .text.dbwarn   0x0000000000002e34       0x28 ./dbprint-scr/dbprint.o
+                0x0000000000002e34                dbwarn
+ .text.dbcrit   0x0000000000002e5c       0x28 ./dbprint-scr/dbprint.o
+                0x0000000000002e5c                dbcrit
+ .text.dbinfoInt
+                0x0000000000002e84       0x38 ./dbprint-scr/dbprint.o
+                0x0000000000002e84                dbinfoInt
+ .text.dbwarnInt
+                0x0000000000002ebc       0x40 ./dbprint-scr/dbprint.o
+                0x0000000000002ebc                dbwarnInt
+ .text.dbcritInt
+                0x0000000000002efc       0x40 ./dbprint-scr/dbprint.o
+                0x0000000000002efc                dbcritInt
+ .text.dbprintInt
+                0x0000000000002f3c       0x50 ./dbprint-scr/dbprint.o
+                0x0000000000002f3c                dbprintInt
+ .text.uint32_to_charDec
+                0x0000000000002f8c       0xf2 ./dbprint-scr/dbprint.o
+                0x0000000000002f8c                uint32_to_charDec
+ *fill*         0x000000000000307e        0x2 
+ .text.USART0_RX_IRQHandler
+                0x0000000000003080       0xac ./dbprint-scr/dbprint.o
+                0x0000000000003080                USART0_RX_IRQHandler
+ .text.USART0_TX_IRQHandler
+                0x000000000000312c       0x78 ./dbprint-scr/dbprint.o
+                0x000000000000312c                USART0_TX_IRQHandler
+ .text.USART1_RX_IRQHandler
+                0x00000000000031a4       0xac ./dbprint-scr/dbprint.o
+                0x00000000000031a4                USART1_RX_IRQHandler
+ .text.USART1_TX_IRQHandler
+                0x0000000000003250       0x78 ./dbprint-scr/dbprint.o
+                0x0000000000003250                USART1_TX_IRQHandler
+ .text.BUS_RegBitWrite
+                0x00000000000032c8       0x3c ./emlib/em_rtc.o
+ .text.RTC_CompareSet
+                0x0000000000003304       0x5c ./emlib/em_rtc.o
+                0x0000000000003304                RTC_CompareSet
+ .text.RTC_Enable
+                0x0000000000003360       0x28 ./emlib/em_rtc.o
+                0x0000000000003360                RTC_Enable
+ .text.RTC_Init
+                0x0000000000003388       0x4c ./emlib/em_rtc.o
+                0x0000000000003388                RTC_Init
+ .text.RTC_CounterReset
+                0x00000000000033d4       0x16 ./emlib/em_rtc.o
+                0x00000000000033d4                RTC_CounterReset
+ *fill*         0x00000000000033ea        0x2 
+ .text.GPIO_IntClear
+                0x00000000000033ec       0x20 ./src/handlers.o
+ .text.GPIO_IntGet
+                0x000000000000340c       0x18 ./src/handlers.o
+ .text.RTC_IntClear
+                0x0000000000003424       0x1c ./src/handlers.o
+ .text.RTC_IRQHandler
+                0x0000000000003440       0x14 ./src/handlers.o
+                0x0000000000003440                RTC_IRQHandler
+ .text.GPIO_EVEN_IRQHandler
+                0x0000000000003454       0x48 ./src/handlers.o
+                0x0000000000003454                GPIO_EVEN_IRQHandler
+ .text.GPIO_ODD_IRQHandler
+                0x000000000000349c       0x6c ./src/handlers.o
+                0x000000000000349c                GPIO_ODD_IRQHandler
+ .text.GPIO_PinOutClear
+                0x0000000000003508       0xac ./src/util.o
+ .text.GPIO_PinOutSet
+                0x00000000000035b4       0xac ./src/util.o
+ .text.GPIO_PinOutToggle
+                0x0000000000003660       0xac ./src/util.o
+ .text.initLEDS
+                0x000000000000370c       0x32 ./src/util.o
+                0x000000000000370c                initLEDS
+ .text.led0     0x000000000000373e       0x2e ./src/util.o
+                0x000000000000373e                led0
+ .text.Error    0x000000000000376c       0x4c ./src/util.o
+                0x000000000000376c                Error
+ .text.SysTick_Handler
+                0x00000000000037b8       0x18 ./src/util.o
+                0x00000000000037b8                SysTick_Handler
+ .text.Delay    0x00000000000037d0       0x2c ./src/util.o
+                0x00000000000037d0                Delay
+ .text.systickInterrupts
+                0x00000000000037fc       0x3c ./src/util.o
+                0x00000000000037fc                systickInterrupts
+ .text          0x0000000000003838      0x114 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivsi3.o)
+                0x0000000000003838                __udivsi3
+                0x0000000000003838                __aeabi_uidiv
+                0x0000000000003944                __aeabi_uidivmod
+ .text          0x000000000000394c        0x4 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_dvmd_tls.o)
+                0x000000000000394c                __aeabi_ldiv0
+                0x000000000000394c                __aeabi_idiv0
+ .text.exit     0x0000000000003950       0x2c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-exit.o)
+                0x0000000000003950                exit
+ .text.__libc_init_array
+                0x000000000000397c       0x48 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-init.o)
+                0x000000000000397c                __libc_init_array
+ .text.memset   0x00000000000039c4       0x10 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-memset.o)
+                0x00000000000039c4                memset
+ .text._exit    0x00000000000039d4        0x4 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libnosys.a(_exit.o)
+                0x00000000000039d4                _exit
+ *(.init)
+ .init          0x00000000000039d8        0x4 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crti.o
+                0x00000000000039d8                _init
+ .init          0x00000000000039dc        0x8 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtn.o
+ *(.fini)
+ .fini          0x00000000000039e4        0x4 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crti.o
+                0x00000000000039e4                _fini
+ .fini          0x00000000000039e8        0x8 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtn.o
+ .fini.__stub   0x00000000000039f0       0x10 linker stubs
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend.o *crtend?.o) .ctors)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+ *crtbegin.o(.dtors)
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend.o *crtend?.o) .dtors)
+ *(SORT_BY_NAME(.dtors.*))
+ *(.dtors)
+ *(.rodata*)
+ .rodata        0x0000000000003a00      0x3df ./src/accel.o
+ *fill*         0x0000000000003ddf        0x1 
+ .rodata        0x0000000000003de0       0x30 ./src/main.o
+ .rodata        0x0000000000003e10       0xd6 ./emlib/em_cmu.o
+ *fill*         0x0000000000003ee6        0x2 
+ .rodata.CMU_ClockEnable
+                0x0000000000003ee8       0x2c ./emlib/em_cmu.o
+ .rodata.CMU_ClockSelectGet
+                0x0000000000003f14       0x20 ./emlib/em_cmu.o
+ .rodata.CMU_ClockSelectSet
+                0x0000000000003f34       0x88 ./emlib/em_cmu.o
+ .rodata.CMU_OscillatorEnable
+                0x0000000000003fbc       0x18 ./emlib/em_cmu.o
+ .rodata        0x0000000000003fd4       0xd7 ./emlib/em_gpio.o
+ *fill*         0x00000000000040ab        0x1 
+ .rodata        0x00000000000040ac       0x6c ./emlib/em_usart.o
+ .rodata        0x0000000000004118      0x1eb ./dbprint-scr/dbprint.o
+ *fill*         0x0000000000004303        0x1 
+ .rodata.dbprint_INIT
+                0x0000000000004304       0x50 ./dbprint-scr/dbprint.o
+ .rodata.dbprint_color
+                0x0000000000004354       0x1c ./dbprint-scr/dbprint.o
+ .rodata        0x0000000000004370       0x6a ./emlib/em_rtc.o
+ *fill*         0x00000000000043da        0x2 
+ .rodata        0x00000000000043dc       0x6b ./src/handlers.o
+ *fill*         0x0000000000004447        0x1 
+ .rodata        0x0000000000004448       0x94 ./src/util.o
+ .rodata._global_impure_ptr
+                0x00000000000044dc        0x4 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-impure.o)
+                0x00000000000044dc                _global_impure_ptr
+ *(.eh_frame*)
+ .eh_frame      0x00000000000044e0        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtbegin.o
+ .eh_frame      0x00000000000044e0        0x4 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtend.o
+
+.glue_7         0x00000000000044e4        0x0
+ .glue_7        0x00000000000044e4        0x0 linker stubs
+
+.glue_7t        0x00000000000044e4        0x0
+ .glue_7t       0x00000000000044e4        0x0 linker stubs
+
+.vfp11_veneer   0x00000000000044e4        0x0
+ .vfp11_veneer  0x00000000000044e4        0x0 linker stubs
+
+.v4_bx          0x00000000000044e4        0x0
+ .v4_bx         0x00000000000044e4        0x0 linker stubs
+
+.iplt           0x00000000000044e4        0x0
+ .iplt          0x00000000000044e4        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtbegin.o
+
+.ARM.extab
+ *(.ARM.extab* .gnu.linkonce.armextab.*)
+                0x00000000000044e4                __exidx_start = .
+
+.ARM.exidx      0x00000000000044e4        0x8
+ *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+ .ARM.exidx     0x00000000000044e4        0x8 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/crt0.o
+                0x00000000000044ec                __exidx_end = .
+                0x00000000000044ec                __etext = .
+
+.rel.dyn        0x00000000000044ec        0x0
+ .rel.iplt      0x00000000000044ec        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtbegin.o
+
+.data           0x0000000020000000       0x88 load address 0x00000000000044ec
+                0x0000000020000000                __data_start__ = .
+ *(vtable)
+ *(.data*)
+ .data.ushfrcoFreq
+                0x0000000020000000        0x4 ./emlib/em_cmu.o
+ .data.SystemHFXOClock
+                0x0000000020000004        0x4 ./CMSIS/EFM32HG/system_efm32hg.o
+ .data.SystemLFXOClock
+                0x0000000020000008        0x4 ./CMSIS/EFM32HG/system_efm32hg.o
+ .data.SystemCoreClock
+                0x000000002000000c        0x4 ./CMSIS/EFM32HG/system_efm32hg.o
+                0x000000002000000c                SystemCoreClock
+ .data.impure_data
+                0x0000000020000010       0x60 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-impure.o)
+                0x0000000020000070                . = ALIGN (0x4)
+ *(.ram)
+ .ram           0x0000000020000070       0x10 ./emlib/em_emu.o
+                0x0000000020000080                . = ALIGN (0x4)
+                0x0000000020000080                PROVIDE (__preinit_array_start, .)
+ *(.preinit_array)
+                0x0000000020000080                PROVIDE (__preinit_array_end, .)
+                0x0000000020000080                . = ALIGN (0x4)
+                0x0000000020000080                PROVIDE (__init_array_start, .)
+ *(SORT_BY_NAME(.init_array.*))
+ *(.init_array)
+ .init_array    0x0000000020000080        0x4 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtbegin.o
+                0x0000000020000084                PROVIDE (__init_array_end, .)
+                0x0000000020000084                . = ALIGN (0x4)
+                [!provide]                        PROVIDE (__fini_array_start, .)
+ *(SORT_BY_NAME(.fini_array.*))
+ *(.fini_array)
+ .fini_array    0x0000000020000084        0x4 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtbegin.o
+                [!provide]                        PROVIDE (__fini_array_end, .)
+ *(.jcr*)
+                0x0000000020000088                . = ALIGN (0x4)
+                0x0000000020000088                __data_end__ = .
+
+.igot.plt       0x0000000020000088        0x0 load address 0x0000000000004574
+ .igot.plt      0x0000000020000088        0x0 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtbegin.o
+
+.bss            0x0000000020000088       0xe4 load address 0x0000000000004574
+                0x0000000020000088                . = ALIGN (0x4)
+                0x0000000020000088                __bss_start__ = .
+ *(.bss*)
+ .bss           0x0000000020000088       0x1c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtbegin.o
+ .bss.range     0x00000000200000a4        0x1 ./src/accel.o
+                0x00000000200000a4                range
+ *fill*         0x00000000200000a5        0x3 
+ .bss.cmuStatus.8011
+                0x00000000200000a8        0x4 ./emlib/em_emu.o
+ .bss.hfClock.8012
+                0x00000000200000ac        0x1 ./emlib/em_emu.o
+ .bss.dbprint_rxdata
+                0x00000000200000ad        0x1 ./dbprint-scr/dbprint.o
+                0x00000000200000ad                dbprint_rxdata
+ *fill*         0x00000000200000ae        0x2 
+ .bss.i.8258    0x00000000200000b0        0x4 ./dbprint-scr/dbprint.o
+ .bss.i.8263    0x00000000200000b4        0x4 ./dbprint-scr/dbprint.o
+ .bss.i.8268    0x00000000200000b8        0x4 ./dbprint-scr/dbprint.o
+ .bss.i.8273    0x00000000200000bc        0x4 ./dbprint-scr/dbprint.o
+ .bss.triggered
+                0x00000000200000c0        0x1 ./src/handlers.o
+                0x00000000200000c0                triggered
+ *(COMMON)
+ *fill*         0x00000000200000c1        0x3 
+ COMMON         0x00000000200000c4       0xa4 ./dbprint-scr/dbprint.o
+                0x00000000200000c4                dbpointer
+                0x00000000200000c8                dbprint_rx_buffer
+                0x0000000020000118                dbprint_tx_buffer
+ COMMON         0x0000000020000168        0x4 ./src/util.o
+                0x0000000020000168                msTicks
+                0x000000002000016c                . = ALIGN (0x4)
+                0x000000002000016c                __bss_end__ = .
+
+.heap           0x0000000020000170      0x400
+                0x0000000020000170                __HeapBase = .
+                0x0000000020000170                __end__ = .
+                0x0000000020000170                end = __end__
+                0x0000000020000170                _end = __end__
+ *(.heap*)
+ .heap          0x0000000020000170      0x400 ./CMSIS/EFM32HG/startup_efm32hg.o
+                0x0000000020000570                __HeapLimit = .
+
+.stack_dummy    0x0000000020000170      0x400
+ *(.stack*)
+ .stack         0x0000000020000170      0x400 ./CMSIS/EFM32HG/startup_efm32hg.o
+                0x0000000020002000                __StackTop = (ORIGIN (RAM) + LENGTH (RAM))
+                0x0000000020001c00                __StackLimit = (__StackTop - SIZEOF (.stack_dummy))
+                0x0000000020002000                PROVIDE (__stack, __StackTop)
+                0x0000000000000001                ASSERT ((__StackLimit >= __HeapLimit), region RAM overflowed with stack)
+                0x0000000000000001                ASSERT ((LENGTH (FLASH) >= (__etext + SIZEOF (.data))), FLASH memory overflowed !)
+OUTPUT(SLSTK3400A_ADXL362.axf elf32-littlearm)
+
+.ARM.attributes
+                0x0000000000000000       0x28
+ .ARM.attributes
+                0x0000000000000000       0x1e /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crti.o
+ .ARM.attributes
+                0x000000000000001e       0x2c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtbegin.o
+ .ARM.attributes
+                0x000000000000004a       0x1b /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/crt0.o
+ .ARM.attributes
+                0x0000000000000065       0x32 ./src/accel.o
+ .ARM.attributes
+                0x0000000000000097       0x32 ./src/main.o
+ .ARM.attributes
+                0x00000000000000c9       0x32 ./emlib/em_assert.o
+ .ARM.attributes
+                0x00000000000000fb       0x32 ./emlib/em_cmu.o
+ .ARM.attributes
+                0x000000000000012d       0x32 ./emlib/em_core.o
+ .ARM.attributes
+                0x000000000000015f       0x32 ./emlib/em_emu.o
+ .ARM.attributes
+                0x0000000000000191       0x32 ./emlib/em_gpio.o
+ .ARM.attributes
+                0x00000000000001c3       0x32 ./emlib/em_usart.o
+ .ARM.attributes
+                0x00000000000001f5       0x1b ./CMSIS/EFM32HG/startup_efm32hg.o
+ .ARM.attributes
+                0x0000000000000210       0x32 ./CMSIS/EFM32HG/system_efm32hg.o
+ .ARM.attributes
+                0x0000000000000242       0x32 ./dbprint-scr/dbprint.o
+ .ARM.attributes
+                0x0000000000000274       0x32 ./emlib/em_rtc.o
+ .ARM.attributes
+                0x00000000000002a6       0x32 ./src/handlers.o
+ .ARM.attributes
+                0x00000000000002d8       0x32 ./src/util.o
+ .ARM.attributes
+                0x000000000000030a       0x1e /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivsi3.o)
+ .ARM.attributes
+                0x0000000000000328       0x1e /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_dvmd_tls.o)
+ .ARM.attributes
+                0x0000000000000346       0x2c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-exit.o)
+ .ARM.attributes
+                0x0000000000000372       0x2c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-impure.o)
+ .ARM.attributes
+                0x000000000000039e       0x2c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-init.o)
+ .ARM.attributes
+                0x00000000000003ca       0x2c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-memset.o)
+ .ARM.attributes
+                0x00000000000003f6       0x2c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libnosys.a(_exit.o)
+ .ARM.attributes
+                0x0000000000000422       0x2c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtend.o
+ .ARM.attributes
+                0x000000000000044e       0x1e /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/crtn.o
+
+.comment        0x0000000000000000       0x7e
+ .comment       0x0000000000000000       0x7e ./src/accel.o
+                                         0x7f (size before relaxing)
+ .comment       0x000000000000007e       0x7f ./src/main.o
+ .comment       0x000000000000007e       0x7f ./emlib/em_assert.o
+ .comment       0x000000000000007e       0x7f ./emlib/em_cmu.o
+ .comment       0x000000000000007e       0x7f ./emlib/em_core.o
+ .comment       0x000000000000007e       0x7f ./emlib/em_emu.o
+ .comment       0x000000000000007e       0x7f ./emlib/em_gpio.o
+ .comment       0x000000000000007e       0x7f ./emlib/em_usart.o
+ .comment       0x000000000000007e       0x7f ./CMSIS/EFM32HG/system_efm32hg.o
+ .comment       0x000000000000007e       0x7f ./dbprint-scr/dbprint.o
+ .comment       0x000000000000007e       0x7f ./emlib/em_rtc.o
+ .comment       0x000000000000007e       0x7f ./src/handlers.o
+ .comment       0x000000000000007e       0x7f ./src/util.o
+
+.debug_info     0x0000000000000000     0xe93b
+ .debug_info    0x0000000000000000     0x14bb ./src/accel.o
+ .debug_info    0x00000000000014bb     0x15ef ./src/main.o
+ .debug_info    0x0000000000002aaa       0x7a ./emlib/em_assert.o
+ .debug_info    0x0000000000002b24     0x1c01 ./emlib/em_cmu.o
+ .debug_info    0x0000000000004725     0x1411 ./emlib/em_core.o
+ .debug_info    0x0000000000005b36     0x11d4 ./emlib/em_emu.o
+ .debug_info    0x0000000000006d0a      0xf81 ./emlib/em_gpio.o
+ .debug_info    0x0000000000007c8b     0x1772 ./emlib/em_usart.o
+ .debug_info    0x00000000000093fd       0x26 ./CMSIS/EFM32HG/startup_efm32hg.o
+ .debug_info    0x0000000000009423      0xe41 ./CMSIS/EFM32HG/system_efm32hg.o
+ .debug_info    0x000000000000a264     0x1bf3 ./dbprint-scr/dbprint.o
+ .debug_info    0x000000000000be57      0xc2c ./emlib/em_rtc.o
+ .debug_info    0x000000000000ca83      0xeca ./src/handlers.o
+ .debug_info    0x000000000000d94d      0xfee ./src/util.o
+
+.debug_abbrev   0x0000000000000000     0x221d
+ .debug_abbrev  0x0000000000000000      0x327 ./src/accel.o
+ .debug_abbrev  0x0000000000000327      0x314 ./src/main.o
+ .debug_abbrev  0x000000000000063b       0x65 ./emlib/em_assert.o
+ .debug_abbrev  0x00000000000006a0      0x34e ./emlib/em_cmu.o
+ .debug_abbrev  0x00000000000009ee      0x307 ./emlib/em_core.o
+ .debug_abbrev  0x0000000000000cf5      0x2cd ./emlib/em_emu.o
+ .debug_abbrev  0x0000000000000fc2      0x29c ./emlib/em_gpio.o
+ .debug_abbrev  0x000000000000125e      0x2ab ./emlib/em_usart.o
+ .debug_abbrev  0x0000000000001509       0x14 ./CMSIS/EFM32HG/startup_efm32hg.o
+ .debug_abbrev  0x000000000000151d      0x25f ./CMSIS/EFM32HG/system_efm32hg.o
+ .debug_abbrev  0x000000000000177c      0x36f ./dbprint-scr/dbprint.o
+ .debug_abbrev  0x0000000000001aeb      0x26a ./emlib/em_rtc.o
+ .debug_abbrev  0x0000000000001d55      0x239 ./src/handlers.o
+ .debug_abbrev  0x0000000000001f8e      0x28f ./src/util.o
+
+.debug_loc      0x0000000000000000     0x2e06
+ .debug_loc     0x0000000000000000      0x3ec ./src/accel.o
+ .debug_loc     0x00000000000003ec      0x250 ./src/main.o
+ .debug_loc     0x000000000000063c       0x38 ./emlib/em_assert.o
+ .debug_loc     0x0000000000000674      0x8fc ./emlib/em_cmu.o
+ .debug_loc     0x0000000000000f70      0x574 ./emlib/em_core.o
+ .debug_loc     0x00000000000014e4      0x314 ./emlib/em_emu.o
+ .debug_loc     0x00000000000017f8      0x2a0 ./emlib/em_gpio.o
+ .debug_loc     0x0000000000001a98      0x50a ./emlib/em_usart.o
+ .debug_loc     0x0000000000001fa2      0x1e8 ./CMSIS/EFM32HG/system_efm32hg.o
+ .debug_loc     0x000000000000218a      0x7bc ./dbprint-scr/dbprint.o
+ .debug_loc     0x0000000000002946      0x1a8 ./emlib/em_rtc.o
+ .debug_loc     0x0000000000002aee      0x138 ./src/handlers.o
+ .debug_loc     0x0000000000002c26      0x1e0 ./src/util.o
+
+.debug_aranges  0x0000000000000000      0x838
+ .debug_aranges
+                0x0000000000000000       0xb0 ./src/accel.o
+ .debug_aranges
+                0x00000000000000b0       0x70 ./src/main.o
+ .debug_aranges
+                0x0000000000000120       0x20 ./emlib/em_assert.o
+ .debug_aranges
+                0x0000000000000140      0x170 ./emlib/em_cmu.o
+ .debug_aranges
+                0x00000000000002b0       0xe8 ./emlib/em_core.o
+ .debug_aranges
+                0x0000000000000398       0x98 ./emlib/em_emu.o
+ .debug_aranges
+                0x0000000000000430       0x78 ./emlib/em_gpio.o
+ .debug_aranges
+                0x00000000000004a8       0xd0 ./emlib/em_usart.o
+ .debug_aranges
+                0x0000000000000578       0x20 ./CMSIS/EFM32HG/startup_efm32hg.o
+ .debug_aranges
+                0x0000000000000598       0x68 ./CMSIS/EFM32HG/system_efm32hg.o
+ .debug_aranges
+                0x0000000000000600      0x138 ./dbprint-scr/dbprint.o
+ .debug_aranges
+                0x0000000000000738       0x58 ./emlib/em_rtc.o
+ .debug_aranges
+                0x0000000000000790       0x48 ./src/handlers.o
+ .debug_aranges
+                0x00000000000007d8       0x60 ./src/util.o
+
+.debug_ranges   0x0000000000000000      0x748
+ .debug_ranges  0x0000000000000000       0xa0 ./src/accel.o
+ .debug_ranges  0x00000000000000a0       0x60 ./src/main.o
+ .debug_ranges  0x0000000000000100       0x10 ./emlib/em_assert.o
+ .debug_ranges  0x0000000000000110      0x160 ./emlib/em_cmu.o
+ .debug_ranges  0x0000000000000270       0xd8 ./emlib/em_core.o
+ .debug_ranges  0x0000000000000348       0x88 ./emlib/em_emu.o
+ .debug_ranges  0x00000000000003d0       0x68 ./emlib/em_gpio.o
+ .debug_ranges  0x0000000000000438       0xc0 ./emlib/em_usart.o
+ .debug_ranges  0x00000000000004f8       0x58 ./CMSIS/EFM32HG/system_efm32hg.o
+ .debug_ranges  0x0000000000000550      0x128 ./dbprint-scr/dbprint.o
+ .debug_ranges  0x0000000000000678       0x48 ./emlib/em_rtc.o
+ .debug_ranges  0x00000000000006c0       0x38 ./src/handlers.o
+ .debug_ranges  0x00000000000006f8       0x50 ./src/util.o
+
+.debug_line     0x0000000000000000     0x4f75
+ .debug_line    0x0000000000000000      0x71d ./src/accel.o
+ .debug_line    0x000000000000071d      0x56f ./src/main.o
+ .debug_line    0x0000000000000c8c       0xa2 ./emlib/em_assert.o
+ .debug_line    0x0000000000000d2e      0xae9 ./emlib/em_cmu.o
+ .debug_line    0x0000000000001817      0x72c ./emlib/em_core.o
+ .debug_line    0x0000000000001f43      0x5b3 ./emlib/em_emu.o
+ .debug_line    0x00000000000024f6      0x622 ./emlib/em_gpio.o
+ .debug_line    0x0000000000002b18      0x707 ./emlib/em_usart.o
+ .debug_line    0x000000000000321f       0xdc ./CMSIS/EFM32HG/startup_efm32hg.o
+ .debug_line    0x00000000000032fb      0x43a ./CMSIS/EFM32HG/system_efm32hg.o
+ .debug_line    0x0000000000003735      0xa60 ./dbprint-scr/dbprint.o
+ .debug_line    0x0000000000004195      0x423 ./emlib/em_rtc.o
+ .debug_line    0x00000000000045b8      0x42c ./src/handlers.o
+ .debug_line    0x00000000000049e4      0x591 ./src/util.o
+
+.debug_str      0x0000000000000000     0x2dfa
+ .debug_str     0x0000000000000000      0xdfa ./src/accel.o
+                                        0xe9f (size before relaxing)
+ .debug_str     0x0000000000000dfa      0x522 ./src/main.o
+                                        0xf7e (size before relaxing)
+ .debug_str     0x000000000000131c       0x7c ./emlib/em_assert.o
+                                        0x1b0 (size before relaxing)
+ .debug_str     0x0000000000001398      0x7a6 ./emlib/em_cmu.o
+                                       0x11df (size before relaxing)
+ .debug_str     0x0000000000001b3e      0x36b ./emlib/em_core.o
+                                        0xb31 (size before relaxing)
+ .debug_str     0x0000000000001ea9      0x1f9 ./emlib/em_emu.o
+                                        0xbed (size before relaxing)
+ .debug_str     0x00000000000020a2      0x19b ./emlib/em_gpio.o
+                                        0xa40 (size before relaxing)
+ .debug_str     0x000000000000223d      0x55e ./emlib/em_usart.o
+                                        0xfb9 (size before relaxing)
+ .debug_str     0x000000000000279b       0x9e ./CMSIS/EFM32HG/startup_efm32hg.o
+                                         0xf3 (size before relaxing)
+ .debug_str     0x0000000000002839      0x16e ./CMSIS/EFM32HG/system_efm32hg.o
+                                        0x8a4 (size before relaxing)
+ .debug_str     0x00000000000029a7      0x2a9 ./dbprint-scr/dbprint.o
+                                       0x11dd (size before relaxing)
+ .debug_str     0x0000000000002c50       0xd0 ./emlib/em_rtc.o
+                                        0x712 (size before relaxing)
+ .debug_str     0x0000000000002d20       0x63 ./src/handlers.o
+                                        0x7f6 (size before relaxing)
+ .debug_str     0x0000000000002d83       0x77 ./src/util.o
+                                        0x9d3 (size before relaxing)
+
+.debug_frame    0x0000000000000000     0x1c6c
+ .debug_frame   0x0000000000000000      0x26c ./src/accel.o
+ .debug_frame   0x000000000000026c      0x168 ./src/main.o
+ .debug_frame   0x00000000000003d4       0x30 ./emlib/em_assert.o
+ .debug_frame   0x0000000000000404      0x550 ./emlib/em_cmu.o
+ .debug_frame   0x0000000000000954      0x33c ./emlib/em_core.o
+ .debug_frame   0x0000000000000c90      0x1ec ./emlib/em_emu.o
+ .debug_frame   0x0000000000000e7c      0x190 ./emlib/em_gpio.o
+ .debug_frame   0x000000000000100c      0x2f4 ./emlib/em_usart.o
+ .debug_frame   0x0000000000001300      0x138 ./CMSIS/EFM32HG/system_efm32hg.o
+ .debug_frame   0x0000000000001438      0x488 ./dbprint-scr/dbprint.o
+ .debug_frame   0x00000000000018c0      0x108 ./emlib/em_rtc.o
+ .debug_frame   0x00000000000019c8       0xc8 ./src/handlers.o
+ .debug_frame   0x0000000000001a90      0x128 ./src/util.o
+ .debug_frame   0x0000000000001bb8       0x20 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m/libgcc.a(_udivsi3.o)
+ .debug_frame   0x0000000000001bd8       0x28 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-exit.o)
+ .debug_frame   0x0000000000001c00       0x2c /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-init.o)
+ .debug_frame   0x0000000000001c2c       0x20 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libc_nano.a(lib_a-memset.o)
+ .debug_frame   0x0000000000001c4c       0x20 /home/brecht/Programs/SimplicityStudio_v4/developer/toolchains/gnu_arm/7.2_2017q4/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v6-m/libnosys.a(_exit.o)
