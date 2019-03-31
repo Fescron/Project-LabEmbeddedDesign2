@@ -1,0 +1,316 @@
+/***************************************************************************//**
+ * @file DS18B20.c
+ * @brief All code for the DS18B20 temperature sensor.
+ * @version 1.0
+ * @author
+ *   Alec Vanderhaegen & Sarah Goossens
+ *   Modified by Brecht Van Eeckhoudt
+ *
+ * ******************************************************************************
+ *
+ * @section Versions
+ *
+ *   v1.0: Reformat existing methods to use pin_mapping.h, change unsigned char to
+ *         uint8_t values, add comments and clean up includes.
+ *
+ *   TODO: Enter EM1 when the MCU is waiting in a delay method.
+ *
+ ******************************************************************************/
+
+
+#include "../inc/DS18B20.h"
+
+
+
+/**************************************************************************//**
+ * @brief
+ *   Get a temperature value from the DS18B20.
+ *
+ * @details
+ *   One measurement takes 550 ms.
+ *
+ * @return
+ *   The read temperature data (float). A impossible value is returned
+ *   if the initialization (reset) failed.
+ *****************************************************************************/
+float readTempDS18B20 ()
+{
+	/* Raw data byte, bit by bit */
+	uint8_t rawDataFromDS18B20Arr[9] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+
+	/* Read a temperature value (see datasheet) if initialization was successful */
+	if (init_DS18B20())
+	{
+		writeByteToDS18B20(0xCC);
+		writeByteToDS18B20(0x44);
+
+		init_DS18B20();
+
+		writeByteToDS18B20(0xCC);
+		writeByteToDS18B20(0xBE);
+
+		/* Read the byte, bit by bit */
+		for (uint8_t n = 0; n < 9; n++)
+		{
+			rawDataFromDS18B20Arr[n] = readByteFromDS18B20();
+		}
+
+		/* Return the converted byte */
+		return (convertTempData(rawDataFromDS18B20Arr[0], rawDataFromDS18B20Arr[1]));
+	}
+	else
+	{
+		/* Return an impossible value if the measurement failed */
+		return (10000);
+	}
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Initialize the VDD pin for the DS18B20.
+ *****************************************************************************/
+void initVDD_DS18B20 ()
+{
+	/* Calibrate microsecond delay loop */
+	//UDELAY_Calibrate();
+
+	/* Enable High-frequency peripheral clock */
+	CMU_ClockEnable(cmuClock_HFPER, true); /* TODO: check if and why this is needed here */
+
+	/* Enable oscillator to GPIO */
+	CMU_ClockEnable(cmuClock_GPIO, true);
+
+	/* TODO: weird init cycle thing? */
+	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 0);
+	GPIO_PinOutClear(TEMP_VDD_PORT, TEMP_VDD_PORT);
+	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PORT, gpioModePushPull, 1);
+
+#ifdef DEBUGGING /* DEBUGGING */
+	dbinfo("DS18B20 VDD pin initialized");
+#endif /* DEBUGGING */
+
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Enable or disable the power to the temperature sensor.
+ *
+ * @param[in] enabled
+ *   @li True - Enable the GPIO pin connected to the VDD pin of the temperature sensor.
+ *   @li False - Disable the GPIO pin connected to the VDD pin of the temperature sensor.
+ *****************************************************************************/
+void powerDS18B20 (bool enabled)
+{
+	if (enabled)
+	{
+		GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 0); /* TODO this seems weird, check datasheet */
+		GPIO_PinOutSet(TEMP_VDD_PORT, TEMP_VDD_PIN);
+		UDELAY_Delay(10000); /* Wait some time TODO: check if this is enough */
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbinfo("DS18B20 VDD pin enabled");
+#endif /* DEBUGGING */
+
+	}
+	else
+	{
+		GPIO_PinOutClear(TEMP_VDD_PORT, TEMP_VDD_PIN);
+		GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 1); /* TODO this seems weird, check datasheet */
+		UDELAY_Delay(10000); /* Wait some time TODO: check if this is enough */
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbinfo("DS18B20 VDD pin disabled");
+#endif /* DEBUGGING */
+
+	}
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Initialize (reset) DS18B20.
+ *
+ * @return
+ *   @li true - Initialization (reset) successful.
+ *   @li false - Initialization (reset) failed.
+ *****************************************************************************/
+bool init_DS18B20 ()
+{
+	uint16_t counter = 0;
+
+	/* Change pin-mode to output and set it high and low (reset) */
+	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0);
+	GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
+	GPIO_PinOutClear(TEMP_DATA_PORT, TEMP_DATA_PIN);
+	UDELAY_Delay(480);
+
+	/* Change pin-mode to input and check if the line becomes HIGH during the maximum waiting time */
+	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0);
+	while (counter++ <= MAX_TIME_CTR && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 1)
+	{
+		/* TODO: Maybe EMU_EnterEM1() */
+	}
+
+	/* Exit the function if the maximum waiting time was reached (reset failed) */
+	if (counter == MAX_TIME_CTR)
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("DS18B20 initialization failed");
+#endif /* DEBUGGING */
+
+		return (false);
+	}
+
+	/* Reset counter value */
+	counter = 0;
+
+	/* Check if the line becomes LOW during the maximum waiting time */
+	while (counter++ <= MAX_TIME_CTR && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 0)
+	{
+		/* TODO: Maybe EMU_EnterEM1() */
+	}
+
+	/* Exit the function if the maximum waiting time was reached (reset failed) */
+	if (counter == MAX_TIME_CTR)
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("DS18B20 initialization failed");
+#endif /* DEBUGGING */
+
+		return (false);
+	}
+
+	/* Continue waiting and finally return that the reset was successful */
+	UDELAY_Delay(480);
+
+#ifdef DEBUGGING /* DEBUGGING */
+	dbinfo("DS18B20 initialized");
+#endif /* DEBUGGING */
+
+	return (true);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Write a byte (uint8_t) to the DS18B20.
+ *
+ * @param[in] data
+ *   The data to write to the DS18B20.
+ *****************************************************************************/
+void writeByteToDS18B20 (uint8_t data)
+{
+	/* Change pin-mode to output */
+	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0);
+
+	/* Write the byte, bit by bit */
+	for (uint8_t i = 0; i < 8; i++)
+	{
+		/* Check if we need to write a "1" */
+		if (data & 0x01)
+		{
+			GPIO_PinOutClear(TEMP_DATA_PORT, TEMP_DATA_PIN);
+			UDELAY_Delay(5);
+			GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
+			UDELAY_Delay(60);
+		}
+		/* If not, write a "0" */
+		else
+		{
+			GPIO_PinOutClear(TEMP_DATA_PORT, TEMP_DATA_PIN);
+			UDELAY_Delay(60);
+			GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
+			UDELAY_Delay(5);
+		}
+		/* Right shift bits once */
+		data >>= 1;
+	}
+
+	/* Change pin-mode to output */
+	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 1); /* TODO this seems weird, check datasheet */
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Read a byte (uint8_t) from the DS18B20.
+ *
+ * @return
+ *   The byte read from the DS18B20.
+ *****************************************************************************/
+uint8_t readByteFromDS18B20 ()
+{
+	/* Data to eventually return */
+	uint8_t data = 0x0;
+
+	/* Read the byte, bit by bit */
+	for (uint8_t i = 0; i < 8; i++)
+	{
+		/* Right shift bits once */
+		data >>= 1;
+
+		/* Change pin-mode to input */
+		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0);
+
+		/* If the line is high, OR the first bit of the data:
+		 * 0x80 = 1000 0000 */
+		if (GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN)) data |= 0x80;
+
+		/* Change pin-mode to output and set it high */
+		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 1); /* TODO this seems weird, check datasheet */
+		GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
+
+		/* Wait some time before exiting function */
+		UDELAY_Delay(70);
+	}
+	return (data);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Convert temperature data.
+ *
+ * @param[in] tempLS
+ *   TODO.
+ *
+ * @param[in] tempMS
+ *   TODO.
+ *
+ * @return
+ *   The converted temperature data (float).
+ *****************************************************************************/
+float convertTempData (uint8_t tempLS, uint8_t tempMS)
+{
+	/* TODO: Reformat this */
+
+	uint16_t rawDataMerge;
+	uint16_t reverseRawDataMerge;
+	float finalTemperature;
+	/* Controleren of het een negatieve temperatuur is */
+	if(tempMS & 0xF8){
+		rawDataMerge = tempMS;
+		/* shift operatie */
+		rawDataMerge <<= 8;
+		/* tweede deel toevoegen */
+		rawDataMerge += tempLS;
+		/* inverteren aangezien we te maken hebben met negatieve temp */
+		reverseRawDataMerge = ~rawDataMerge;
+		/* Berekenen van de temperatuur */
+		finalTemperature = -(reverseRawDataMerge + 1) * 0.0625;
+	}
+	else{  /* We hebben te maken met een positieve temperatuur */
+		rawDataMerge = tempMS;
+		/* shift operatie */
+		rawDataMerge <<= 8;
+		/* tweede deel toevoegen */
+		rawDataMerge += tempLS;
+		/* Berekenen van de temperatuur */
+		finalTemperature = rawDataMerge * 0.0625;
+	}
+	return (finalTemperature);
+}
