@@ -36,7 +36,7 @@
  *   The read temperature data (float). A impossible value is returned
  *   if the initialization (reset) failed.
  *****************************************************************************/
-float readTempDS18B20 ()
+float readTempDS18B20 (void)
 {
 	/* Raw data byte, bit by bit */
 	uint8_t rawDataFromDS18B20Arr[9] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
@@ -73,21 +73,16 @@ float readTempDS18B20 ()
  * @brief
  *   Initialize the VDD pin for the DS18B20.
  *****************************************************************************/
-void initVDD_DS18B20 ()
+void initVDD_DS18B20 (void)
 {
 	/* Enable High-frequency peripheral clock */
-	CMU_ClockEnable(cmuClock_HFPER, true); /* TODO: check if and why this is needed here */
+	CMU_ClockEnable(cmuClock_HFPER, true); /* TODO: Check if and why this is needed here */
 
 	/* Enable oscillator to GPIO */
-	CMU_ClockEnable(cmuClock_GPIO, true);
+	CMU_ClockEnable(cmuClock_GPIO, true); /* TODO: Not really needed here... */
 
 	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 0);
 	GPIO_PinOutSet(TEMP_VDD_PORT, TEMP_VDD_PIN);   /* Enable VDD pin */
-
-	/* TODO: weird init cycle thing? -- probably fixed (see above), delete in next cleanup */
-//	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 0);
-//	GPIO_PinOutClear(TEMP_VDD_PORT, TEMP_VDD_PORT);
-//	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PORT, gpioModePushPull, 1);
 
 #ifdef DEBUGGING /* DEBUGGING */
 	dbinfo("DS18B20 VDD pin initialized and enabled");
@@ -108,9 +103,7 @@ void powerDS18B20 (bool enabled)
 {
 	if (enabled)
 	{
-		//GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 0); /* TODO this seems weird, check datasheet */
 		GPIO_PinOutSet(TEMP_VDD_PORT, TEMP_VDD_PIN);
-		//UDELAY_Delay(10000); /* Wait some time TODO: check if this is enough */
 
 #ifdef DEBUGGING /* DEBUGGING */
 		dbinfo("DS18B20 VDD pin enabled");
@@ -120,8 +113,6 @@ void powerDS18B20 (bool enabled)
 	else
 	{
 		GPIO_PinOutClear(TEMP_VDD_PORT, TEMP_VDD_PIN);
-		//GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 1); /* TODO this seems weird, check datasheet */
-		//UDELAY_Delay(10000); /* Wait some time TODO: check if this is enough */
 
 #ifdef DEBUGGING /* DEBUGGING */
 		dbinfo("DS18B20 VDD pin disabled");
@@ -139,13 +130,13 @@ void powerDS18B20 (bool enabled)
  *   @li true - Initialization (reset) successful.
  *   @li false - Initialization (reset) failed.
  *****************************************************************************/
-bool init_DS18B20 ()
+bool init_DS18B20 (void)
 {
 	uint16_t counter = 0;
 
 	/* Change pin-mode to output and set it high and low (reset) */
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0);
-	GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
+	GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN); /* TODO: Not really needed here? */
 	GPIO_PinOutClear(TEMP_DATA_PORT, TEMP_DATA_PIN);
 	UDELAY_Delay(480);
 
@@ -245,7 +236,7 @@ void writeByteToDS18B20 (uint8_t data)
  * @return
  *   The byte read from the DS18B20.
  *****************************************************************************/
-uint8_t readByteFromDS18B20 ()
+uint8_t readByteFromDS18B20 (void)
 {
 	/* Data to eventually return */
 	uint8_t data = 0x0;
@@ -253,11 +244,11 @@ uint8_t readByteFromDS18B20 ()
 	/* Read the byte, bit by bit */
 	for (uint8_t i = 0; i < 8; i++)
 	{
-		/* Right shift bits once */
-		data >>= 1;
-
 		/* Change pin-mode to input */
 		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0);
+
+		/* Right shift bits once */
+		data >>= 1;
 
 		/* If the line is high, OR the first bit of the data:
 		 * 0x80 = 1000 0000 */
@@ -267,7 +258,7 @@ uint8_t readByteFromDS18B20 ()
 		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 1); /* TODO this seems weird, check datasheet */
 		GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
 
-		/* Wait some time before exiting function */
+		/* Wait some time before going into next loop */
 		UDELAY_Delay(70);
 	}
 	return (data);

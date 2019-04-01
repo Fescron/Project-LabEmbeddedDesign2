@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.h
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.0
+ * @version 1.1
  * @author
  *   Alec Vanderhaegen & Sarah Goossens
  *   Modified by Brecht Van Eeckhoudt
@@ -35,14 +35,14 @@
 
 
 /* Prototypes */
-float readTempDS18B20 ();
+float readTempDS18B20 (void);
 
-void initVDD_DS18B20 ();
+void initVDD_DS18B20 (void);
 void powerDS18B20 (bool enabled);
-bool init_DS18B20 ();
+bool init_DS18B20 (void);
 
 void writeByteToDS18B20 (uint8_t data);
-uint8_t readByteFromDS18B20 ();
+uint8_t readByteFromDS18B20 (void);
 float convertTempData (uint8_t temp1, uint8_t temp2);
 
 
