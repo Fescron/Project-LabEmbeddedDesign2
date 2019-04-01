@@ -57,11 +57,11 @@ void initGPIOwakeup (void)
 	/* Enable necessary clock */
 	CMU_ClockEnable(cmuClock_GPIO, true);
 
-	/* Configure PB0 and PB1 as input with glitch filter enabled */
+	/* Configure PB0 and PB1 as input with glitch filter enabled, last argument sets pull direction */
 	GPIO_PinModeSet(PB0_PORT, PB0_PIN, gpioModeInputPullFilter, 1);
 	GPIO_PinModeSet(PB1_PORT, PB1_PIN, gpioModeInputPullFilter, 1);
 
-	/* Configure ADXL_INT1 as input */
+	/* Configure ADXL_INT1 as input, the last argument enables the filter */
 	GPIO_PinModeSet(ADXL_INT1_PORT, ADXL_INT1_PIN, gpioModeInput, 1);
 
 	/* Enable IRQ for even numbered GPIO pins */

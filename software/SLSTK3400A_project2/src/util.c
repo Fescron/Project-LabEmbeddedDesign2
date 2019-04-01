@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.c
  * @brief Utility functions.
- * @version 1.1
+ * @version 1.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -10,6 +10,7 @@
  *
  *   v1.0: Start with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
  *   v1.1: Change PinModeSet DOUT value to 0 in initLED.
+ *   v1.2: Remove unnecessary "GPIO_PinOutClear" line in initLED.
  *
  ******************************************************************************/
 
@@ -27,8 +28,10 @@ volatile uint32_t msTicks; /* Volatile because it's a global variable that's mod
  *****************************************************************************/
 void initLED (void)
 {
+	/* In the case of gpioModePushPull", the last argument directly sets the
+	 * the pin low if the value is "0" or high if the value is "1".
+	 * This means that "GPIO_PinOutClear(...)" is not necessary after this mode change.*/
 	GPIO_PinModeSet(LED_PORT, LED_PIN, gpioModePushPull, 0);
-	GPIO_PinOutClear(LED_PORT, LED_PIN); /* Disable LED */
 }
 
 

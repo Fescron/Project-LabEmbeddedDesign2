@@ -5,7 +5,7 @@
  *   Started with code from the UART example (main_series0_HG.c) from SiLabs Github.
  *   See also https://github.com/Fescron/Project-LabEmbeddedDesign1 because
  *   this file is based on that this but some unused methods are omitted.
- * @version 1.1
+ * @version 1.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -14,7 +14,9 @@
  *
  *   v1.0: Start with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
  *         Change file name from accel.c to ADXL362.c.
- *   v1.1: Change PinModeSet DOUT value to 0 in initADXL_VCC.
+ *   v1.1: Change PinModeSet "out" value to 0 in initADXL_VCC.
+ *   v1.2: Change last argument in GPIO_PinModeSet in method initADXL_VCC to
+ *         change the pin mode and enable the pin in one statement.
  *
  *   TODO: Too much movement breaks interrupt functionality, register not cleared
  *         good but new movement already detected?
@@ -36,11 +38,12 @@ uint8_t range = 0;
  *****************************************************************************/
 void initADXL_VCC (void)
 {
-	GPIO_PinModeSet(ADXL_VDD_PORT, ADXL_VDD_PIN, gpioModePushPull, 0);
-	GPIO_PinOutSet(ADXL_VDD_PORT, ADXL_VDD_PIN);   /* Enable VDD pin */
+	/* In the case of gpioModePushPull", the last argument directly sets the
+	 * the pin low if the value is "0" or high if the value is "1". */
+	GPIO_PinModeSet(ADXL_VDD_PORT, ADXL_VDD_PIN, gpioModePushPull, 1);
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("Accelerometer powered");
+	dbinfo("ADXL362 VDD pin initialized and enabled");
 #endif /* DEBUGGING */
 
 }
@@ -88,6 +91,8 @@ void enableSPIpinsADXL (bool enabled)
 {
 	if (enabled)
 	{
+		/* In the case of gpioModePushPull", the last argument directly sets the
+		 * the pin low if the value is "0" or high if the value is "1". */
 		GPIO_PinModeSet(ADXL_CLK_PORT, ADXL_CLK_PIN, gpioModePushPull, 0);   /* US0_CLK is push pull */
 		GPIO_PinModeSet(ADXL_NCS_PORT, ADXL_NCS_PIN, gpioModePushPull, 1);   /* US0_CS is push pull */
 		GPIO_PinModeSet(ADXL_MOSI_PORT, ADXL_MOSI_PIN, gpioModePushPull, 1); /* US0_TX (MOSI) is push pull */
@@ -119,7 +124,9 @@ void initADXL_SPI (void)
 	CMU_ClockEnable(cmuClock_GPIO, true);
 	CMU_ClockEnable(cmuClock_USART0, true);
 
-	/* Configure GPIO */
+	/* Configure GPIO
+	 * In the case of gpioModePushPull", the last argument directly sets the
+	 * the pin low if the value is "0" or high if the value is "1". */
 	GPIO_PinModeSet(ADXL_CLK_PORT, ADXL_CLK_PIN, gpioModePushPull, 0);   /* US0_CLK is push pull */
 	GPIO_PinModeSet(ADXL_NCS_PORT, ADXL_NCS_PIN, gpioModePushPull, 1);   /* US0_CS is push pull */
 	GPIO_PinModeSet(ADXL_MOSI_PORT, ADXL_MOSI_PIN, gpioModePushPull, 1); /* US0_TX (MOSI) is push pull */

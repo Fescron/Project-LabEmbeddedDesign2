@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.1
+ * @version 1.2
  * @author
  *   Alec Vanderhaegen & Sarah Goossens
  *   Modified by Brecht Van Eeckhoudt
@@ -14,8 +14,10 @@
  *         uint8_t values, add comments and clean up includes.
  *   v1.1: Add documentation, remove unnecessary GPIO statements regarding
  *         DOUT values of VDD pin.
+ *   v1.2: Remove some unnecessary GPIO lines and add comments about "out" (DOUT) argument.
  *
- *   TODO: Use internal pull-up resistor.
+ *   TODO: Use internal pull-up resistor for DATA pin using DOUT argument.
+ *           -> Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
  *         Enter EM1 when the MCU is waiting in a delay method.
  *
  ******************************************************************************/
@@ -33,12 +35,12 @@
  *   One measurement takes 550 ms.
  *
  * @return
- *   The read temperature data (float). A impossible value is returned
+ *   The read temperature data (float). An impossible value is returned
  *   if the initialization (reset) failed.
  *****************************************************************************/
 float readTempDS18B20 (void)
 {
-	/* Raw data byte, bit by bit */
+	/* Raw data bytes */
 	uint8_t rawDataFromDS18B20Arr[9] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
 
 	/* Read a temperature value (see datasheet) if initialization was successful */
@@ -52,7 +54,7 @@ float readTempDS18B20 (void)
 		writeByteToDS18B20(0xCC); /* 0xCC = "Skip Rom" */
 		writeByteToDS18B20(0xBE); /* 0xCC = "Read Scratchpad" */
 
-		/* Read the byte, bit by bit */
+		/* Read the bytes */
 		for (uint8_t n = 0; n < 9; n++)
 		{
 			rawDataFromDS18B20Arr[n] = readByteFromDS18B20();
@@ -76,13 +78,14 @@ float readTempDS18B20 (void)
 void initVDD_DS18B20 (void)
 {
 	/* Enable High-frequency peripheral clock */
-	CMU_ClockEnable(cmuClock_HFPER, true); /* TODO: Check if and why this is needed here */
+	//CMU_ClockEnable(cmuClock_HFPER, true); /* TODO: Check if and why this is needed here */
 
-	/* Enable oscillator to GPIO */
-	CMU_ClockEnable(cmuClock_GPIO, true); /* TODO: Not really needed here... */
+	/* Enable oscillator to GPIO (keeping it here just in case...) */
+	CMU_ClockEnable(cmuClock_GPIO, true);
 
-	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 0);
-	GPIO_PinOutSet(TEMP_VDD_PORT, TEMP_VDD_PIN);   /* Enable VDD pin */
+	/* In the case of gpioModePushPull", the last argument directly sets the
+	 * the pin low if the value is "0" or high if the value is "1". */
+	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 1);
 
 #ifdef DEBUGGING /* DEBUGGING */
 	dbinfo("DS18B20 VDD pin initialized and enabled");
@@ -134,14 +137,15 @@ bool init_DS18B20 (void)
 {
 	uint16_t counter = 0;
 
-	/* Change pin-mode to output and set it high and low (reset) */
+	/* In the case of gpioModePushPull", the last argument directly sets the
+	 * the pin low if the value is "0" or high if the value is "1". */
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0);
-	GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN); /* TODO: Not really needed here? */
-	GPIO_PinOutClear(TEMP_DATA_PORT, TEMP_DATA_PIN);
 	UDELAY_Delay(480);
 
-	/* Change pin-mode to input and check if the line becomes HIGH during the maximum waiting time */
-	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0);
+	/* Change pin-mode to input */
+	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0); /* TODO: Try to use internal pullup */
+
+	/* Check if the line becomes HIGH during the maximum waiting time */
 	while (counter++ <= MAX_TIME_CTR && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 1)
 	{
 		/* TODO: Maybe EMU_EnterEM1() */
@@ -198,7 +202,8 @@ bool init_DS18B20 (void)
  *****************************************************************************/
 void writeByteToDS18B20 (uint8_t data)
 {
-	/* Change pin-mode to output */
+	/* In the case of gpioModePushPull", the last argument directly sets the
+	 * the pin low if the value is "0" or high if the value is "1". */
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0);
 
 	/* Write the byte, bit by bit */
@@ -224,8 +229,8 @@ void writeByteToDS18B20 (uint8_t data)
 		data >>= 1;
 	}
 
-	/* Change pin-mode to output */
-	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 1); /* TODO this seems weird, check datasheet */
+	/* Set data line high */
+	GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
 }
 
 
@@ -245,7 +250,7 @@ uint8_t readByteFromDS18B20 (void)
 	for (uint8_t i = 0; i < 8; i++)
 	{
 		/* Change pin-mode to input */
-		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0);
+		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0); /* TODO: Try to use internal pullup */
 
 		/* Right shift bits once */
 		data >>= 1;
@@ -254,9 +259,10 @@ uint8_t readByteFromDS18B20 (void)
 		 * 0x80 = 1000 0000 */
 		if (GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN)) data |= 0x80;
 
-		/* Change pin-mode to output and set it high */
-		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 1); /* TODO this seems weird, check datasheet */
-		GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
+		/* In the case of gpioModePushPull", the last argument directly sets the
+		 * the pin low if the value is "0" or high if the value is "1". */
+		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 1);
+
 
 		/* Wait some time before going into next loop */
 		UDELAY_Delay(70);
