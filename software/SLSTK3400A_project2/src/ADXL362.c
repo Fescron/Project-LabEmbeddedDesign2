@@ -5,14 +5,19 @@
  *   Started with code from the UART example (main_series0_HG.c) from SiLabs Github.
  *   See also https://github.com/Fescron/Project-LabEmbeddedDesign1 because
  *   this file is based on that this but some unused methods are omitted.
- * @version 1.0
+ * @version 1.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
  *
  * @section Versions
  *
- *   v1.0: Change file name from accel.c to ADXL362.c.
+ *   v1.0: Start with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
+ *         Change file name from accel.c to ADXL362.c.
+ *   v1.1: Change PinModeSet DOUT value to 0 in initADXL_VCC.
+ *
+ *   TODO: Too much movement breaks interrupt functionality, register not cleared
+ *         good but new movement already detected?
  *
  ******************************************************************************/
 
@@ -31,7 +36,7 @@ uint8_t range = 0;
  *****************************************************************************/
 void initADXL_VCC (void)
 {
-	GPIO_PinModeSet(ADXL_VDD_PORT, ADXL_VDD_PIN, gpioModePushPull, 1);
+	GPIO_PinModeSet(ADXL_VDD_PORT, ADXL_VDD_PIN, gpioModePushPull, 0);
 	GPIO_PinOutSet(ADXL_VDD_PORT, ADXL_VDD_PIN);   /* Enable VDD pin */
 
 #ifdef DEBUGGING /* DEBUGGING */
@@ -90,6 +95,7 @@ void enableSPIpinsADXL (bool enabled)
 	}
 	else
 	{
+		/* gpioModeDisabled: Pull-up if DOUT is set. */
 		GPIO_PinModeSet(ADXL_CLK_PORT, ADXL_CLK_PIN, gpioModeDisabled, 0);
 		GPIO_PinModeSet(ADXL_NCS_PORT, ADXL_NCS_PIN, gpioModeDisabled, 1);
 		GPIO_PinModeSet(ADXL_MOSI_PORT, ADXL_MOSI_PIN, gpioModeDisabled, 1);

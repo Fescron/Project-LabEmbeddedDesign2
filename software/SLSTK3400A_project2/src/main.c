@@ -177,7 +177,6 @@ int main (void)
 
 	initVDD_DS18B20();
 
-	powerDS18B20(true);
 	Temperature = readTempDS18B20(); // 1 meting duurt 550 ms
 #ifdef DEBUGGING /* DEBUGGING */
 	dbinfoInt("Temperature: ", Temperature, "°C");

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.0
+ * @version 1.1
  * @author
  *   Alec Vanderhaegen & Sarah Goossens
  *   Modified by Brecht Van Eeckhoudt
@@ -12,8 +12,11 @@
  *
  *   v1.0: Reformat existing methods to use pin_mapping.h, change unsigned char to
  *         uint8_t values, add comments and clean up includes.
+ *   v1.1: Add documentation, remove unnecessary GPIO statements regarding
+ *         DOUT values of VDD pin.
  *
- *   TODO: Enter EM1 when the MCU is waiting in a delay method.
+ *   TODO: Use internal pull-up resistor.
+ *         Enter EM1 when the MCU is waiting in a delay method.
  *
  ******************************************************************************/
 
@@ -41,13 +44,13 @@ float readTempDS18B20 ()
 	/* Read a temperature value (see datasheet) if initialization was successful */
 	if (init_DS18B20())
 	{
-		writeByteToDS18B20(0xCC);
-		writeByteToDS18B20(0x44);
+		writeByteToDS18B20(0xCC); /* 0xCC = "Skip Rom" */
+		writeByteToDS18B20(0x44); /* 0x44 = "Convert T" */
 
 		init_DS18B20();
 
-		writeByteToDS18B20(0xCC);
-		writeByteToDS18B20(0xBE);
+		writeByteToDS18B20(0xCC); /* 0xCC = "Skip Rom" */
+		writeByteToDS18B20(0xBE); /* 0xCC = "Read Scratchpad" */
 
 		/* Read the byte, bit by bit */
 		for (uint8_t n = 0; n < 9; n++)
@@ -72,22 +75,22 @@ float readTempDS18B20 ()
  *****************************************************************************/
 void initVDD_DS18B20 ()
 {
-	/* Calibrate microsecond delay loop */
-	//UDELAY_Calibrate();
-
 	/* Enable High-frequency peripheral clock */
 	CMU_ClockEnable(cmuClock_HFPER, true); /* TODO: check if and why this is needed here */
 
 	/* Enable oscillator to GPIO */
 	CMU_ClockEnable(cmuClock_GPIO, true);
 
-	/* TODO: weird init cycle thing? */
 	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 0);
-	GPIO_PinOutClear(TEMP_VDD_PORT, TEMP_VDD_PORT);
-	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PORT, gpioModePushPull, 1);
+	GPIO_PinOutSet(TEMP_VDD_PORT, TEMP_VDD_PIN);   /* Enable VDD pin */
+
+	/* TODO: weird init cycle thing? -- probably fixed (see above), delete in next cleanup */
+//	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 0);
+//	GPIO_PinOutClear(TEMP_VDD_PORT, TEMP_VDD_PORT);
+//	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PORT, gpioModePushPull, 1);
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("DS18B20 VDD pin initialized");
+	dbinfo("DS18B20 VDD pin initialized and enabled");
 #endif /* DEBUGGING */
 
 }
@@ -105,9 +108,9 @@ void powerDS18B20 (bool enabled)
 {
 	if (enabled)
 	{
-		GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 0); /* TODO this seems weird, check datasheet */
+		//GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 0); /* TODO this seems weird, check datasheet */
 		GPIO_PinOutSet(TEMP_VDD_PORT, TEMP_VDD_PIN);
-		UDELAY_Delay(10000); /* Wait some time TODO: check if this is enough */
+		//UDELAY_Delay(10000); /* Wait some time TODO: check if this is enough */
 
 #ifdef DEBUGGING /* DEBUGGING */
 		dbinfo("DS18B20 VDD pin enabled");
@@ -117,8 +120,8 @@ void powerDS18B20 (bool enabled)
 	else
 	{
 		GPIO_PinOutClear(TEMP_VDD_PORT, TEMP_VDD_PIN);
-		GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 1); /* TODO this seems weird, check datasheet */
-		UDELAY_Delay(10000); /* Wait some time TODO: check if this is enough */
+		//GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 1); /* TODO this seems weird, check datasheet */
+		//UDELAY_Delay(10000); /* Wait some time TODO: check if this is enough */
 
 #ifdef DEBUGGING /* DEBUGGING */
 		dbinfo("DS18B20 VDD pin disabled");
@@ -276,41 +279,52 @@ uint8_t readByteFromDS18B20 ()
  *   Convert temperature data.
  *
  * @param[in] tempLS
- *   TODO.
+ *   Least significant byte.
  *
  * @param[in] tempMS
- *   TODO.
+ *   Most significant byte
  *
  * @return
  *   The converted temperature data (float).
  *****************************************************************************/
 float convertTempData (uint8_t tempLS, uint8_t tempMS)
 {
-	/* TODO: Reformat this */
-
 	uint16_t rawDataMerge;
 	uint16_t reverseRawDataMerge;
 	float finalTemperature;
-	/* Controleren of het een negatieve temperatuur is */
-	if(tempMS & 0xF8){
+
+	/* Check if it is a negative temperature value
+	 * 0xF8 = 0b1111 1000 */
+	if (tempMS & 0xF8)
+	{
 		rawDataMerge = tempMS;
-		/* shift operatie */
+
+		/* Left shift 8 times */
 		rawDataMerge <<= 8;
-		/* tweede deel toevoegen */
+
+		/* Add the second part */
 		rawDataMerge += tempLS;
-		/* inverteren aangezien we te maken hebben met negatieve temp */
+
+		/* Invert the value since we have a negative temperature */
 		reverseRawDataMerge = ~rawDataMerge;
-		/* Berekenen van de temperatuur */
+
+		/* Calculate the final temperature */
 		finalTemperature = -(reverseRawDataMerge + 1) * 0.0625;
 	}
-	else{  /* We hebben te maken met een positieve temperatuur */
+	/* We're dealing with a positive temperature */
+	else
+	{
 		rawDataMerge = tempMS;
-		/* shift operatie */
+
+		/* Left shift 8 times */
 		rawDataMerge <<= 8;
-		/* tweede deel toevoegen */
+
+		/* Add the second part */
 		rawDataMerge += tempLS;
-		/* Berekenen van de temperatuur */
+
+		/* Calculate the final temperature */
 		finalTemperature = rawDataMerge * 0.0625;
 	}
+
 	return (finalTemperature);
 }
