@@ -20,14 +20,7 @@
 #include "../inc/udelay.h"      /* Microsecond delay routine */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
 
-#include "../inc/debugging.h" /* Enable or disable printing to UART */
-
-/* TODO: check if these are really necessary
-#include <stdio.h>
-#include "em_emu.h"
-#include "em_device.h"
-#include "em_chip.h"
-#include "bspconfig.h" */
+#include "../inc/debugging.h"   /* Enable or disable printing to UART */
 
 
 /* Maximum waiting value before a reset becomes "failed" */

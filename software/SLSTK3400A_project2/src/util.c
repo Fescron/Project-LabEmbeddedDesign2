@@ -12,6 +12,8 @@
  *   v1.1: Change PinModeSet DOUT value to 0 in initLED.
  *   v1.2: Remove unnecessary "GPIO_PinOutClear" line in initLED.
  *
+ *   TODO: Enter EM1/EM2 when in the Delay method.
+ *
  ******************************************************************************/
 
 
@@ -95,7 +97,7 @@ void SysTick_Handler (void)
  *****************************************************************************/
 void Delay (uint32_t dlyTicks)
 {
-	/* TODO: Maybe enter EM1 of 2? */
+	/* TODO: Maybe enter EM1 or 2? */
 	// EMU_EnterEM1();
 
 	uint32_t curTicks = msTicks;
@@ -106,7 +108,7 @@ void Delay (uint32_t dlyTicks)
 
 /**************************************************************************//**
  * @brief
- *   Disable
+ *   Enable or disable sysTick interrupt and counter.
  *
  * @note
  *   SysTick interrupt and counter (used by Delay) need to

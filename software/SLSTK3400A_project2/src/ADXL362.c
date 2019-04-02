@@ -1,10 +1,6 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @details
- *   Started with code from the UART example (main_series0_HG.c) from SiLabs Github.
- *   See also https://github.com/Fescron/Project-LabEmbeddedDesign1 because
- *   this file is based on that this but some unused methods are omitted.
  * @version 1.2
  * @author Brecht Van Eeckhoudt
  *

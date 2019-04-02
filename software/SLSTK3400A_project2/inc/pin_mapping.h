@@ -144,9 +144,9 @@
 
 	/* Link breakage sensor */
 	#define BREAK1_PORT         gpioPortC
-	#define BREAK1_PIN          2
+	#define BREAK1_PIN          1
 	#define BREAK2_PORT         gpioPortC
-	#define BREAK2_PIN          3
+	#define BREAK2_PIN          2
 
 	/* RN2483 */
 	#define RN2483_UART         LEUART0

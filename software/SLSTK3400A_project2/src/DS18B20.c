@@ -26,7 +26,6 @@
 #include "../inc/DS18B20.h"
 
 
-
 /**************************************************************************//**
  * @brief
  *   Get a temperature value from the DS18B20.
@@ -81,7 +80,7 @@ void initVDD_DS18B20 (void)
 	//CMU_ClockEnable(cmuClock_HFPER, true); /* TODO: Check if and why this is needed here */
 
 	/* Enable oscillator to GPIO (keeping it here just in case...) */
-	CMU_ClockEnable(cmuClock_GPIO, true);
+	CMU_ClockEnable(cmuClock_GPIO, true); /* TODO: Maybe move this to readTempDS18B20 when clocks are disabled on sleep */
 
 	/* In the case of gpioModePushPull", the last argument directly sets the
 	 * the pin low if the value is "0" or high if the value is "1". */
