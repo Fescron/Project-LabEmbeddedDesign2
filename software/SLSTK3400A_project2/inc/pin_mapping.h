@@ -8,8 +8,8 @@
  *
  * @section Versions
  *
- *   v1.0: Start with custom board pinout.
- *   v1.1: Add regular board pinout, selectable with define statement.
+ *   v1.0: Started with custom board pinout.
+ *   v1.1: Added regular board pinout, selectable with define statement.
  *
  ******************************************************************************/
 

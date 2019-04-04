@@ -10,11 +10,11 @@
  *
  * @section Versions
  *
- *   v1.0: Reformat existing methods to use pin_mapping.h, change unsigned char to
- *         uint8_t values, add comments and clean up includes.
- *   v1.1: Add documentation, remove unnecessary GPIO statements regarding
+ *   v1.0: Reformatted existing methods to use pin_mapping.h, changed unsigned char to
+ *         uint8_t values, added comments and cleaned up includes.
+ *   v1.1: Added documentation, removed unnecessary GPIO statements regarding
  *         DOUT values of VDD pin.
- *   v1.2: Remove some unnecessary GPIO lines and add comments about "out" (DOUT) argument.
+ *   v1.2: Removed some unnecessary GPIO lines and added comments about "out" (DOUT) argument.
  *
  *   TODO: Use internal pull-up resistor for DATA pin using DOUT argument.
  *           -> Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);

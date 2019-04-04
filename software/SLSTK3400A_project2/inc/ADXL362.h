@@ -17,6 +17,7 @@
 #include "em_gpio.h"    /* General Purpose IO (GPIO) peripheral API */
 #include "em_usart.h"   /* Universal synchr./asynchr. receiver/transmitter (USART/UART) Peripheral API */
 
+#include "../inc/delay.h"     	/* Delay functionality */
 #include "../inc/util.h"     	/* Utility functions */
 #include "../inc/handlers.h" 	/* Interrupt handlers */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */

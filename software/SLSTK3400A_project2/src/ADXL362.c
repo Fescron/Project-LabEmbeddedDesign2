@@ -8,10 +8,10 @@
  *
  * @section Versions
  *
- *   v1.0: Start with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
- *         Change file name from accel.c to ADXL362.c.
- *   v1.1: Change PinModeSet "out" value to 0 in initADXL_VCC.
- *   v1.2: Change last argument in GPIO_PinModeSet in method initADXL_VCC to
+ *   v1.0: Started with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
+ *         Changed file name from accel.c to ADXL362.c.
+ *   v1.1: Changed PinModeSet "out" value to 0 in initADXL_VCC.
+ *   v1.2: Changed last argument in GPIO_PinModeSet in method initADXL_VCC to
  *         change the pin mode and enable the pin in one statement.
  *
  *   TODO: Too much movement breaks interrupt functionality, register not cleared
@@ -341,7 +341,7 @@ void resetHandlerADXL (void)
 				/* Last try to get the correct ID failed */
 				if (!checkID_ADXL())
 				{
-					Error(0);
+					error(1);
 				}
 			}
 		}

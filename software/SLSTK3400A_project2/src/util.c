@@ -1,20 +1,19 @@
 /***************************************************************************//**
  * @file util.c
  * @brief Utility functions.
- * @version 1.3
+ * @version 2.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
  *
  * @section Versions
  *
- *   v1.0: Start with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
- *   v1.1: Change PinModeSet DOUT value to 0 in initLED.
- *   v1.2: Remove unnecessary "GPIO_PinOutClear" line in initLED.
- *   v1.3: Move initRTCcomp method from "main.c" to here, add delay functionality wich goes into EM1 or EM2.
- *
- *   TODO: Fix EM1 delay
- *         Disable oscillators and clocks before going to sleep
+ *   v1.0: Started with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
+ *   v1.1: Changed PinModeSet DOUT value to 0 in initLED.
+ *   v1.2: Removed unnecessary "GPIO_PinOutClear" line in initLED.
+ *   v1.3: Moved initRTCcomp method from "main.c" to here, added delay functionality which goes into EM1 or EM2.
+ *   v1.4: Moved delay functionality to specific header and source files.
+ *   v2.0: Changed "Error()" to "error()", added a global variable to keep the error number and initialize the pin of the LED automatically.
  *
  ******************************************************************************/
 
@@ -23,26 +22,16 @@
 
 
 /* Global variables */
-volatile uint32_t msTicks; /* Volatile because it's a global variable that's modified by an interrupt service routine */
-bool RTCCinitialized = false;
-
-
-/**************************************************************************//**
- * @brief
- *   Initialize the LED.
- *****************************************************************************/
-void initLED (void)
-{
-	/* In the case of gpioModePushPull", the last argument directly sets the
-	 * the pin low if the value is "0" or high if the value is "1".
-	 * This means that "GPIO_PinOutClear(...)" is not necessary after this mode change.*/
-	GPIO_PinModeSet(LED_PORT, LED_PIN, gpioModePushPull, 0);
-}
+uint8_t errorNumber = 0;
+bool LEDinitialized = false;
 
 
 /**************************************************************************//**
  * @brief
  *   Enable or disable the LED.
+ *
+ * @details
+ *   This method also initializes the pin-mode if necessary.
  *
  * @param[in] enabled
  *   @li True - Enable LED
@@ -50,126 +39,12 @@ void initLED (void)
  *****************************************************************************/
 void led (bool enabled)
 {
+	/* Initialize LED if not already the case */
+	if (!LEDinitialized) initLED();
+
+	/* Set the selected state */
 	if (enabled) GPIO_PinOutSet(LED_PORT, LED_PIN);
 	else GPIO_PinOutClear(LED_PORT, LED_PIN);
-}
-
-
-/**************************************************************************//**
- * @brief
- *   RTCC initialization
- *
- * @details
- *   The RTC compare functionality uses the low-frequency crystal oscillator
- *   (LFXO) as the source.
- *
- * @note
- *   Apparently it's more energy efficient to use an external oscillator/crystal
- *   instead of the internal one. They only reason to use an internal one could be
- *   to reduce the part count. At one point I tried to use the Ultra low-frequency
- *   RC oscillator (ULFRCO) based on an example from SiliconLabs's GitHub (rtc_ulfrco),
- *   but development was halted shortly after this finding.
- *****************************************************************************/
-void initRTCcomp (void)
-{
-	/* Enable the low-frequency crystal oscillator for the RTC */
-	CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
-
-	/* Enable the clock to the interface of the low energy modules
-	 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
-	CMU_ClockEnable(cmuClock_HFLE, true);
-
-	/* Route the LFXO clock to the RTC */
-	CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_LFXO);
-
-	/* Turn on the RTC clock */
-	CMU_ClockEnable(cmuClock_RTC, true);
-
-	/* Set RTC compare value for RTC compare register 0 */
-	//RTC_CompareSet(0, COMPARE_RTC); /* TODO: remove if the new delay methods work as intended */
-
-	/* Allow channel 0 to cause an interrupt */
-	RTC_IntEnable(RTC_IEN_COMP0);
-	NVIC_ClearPendingIRQ(RTC_IRQn);
-	NVIC_EnableIRQ(RTC_IRQn);
-
-	/* Configure the RTC settings */
-	RTC_Init_TypeDef rtc = RTC_INIT_DEFAULT;
-	rtc.enable = false; /* Don't start counting when initialization is done */
-
-	/* Initialize RTC with pre-defined settings */
-	RTC_Init(&rtc);
-
-	RTCCinitialized = true;
-}
-
-
-/**************************************************************************//**
- * @brief
- *   Generate a delay and wait in EM1.
- *
- * @param[in] msDelay
- *   The delay in milliseconds.
- *****************************************************************************/
-void delayRTCC_EM1 (uint32_t msDelay)
-{
-	/* Initialize RTCC if not already the case */
-	if (!RTCCinitialized) initRTCcomp();
-
-	/* Set RTC compare value for RTC compare register 0 */
-	RTC_CompareSet(0, (LFXOFREQ_MS * msDelay)); /* <= 0x00ffffff */
-
-	/* Start the RTC */
-	RTC_Enable(true);
-
-	/* Enter EM1 */
-	EMU_EnterEM1(); /* TODO: this doesn't seem to work, the delay is not even close to the selected one */
-}
-
-
-/**************************************************************************//**
- * @brief
- *   Generate a delay and wait in EM2.
- *
- * @param[in] msDelay
- *   The delay in milliseconds.
- *****************************************************************************/
-void delayRTCC_EM2 (uint32_t msDelay)
-{
-	/* Initialize RTCC if not already the case */
-	if (!RTCCinitialized) initRTCcomp();
-
-	/* Set RTC compare value for RTC compare register 0 */
-	RTC_CompareSet(0, (LFXOFREQ_MS * msDelay)); /* <= 0x00ffffff */
-
-	/* Start the RTC */
-	RTC_Enable(true);
-
-	/* Enter EM2 */
-	EMU_EnterEM2(true); /* "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
-}
-
-
-/**************************************************************************//**
- * @brief
- *   Sleep for a certain amount of seconds in EM2.
- *
- * @param[in] sleep
- *   The sleep time in seconds.
- *****************************************************************************/
-void sleepRTCC_EM2 (uint32_t sleep)
-{
-	/* Initialize RTCC if not already the case */
-	if (!RTCCinitialized) initRTCcomp();
-
-	/* Set RTC compare value for RTC compare register 0 */
-	RTC_CompareSet(0, (LFXOFREQ * sleep)); /* <= 0x00ffffff */
-
-	/* Start the RTC */
-	RTC_Enable(true);
-
-	/* Enter EM2 */
-	EMU_EnterEM2(true); /* "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
 }
 
 
@@ -179,13 +54,19 @@ void sleepRTCC_EM2 (uint32_t sleep)
  *
  * @details
  *   Flashes the LED, displays a UART message and holds
- *   the microcontroller forever in a loop until it gets reset.
+ *   the microcontroller forever in a loop until it gets reset. Also
+ *   stores the error number in a global variable.
  *
  * @param[in] number
  *   The number to indicate where in the code the error was thrown.
  *****************************************************************************/
-void Error (uint8_t number)
+void error (uint8_t number)
 {
+	/* Initialize LED if not already the case */
+	if (!LEDinitialized) initLED();
+
+	/* Save the given number in the global variable */
+	errorNumber = number;
 
 #ifdef DEBUGGING /* DEBUGGING */
 	dbcritInt(">>> Error (", number, ")! Please reset MCU. <<<");
@@ -201,47 +82,24 @@ void Error (uint8_t number)
 
 /**************************************************************************//**
  * @brief
- *   Interrupt Service Routine for system tick counter.
- *****************************************************************************/
-void SysTick_Handler (void)
-{
-	msTicks++; /* Increment counter necessary in Delay() */
-}
-
-
-/**************************************************************************//**
- * @brief
- *   Waits a certain amount of milliseconds using the systicks.
- *
- * @param[in] dlyTicks
- *   Number of milliseconds (ticks) to wait.
- *****************************************************************************/
-void Delay (uint32_t dlyTicks)
-{
-	/* TODO: Maybe enter EM1 or 2? */
-	// EMU_EnterEM1();
-
-	uint32_t curTicks = msTicks;
-
-	while ((msTicks - curTicks) < dlyTicks);
-}
-
-
-/**************************************************************************//**
- * @brief
- *   Enable or disable sysTick interrupt and counter.
+ *   Initialize the LED.
  *
  * @note
- *   SysTick interrupt and counter (used by Delay) need to
- *   be disabled before going to EM2.
- *
- * @param[in] enabled
- *   @li True - Enable SysTick interrupt and counter by setting their bits.
- *   @li False - Disable SysTick interrupt and counter by clearing their bits.
+ *   This method is automatically called by the other methods if necessary.
  *****************************************************************************/
-void systickInterrupts (bool enabled)
+void initLED (void)
 {
-	if (enabled) SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
-	else SysTick->CTRL &= ~SysTick_CTRL_TICKINT_Msk & ~SysTick_CTRL_ENABLE_Msk;
-}
+	/* Enable necessary clock (just in case) */
+	CMU_ClockEnable(cmuClock_GPIO, true);
 
+	/* In the case of gpioModePushPull", the last argument directly sets the
+	 * the pin low if the value is "0" or high if the value is "1".
+	 * This means that "GPIO_PinOutClear(...)" is not necessary after this mode change.*/
+	GPIO_PinModeSet(LED_PORT, LED_PIN, gpioModePushPull, 0);
+
+#ifdef DEBUGGING /* DEBUGGING */
+	dbinfo("LED pin initialized");
+#endif /* DEBUGGING */
+
+	LEDinitialized = true;
+}

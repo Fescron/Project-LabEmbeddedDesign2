@@ -13,12 +13,14 @@
  *   v1.0: Started from https://github.com/Fescron/Project-LabEmbeddedDesign1
  *         and added code for the DS18B20 temperature sensor and the selfmade
  *         link breakage sensor. Reformatted some of these imported methods.
- *   v1.1: Remove unused files, add cable-checking method.
- *   v1.2: Move initRTCcomp method to "util.c".
+ *   v1.1: Removed unused files, add cable-checking method.
+ *   v1.2: Moved initRTCcomp method to "util.c".
+ *   v1.3: Stopped using deprecated function "GPIO_IntConfig".
  *
  *   TODO: 1) Use EM3 instead of EM2 as sleep mode.
  *         2) Disable unused peripherals and clocks (see emodes.c) and check if nothing breaks.
  *         2) Use EM2 when in a Delay.
+ *         2) Initialize more stuff like delayRTC (led, adxl)
  *         3) RTCcomp is broken when UDELAY_Calibrate() is called.
  *              -> When UDELAY_Calibrate is called after initRTCcomp this is fixed but
  *                 the temperature sensor code stops working.
@@ -39,6 +41,7 @@
 
 #include "../inc/ADXL362.h"    	/* Functions related to the accelerometer */
 #include "../inc/DS18B20.h"     /* Functions related to the temperature sensor */
+#include "../inc/delay.h"     	/* Delay functionality */
 #include "../inc/util.h"    	/* Utility functions */
 #include "../inc/handlers.h" 	/* Interrupt handlers */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
@@ -69,6 +72,9 @@ void initGPIOwakeup (void)
 	/* Configure ADXL_INT1 as input, the last argument enables the filter */
 	GPIO_PinModeSet(ADXL_INT1_PORT, ADXL_INT1_PIN, gpioModeInput, 1);
 
+	/* Clear pending interrupts */
+	//GPIO_IntClear(0xFFFF);
+
 	/* Enable IRQ for even numbered GPIO pins */
 	NVIC_EnableIRQ(GPIO_EVEN_IRQn);
 
@@ -76,11 +82,11 @@ void initGPIOwakeup (void)
 	NVIC_EnableIRQ(GPIO_ODD_IRQn);
 
 	/* Enable falling-edge interrupts for PB pins */
-	GPIO_IntConfig(PB0_PORT, PB0_PIN, 0, 1, true);
-	GPIO_IntConfig(PB1_PORT, PB1_PIN, 0, 1, true);
+	GPIO_ExtIntConfig(PB0_PORT, PB0_PIN, PB0_PIN, false, true, true);
+	GPIO_ExtIntConfig(PB1_PORT, PB1_PIN, PB1_PIN, false, true, true);
 
 	/* Enable rising-edge interrupts for ADXL_INT1 */
-	GPIO_IntConfig(ADXL_INT1_PORT, ADXL_INT1_PIN, 1, 0, true);
+	GPIO_ExtIntConfig(ADXL_INT1_PORT, ADXL_INT1_PIN, ADXL_INT1_PIN, true, false, true);
 }
 
 
@@ -131,8 +137,6 @@ bool checkCable (void)
  *****************************************************************************/
 int main (void)
 {
-	//uint32_t counter = 0;
-
 	/* Initialize chip */
 	CHIP_Init();
 
@@ -140,27 +144,21 @@ int main (void)
 
 	/* Initialize and start systick
 	 * Number of ticks between interrupt = cmuClock_CORE/1000 */
-	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000)) while (1); /* TODO: move this to util.c */
-
-	/* Initialize RTC compare settings */
-	//initRTCcomp(); /* TODO: remove if the new delay methods work as intended */
-
-	/* Initialize GPIO wakeup */
-	initGPIOwakeup();
+	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000)) while (1); /* TODO: move this to delay.c */
 
 #ifdef DEBUGGING /* DEBUGGING */
 	dbprint_INIT(USART1, 4, true, false); /* VCOM */
 	//dbprint_INIT(USART1, 0, false, false); /* US1_TX = PC0 */
 #endif /* DEBUGGING */
 
+	/* Initialize GPIO wakeup */
+	initGPIOwakeup();
+
 	/* Initialize VCC GPIO and turn the power to the accelerometer on */
 	initADXL_VCC();
 
 	/* Initialize USART0 as SPI slave (also initialize CS pin) */
 	initADXL_SPI();
-
-	/* Initialize LED */
-	initLED();
 
 	/* Soft reset ADXL handler */
 	resetHandlerADXL();
@@ -191,26 +189,25 @@ int main (void)
 
 	initVDD_DS18B20();
 
+	/* TODO: not working atm due to UDelay_calibrate being disabled */
 	Temperature = readTempDS18B20(); // 1 meting duurt 550 ms
 #ifdef DEBUGGING /* DEBUGGING */
 	dbinfoInt("Temperature: ", Temperature, "°C");
 #endif /* DEBUGGING */
 	powerDS18B20(false);
 
-
 	led(true);
 	Delay(2000);
 	led(false);
-	dbwarn("Sleeping for 500 ms in EM1");
-	delayRTCC_EM1(500);
-	dbwarn("Done");
 
-	led(true);
-	Delay(2000);
-	led(false);
-	dbwarn("Sleeping for 500 ms in EM2");
 	delayRTCC_EM2(500);
-	dbwarn("Done");
+
+	led(true);
+	Delay(2000);
+	led(false);
+
+	delayRTCC_EM1(500); /* TODO: fix this method */
+
 	led(true);
 	Delay(2000);
 	led(false);

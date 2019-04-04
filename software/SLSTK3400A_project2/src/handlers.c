@@ -2,9 +2,18 @@
  * @file handlers.c
  * @brief
  *   Interrupt handlers for the RTC and GPIO wakeup functionality.
- *   More interrupt handlers can be found in "util.c".
- * @version 1.0
+ *   More interrupt handlers can be found in "delay.c".
+ * @version 1.1
  * @author Brecht Van Eeckhoudt
+ *
+ * ******************************************************************************
+ *
+ * @section Versions
+ *
+ *   v1.0: Started from https://github.com/Fescron/Project-LabEmbeddedDesign1
+ *   v1.1: Added dbprintln(""); above dbinfo statements in IRQ handlers to fix
+ *         overwriting of text.
+ *
  ******************************************************************************/
 
 
@@ -24,9 +33,6 @@ volatile bool triggered = false; /* Accelerometer triggered interrupt */
  *****************************************************************************/
 void RTC_IRQHandler (void)
 {
-	/* Reset counter */
-	//RTC_CounterReset(); /* TODO: remove if the new delay methods work as intended */
-
 	/* Disable the counter */
 	RTC_Enable(false);
 
@@ -48,6 +54,7 @@ void GPIO_EVEN_IRQHandler(void)
 	uint32_t flags = GPIO_IntGet();
 
 #ifdef DEBUGGING /* DEBUGGING */
+	dbprintln("");
 	dbinfo("Even numbered GPIO interrupt triggered.");
 	if (flags == 0x400) dbprint_color("PB1\n\r", 4);
 #endif /* DEBUGGING */
@@ -70,6 +77,7 @@ void GPIO_ODD_IRQHandler(void)
 	uint32_t flags = GPIO_IntGet();
 
 #ifdef DEBUGGING /* DEBUGGING */
+	dbprintln("");
 	dbinfo("Odd numbered GPIO interrupt triggered.");
 	if (flags == 0x200) dbprint_color("PB0\n\r", 4);
 	else if (flags == 0x80) dbprint_color("INT1-PD7\n\r", 4);
@@ -81,4 +89,3 @@ void GPIO_ODD_IRQHandler(void)
 	/* Clear all odd pin interrupt flags */
 	GPIO_IntClear(0xAAAA);
 }
-
