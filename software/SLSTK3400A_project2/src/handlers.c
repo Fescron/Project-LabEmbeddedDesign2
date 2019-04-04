@@ -1,6 +1,8 @@
 /***************************************************************************//**
  * @file handlers.c
- * @brief Interrupt handlers.
+ * @brief
+ *   Interrupt handlers for the RTC and GPIO wakeup functionality.
+ *   More interrupt handlers can be found in "util.c".
  * @version 1.0
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
@@ -23,7 +25,10 @@ volatile bool triggered = false; /* Accelerometer triggered interrupt */
 void RTC_IRQHandler (void)
 {
 	/* Reset counter */
-	RTC_CounterReset();
+	//RTC_CounterReset(); /* TODO: remove if the new delay methods work as intended */
+
+	/* Disable the counter */
+	RTC_Enable(false);
 
 	/* Clear the interrupt source */
 	RTC_IntClear(RTC_IFC_COMP0);

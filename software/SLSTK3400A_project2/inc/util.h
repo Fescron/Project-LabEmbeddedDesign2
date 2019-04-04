@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.h
  * @brief Utility functions.
- * @version 1.2
+ * @version 1.3
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -15,14 +15,27 @@
 #include <stdbool.h>   /* "bool", "true", "false" */
 #include "em_device.h" /* Include necessary MCU-specific header file */
 #include "em_gpio.h"   /* General Purpose IO */
+#include "em_cmu.h"    /* Clock management unit */
+#include "em_emu.h"    /* Energy Management Unit */
+#include "em_rtc.h"    /* Real Time Counter (RTC) */
+#include "em_timer.h"  /* Timer functionality */
 
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
 #include "../inc/debugging.h" 	/* Enable or disable printing to UART */
 
 
+/* Definitions for RTC compare interrupts */
+#define LFXOFREQ 32768
+#define LFXOFREQ_MS 32.768
+
+
 /* Prototypes */
 void initLED (void);
 void led (bool enabled);
+void initRTCcomp (void);
+void delayRTCC_EM1 (uint32_t msDelay);
+void delayRTCC_EM2 (uint32_t msDelay);
+void sleepRTCC_EM2 (uint32_t sleep);
 void Error (uint8_t number);
 void Delay (uint32_t dlyTicks);
 void systickInterrupts (bool enabled);

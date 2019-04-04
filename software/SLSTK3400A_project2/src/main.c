@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 1.1
+ * @version 1.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -14,6 +14,7 @@
  *         and added code for the DS18B20 temperature sensor and the selfmade
  *         link breakage sensor. Reformatted some of these imported methods.
  *   v1.1: Remove unused files, add cable-checking method.
+ *   v1.2: Move initRTCcomp method to "util.c".
  *
  *   TODO: 1) Use EM3 instead of EM2 as sleep mode.
  *         2) Disable unused peripherals and clocks (see emodes.c) and check if nothing breaks.
@@ -35,9 +36,6 @@
 #include "em_chip.h"   /* Chip Initialization */
 #include "em_cmu.h"    /* Clock management unit */
 #include "em_gpio.h"   /* General Purpose IO */
-#include "em_usart.h"  /* Universal synchronous/asynchronous receiver/transmitter */
-#include "em_emu.h"    /* Energy Management Unit */
-#include "em_rtc.h"    /* Real Time Counter (RTC) */
 
 #include "../inc/ADXL362.h"    	/* Functions related to the accelerometer */
 #include "../inc/DS18B20.h"     /* Functions related to the temperature sensor */
@@ -47,11 +45,6 @@
 
 #include "../inc/debugging.h" /* Enable or disable printing to UART for debugging */
 
-
-/* Definitions for RTC compare interrupts */
-#define DELAY_RTC 10.0 /* seconds */
-#define LFXOFREQ 32768
-#define COMPARE_RTC (DELAY_RTC * LFXOFREQ)
 
 float Temperature = 0; /* TODO: Remove this later */
 
@@ -88,52 +81,6 @@ void initGPIOwakeup (void)
 
 	/* Enable rising-edge interrupts for ADXL_INT1 */
 	GPIO_IntConfig(ADXL_INT1_PORT, ADXL_INT1_PIN, 1, 0, true);
-}
-
-
-/**************************************************************************//**
- * @brief
- *   RTCC initialization
- *
- * @details
- *   The RTC compare functionality uses the low-frequency crystal oscillator
- *   (LFXO) as the source.
- *
- * @note
- *   Apparently it's more energy efficient to use an external oscillator/crystal
- *   instead of the internal one. They only reason to use an internal one could be
- *   to reduce the part count. At one point I tried to use the Ultra low-frequency
- *   RC oscillator (ULFRCO) based on an example from SiliconLabs's GitHub (rtc_ulfrco),
- *   but development was halted shortly after this finding.
- *****************************************************************************/
-void initRTCcomp (void)
-{
-	/* Enable the low-frequency crystal oscillator for the RTC */
-	CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
-
-	/* Enable the clock to the interface of the low energy modules
-	 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
-	CMU_ClockEnable(cmuClock_HFLE, true);
-
-	/* Route the LFXO clock to the RTC */
-	CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_LFXO);
-
-	/* Turn on the RTC clock */
-	CMU_ClockEnable(cmuClock_RTC, true);
-
-	/* Set RTC compare value for RTC compare register 0 */
-	RTC_CompareSet(0, COMPARE_RTC);
-
-	/* Allow channel 0 to cause an interrupt */
-	RTC_IntEnable(RTC_IEN_COMP0);
-	NVIC_ClearPendingIRQ(RTC_IRQn);
-	NVIC_EnableIRQ(RTC_IRQn);
-
-	/* Configure the RTC settings */
-	RTC_Init_TypeDef rtc = RTC_INIT_DEFAULT;
-
-	/* Initialize RTC with pre-defined settings */
-	RTC_Init(&rtc);
 }
 
 
@@ -193,10 +140,10 @@ int main (void)
 
 	/* Initialize and start systick
 	 * Number of ticks between interrupt = cmuClock_CORE/1000 */
-	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000)) while (1);
+	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000)) while (1); /* TODO: move this to util.c */
 
 	/* Initialize RTC compare settings */
-	initRTCcomp();
+	//initRTCcomp(); /* TODO: remove if the new delay methods work as intended */
 
 	/* Initialize GPIO wakeup */
 	initGPIOwakeup();
@@ -251,6 +198,24 @@ int main (void)
 	powerDS18B20(false);
 
 
+	led(true);
+	Delay(2000);
+	led(false);
+	dbwarn("Sleeping for 500 ms in EM1");
+	delayRTCC_EM1(500);
+	dbwarn("Done");
+
+	led(true);
+	Delay(2000);
+	led(false);
+	dbwarn("Sleeping for 500 ms in EM2");
+	delayRTCC_EM2(500);
+	dbwarn("Done");
+	led(true);
+	Delay(2000);
+	led(false);
+
+
 	/* Enable measurements */
 	measureADXL(true);
 
@@ -262,7 +227,6 @@ int main (void)
 	{
 		led(true); /* Enable LED */
 		Delay(1000);
-		led(false); /* Disable LED */
 
 		/* Read status register to acknowledge interrupt
 		 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL)
@@ -293,11 +257,12 @@ int main (void)
 	dbinfo("Disabling systick & going to sleep...\r\n");
 #endif /* DEBUGGING */
 
+		led(false); /* Disable LED */
+
 		systickInterrupts(false); /* Disable SysTick interrupts */
 		enableSPIpinsADXL(false); /* Disable SPI pins */
 
-		/* RTCC already seems to work in EM3? */
-		EMU_EnterEM2(true); /* "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+		sleepRTCC_EM2(10); /* Go to sleep for 10 seconds */
 
 		enableSPIpinsADXL(true); /* Enable SPI pins */
 		systickInterrupts(true); /* Enable SysTick interrupts */

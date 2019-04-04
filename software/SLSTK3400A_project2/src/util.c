@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.c
  * @brief Utility functions.
- * @version 1.2
+ * @version 1.3
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -11,8 +11,10 @@
  *   v1.0: Start with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
  *   v1.1: Change PinModeSet DOUT value to 0 in initLED.
  *   v1.2: Remove unnecessary "GPIO_PinOutClear" line in initLED.
+ *   v1.3: Move initRTCcomp method from "main.c" to here, add delay functionality wich goes into EM1 or EM2.
  *
- *   TODO: Enter EM1/EM2 when in the Delay method.
+ *   TODO: Fix EM1 delay
+ *         Disable oscillators and clocks before going to sleep
  *
  ******************************************************************************/
 
@@ -22,6 +24,7 @@
 
 /* Global variables */
 volatile uint32_t msTicks; /* Volatile because it's a global variable that's modified by an interrupt service routine */
+bool RTCCinitialized = false;
 
 
 /**************************************************************************//**
@@ -49,6 +52,124 @@ void led (bool enabled)
 {
 	if (enabled) GPIO_PinOutSet(LED_PORT, LED_PIN);
 	else GPIO_PinOutClear(LED_PORT, LED_PIN);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   RTCC initialization
+ *
+ * @details
+ *   The RTC compare functionality uses the low-frequency crystal oscillator
+ *   (LFXO) as the source.
+ *
+ * @note
+ *   Apparently it's more energy efficient to use an external oscillator/crystal
+ *   instead of the internal one. They only reason to use an internal one could be
+ *   to reduce the part count. At one point I tried to use the Ultra low-frequency
+ *   RC oscillator (ULFRCO) based on an example from SiliconLabs's GitHub (rtc_ulfrco),
+ *   but development was halted shortly after this finding.
+ *****************************************************************************/
+void initRTCcomp (void)
+{
+	/* Enable the low-frequency crystal oscillator for the RTC */
+	CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
+
+	/* Enable the clock to the interface of the low energy modules
+	 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
+	CMU_ClockEnable(cmuClock_HFLE, true);
+
+	/* Route the LFXO clock to the RTC */
+	CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_LFXO);
+
+	/* Turn on the RTC clock */
+	CMU_ClockEnable(cmuClock_RTC, true);
+
+	/* Set RTC compare value for RTC compare register 0 */
+	//RTC_CompareSet(0, COMPARE_RTC); /* TODO: remove if the new delay methods work as intended */
+
+	/* Allow channel 0 to cause an interrupt */
+	RTC_IntEnable(RTC_IEN_COMP0);
+	NVIC_ClearPendingIRQ(RTC_IRQn);
+	NVIC_EnableIRQ(RTC_IRQn);
+
+	/* Configure the RTC settings */
+	RTC_Init_TypeDef rtc = RTC_INIT_DEFAULT;
+	rtc.enable = false; /* Don't start counting when initialization is done */
+
+	/* Initialize RTC with pre-defined settings */
+	RTC_Init(&rtc);
+
+	RTCCinitialized = true;
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Generate a delay and wait in EM1.
+ *
+ * @param[in] msDelay
+ *   The delay in milliseconds.
+ *****************************************************************************/
+void delayRTCC_EM1 (uint32_t msDelay)
+{
+	/* Initialize RTCC if not already the case */
+	if (!RTCCinitialized) initRTCcomp();
+
+	/* Set RTC compare value for RTC compare register 0 */
+	RTC_CompareSet(0, (LFXOFREQ_MS * msDelay)); /* <= 0x00ffffff */
+
+	/* Start the RTC */
+	RTC_Enable(true);
+
+	/* Enter EM1 */
+	EMU_EnterEM1(); /* TODO: this doesn't seem to work, the delay is not even close to the selected one */
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Generate a delay and wait in EM2.
+ *
+ * @param[in] msDelay
+ *   The delay in milliseconds.
+ *****************************************************************************/
+void delayRTCC_EM2 (uint32_t msDelay)
+{
+	/* Initialize RTCC if not already the case */
+	if (!RTCCinitialized) initRTCcomp();
+
+	/* Set RTC compare value for RTC compare register 0 */
+	RTC_CompareSet(0, (LFXOFREQ_MS * msDelay)); /* <= 0x00ffffff */
+
+	/* Start the RTC */
+	RTC_Enable(true);
+
+	/* Enter EM2 */
+	EMU_EnterEM2(true); /* "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Sleep for a certain amount of seconds in EM2.
+ *
+ * @param[in] sleep
+ *   The sleep time in seconds.
+ *****************************************************************************/
+void sleepRTCC_EM2 (uint32_t sleep)
+{
+	/* Initialize RTCC if not already the case */
+	if (!RTCCinitialized) initRTCcomp();
+
+	/* Set RTC compare value for RTC compare register 0 */
+	RTC_CompareSet(0, (LFXOFREQ * sleep)); /* <= 0x00ffffff */
+
+	/* Start the RTC */
+	RTC_Enable(true);
+
+	/* Enter EM2 */
+	EMU_EnterEM2(true); /* "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
 }
 
 
