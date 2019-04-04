@@ -14,6 +14,8 @@
  *   v1.1: Added dbprintln(""); above dbinfo statements in IRQ handlers to fix
  *         overwriting of text.
  *
+ *   TODO: Make "triggered" static using getter?
+ *
  ******************************************************************************/
 
 
@@ -21,7 +23,7 @@
 
 
 /* Global variables */
-volatile bool triggered = false; /* Accelerometer triggered interrupt */
+volatile bool triggered = false; /* TODO: make static using getter? Accelerometer triggered interrupt */
 
 
 /**************************************************************************//**

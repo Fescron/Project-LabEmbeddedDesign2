@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 1.2
+ * @version 1.3
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -247,11 +247,11 @@ int main (void)
 		}
 		else
 		{
-			dbwarn("Cable broken!");
+			dbcrit("Cable broken!");
 		}
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("Disabling systick & going to sleep...\r\n");
+	dbinfo("Disabling systick & going to sleep...");
 #endif /* DEBUGGING */
 
 		led(false); /* Disable LED */

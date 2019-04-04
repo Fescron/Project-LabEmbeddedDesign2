@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.2
+ * @version 1.3
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -13,6 +13,7 @@
  *   v1.1: Changed PinModeSet "out" value to 0 in initADXL_VCC.
  *   v1.2: Changed last argument in GPIO_PinModeSet in method initADXL_VCC to
  *         change the pin mode and enable the pin in one statement.
+ *   v1.3: Changed some methods and global variables to be static (~hidden).
  *
  *   TODO: Too much movement breaks interrupt functionality, register not cleared
  *         good but new movement already detected?
@@ -25,7 +26,12 @@
 
 /* Global variables */
 volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
-uint8_t range = 0;
+static uint8_t range = 0; /* ~hidden */
+
+/* Prototypes for static (~hidden) methods */
+static void softResetADXL (void);
+static bool checkID_ADXL (void);
+static int32_t convertGRangeToGValue (int8_t sensorValue);
 
 
 /**************************************************************************//**
@@ -614,8 +620,12 @@ void measureADXL (bool enabled)
 /**************************************************************************//**
  * @brief
  *   Soft reset accelerometer.
+ *
+ * @note
+ *   This is a static (~hidden) method because it's only internally used
+ *   in this file and called by other methods if necessary.
  *****************************************************************************/
-void softResetADXL (void)
+static void softResetADXL (void)
 {
 	writeADXL(ADXL_REG_SOFT_RESET, 0x52); /* 0x52 = "R" */
 }
@@ -624,11 +634,15 @@ void softResetADXL (void)
 /**************************************************************************//**
  * @brief Check if the ID is correct.
  *
+ * @note
+ *   This is a static (~hidden) method because it's only internally used
+ *   in this file and called by other methods if necessary.
+ *
  * @return
  *   @li true - Correct ID returned.
  *   @li false - Incorrect ID returned.
  *****************************************************************************/
-bool checkID_ADXL (void)
+static bool checkID_ADXL (void)
 {
 	return (readADXL(ADXL_REG_DEVID_AD) == 0xAD);
 }
@@ -640,6 +654,8 @@ bool checkID_ADXL (void)
  *
  * @note
  *   Info found at http://ozzmaker.com/accelerometer-to-g/
+ *   This is a static (~hidden) method because it's only internally used
+ *   in this file and called by other methods if necessary.
  *
  * @param[in] sensorValue
  *   Value in g-range returned by sensor.
@@ -647,7 +663,7 @@ bool checkID_ADXL (void)
  * @return
  *   The calculated mg value.
  *****************************************************************************/
-int32_t convertGRangeToGValue (int8_t sensorValue)
+static int32_t convertGRangeToGValue (int8_t sensorValue)
 {
 	/* 255 = (-) 128 + 127 */
 

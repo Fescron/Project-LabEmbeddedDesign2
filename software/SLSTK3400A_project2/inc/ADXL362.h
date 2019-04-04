@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.h
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.2
+ * @version 1.3
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -66,11 +66,6 @@ void measureADXL (bool enabled);
 void configADXL_range (uint8_t givenRange);
 void configADXL_ODR (uint8_t givenODR);
 void configADXL_activity (uint8_t gThreshold);
-
-void softResetADXL (void);
-bool checkID_ADXL (void);
-
-int32_t convertGRangeToGValue (int8_t sensorValue);
 
 
 #endif /* _ACCEL_H_ */

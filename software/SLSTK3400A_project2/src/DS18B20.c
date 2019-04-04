@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.2
+ * @version 1.3
  * @author
  *   Alec Vanderhaegen & Sarah Goossens
  *   Modified by Brecht Van Eeckhoudt
@@ -15,6 +15,7 @@
  *   v1.1: Added documentation, removed unnecessary GPIO statements regarding
  *         DOUT values of VDD pin.
  *   v1.2: Removed some unnecessary GPIO lines and added comments about "out" (DOUT) argument.
+ *   v1.3: Changed some methods to be static (~hidden).
  *
  *   TODO: Use internal pull-up resistor for DATA pin using DOUT argument.
  *           -> Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
@@ -24,6 +25,12 @@
 
 
 #include "../inc/DS18B20.h"
+
+
+/* Prototypes for static (~hidden) methods */
+static void writeByteToDS18B20 (uint8_t data);
+static uint8_t readByteFromDS18B20 (void);
+static float convertTempData (uint8_t tempLS, uint8_t tempMS);
 
 
 /**************************************************************************//**
@@ -196,10 +203,14 @@ bool init_DS18B20 (void)
  * @brief
  *   Write a byte (uint8_t) to the DS18B20.
  *
+ * @note
+ *   This is a static (~hidden) method because it's only internally used
+ *   in this file and called by other methods if necessary.
+ *
  * @param[in] data
  *   The data to write to the DS18B20.
  *****************************************************************************/
-void writeByteToDS18B20 (uint8_t data)
+static void writeByteToDS18B20 (uint8_t data)
 {
 	/* In the case of gpioModePushPull", the last argument directly sets the
 	 * the pin low if the value is "0" or high if the value is "1". */
@@ -237,10 +248,14 @@ void writeByteToDS18B20 (uint8_t data)
  * @brief
  *   Read a byte (uint8_t) from the DS18B20.
  *
+ * @note
+ *   This is a static (~hidden) method because it's only internally used
+ *   in this file and called by other methods if necessary.
+ *
  * @return
  *   The byte read from the DS18B20.
  *****************************************************************************/
-uint8_t readByteFromDS18B20 (void)
+static uint8_t readByteFromDS18B20 (void)
 {
 	/* Data to eventually return */
 	uint8_t data = 0x0;
@@ -274,6 +289,10 @@ uint8_t readByteFromDS18B20 (void)
  * @brief
  *   Convert temperature data.
  *
+ * @note
+ *   This is a static (~hidden) method because it's only internally used
+ *   in this file and called by other methods if necessary.
+ *
  * @param[in] tempLS
  *   Least significant byte.
  *
@@ -283,7 +302,7 @@ uint8_t readByteFromDS18B20 (void)
  * @return
  *   The converted temperature data (float).
  *****************************************************************************/
-float convertTempData (uint8_t tempLS, uint8_t tempMS)
+static float convertTempData (uint8_t tempLS, uint8_t tempMS)
 {
 	uint16_t rawDataMerge;
 	uint16_t reverseRawDataMerge;

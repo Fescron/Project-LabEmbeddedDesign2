@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.h
  * @brief Utility functions.
- * @version 2.0
+ * @version 2.1
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -25,7 +25,6 @@
 /* Prototypes */
 void led (bool enabled);
 void error (uint8_t number);
-void initLED (void);
 
 
 #endif /* _UTIL_H_ */

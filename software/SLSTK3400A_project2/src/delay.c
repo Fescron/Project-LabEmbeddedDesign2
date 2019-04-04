@@ -1,14 +1,15 @@
 /***************************************************************************//**
  * @file delay.c
  * @brief Utility functions.
- * @version 1.0
+ * @version 1.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
  *
  * @section Versions
  *
- *   v1.0: Move delay functionality from "util.c" to this file.
+ *   v1.0: Moved delay functionality from "util.c" to this file.
+ *   v1.1: Changed global variables to be static (~hidden) and added dbprint "\n\r" fixes.
  *
  *   TODO: Fix EM1 delay
  *         Disable oscillators and clocks before going to sleep
@@ -20,9 +21,9 @@
 #include "../inc/delay.h"
 
 
-/* Global variables */
-volatile uint32_t msTicks; /* Volatile because it's a global variable that's modified by an interrupt service routine */
-bool RTCCinitialized = false;
+/* Static (~hidden) global variables */
+static volatile uint32_t msTicks; /* Volatile because it's a global variable that's modified by an interrupt service routine */
+static bool RTCCinitialized = false;
 
 
 /**************************************************************************//**
@@ -88,7 +89,7 @@ void delayRTCC_EM1 (uint32_t msDelay)
 	if (!RTCCinitialized) initRTCcomp();
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbwarnInt("Waiting in EM1 for ", msDelay, "ms");
+	dbwarnInt("Waiting in EM1 for ", msDelay, "ms\n\r");
 #endif /* DEBUGGING */
 
 	/* Set RTC compare value for RTC compare register 0 */
@@ -115,7 +116,7 @@ void delayRTCC_EM2 (uint32_t msDelay)
 	if (!RTCCinitialized) initRTCcomp();
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbwarnInt("Waiting in EM2 for ", msDelay, "ms");
+	dbwarnInt("Waiting in EM2 for ", msDelay, "ms\n\r");
 #endif /* DEBUGGING */
 
 	/* Set RTC compare value for RTC compare register 0 */
@@ -142,7 +143,7 @@ void sleepRTCC_EM2 (uint32_t sleep)
 	if (!RTCCinitialized) initRTCcomp();
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbwarnInt("Sleeping in EM2 for ", sleep, "s");
+	dbwarnInt("Sleeping in EM2 for ", sleep, "s\n\r");
 #endif /* DEBUGGING */
 
 	/* Set RTC compare value for RTC compare register 0 */

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.c
  * @brief Utility functions.
- * @version 2.0
+ * @version 2.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -14,6 +14,7 @@
  *   v1.3: Moved initRTCcomp method from "main.c" to here, added delay functionality which goes into EM1 or EM2.
  *   v1.4: Moved delay functionality to specific header and source files.
  *   v2.0: Changed "Error()" to "error()", added a global variable to keep the error number and initialize the pin of the LED automatically.
+ *   v2.1: Changed initLED to be a static (~hidden) method and also made the global variables static.
  *
  ******************************************************************************/
 
@@ -21,9 +22,12 @@
 #include "../inc/util.h"
 
 
-/* Global variables */
-uint8_t errorNumber = 0;
-bool LEDinitialized = false;
+/* Static (~hidden) global variables */
+static uint8_t errorNumber = 0;
+static bool LEDinitialized = false;
+
+/* Prototypes for static (~hidden) methods */
+static void initLED (void);
 
 
 /**************************************************************************//**
@@ -85,9 +89,10 @@ void error (uint8_t number)
  *   Initialize the LED.
  *
  * @note
- *   This method is automatically called by the other methods if necessary.
+ *   This is a static (~hidden) method because it's only internally used
+ *   in this file and called by other methods if necessary.
  *****************************************************************************/
-void initLED (void)
+static void initLED (void)
 {
 	/* Enable necessary clock (just in case) */
 	CMU_ClockEnable(cmuClock_GPIO, true);
