@@ -54,10 +54,4 @@ void ADXL_configActivity (uint8_t gThreshold);
 void ADXL_readValues (void);
 
 
-
-
-
-
-
 #endif /* _ADXL362_H_ */
-

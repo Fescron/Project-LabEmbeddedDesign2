@@ -18,7 +18,8 @@
  *   v1.5: Added get/set method for the static variable "ADXL_triggered".
  *   v1.6: Changed a lot of things...
  *
- *   TODO: Remove stdint and stdbool includes?
+ *   TODO: Check if variables need to be volatile.
+ *         Remove stdint and stdbool includes?
  *         Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
  *
  *         Enable wake-up mode: writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit
@@ -42,9 +43,9 @@
 
 
 /* Static variables only available and used in this file */
-static volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
+static volatile bool ADXL_triggered = false; /* TODO: Perhaps this shouldn't be volatile */
+static volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 }; /* TODO: Perhaps this shouldn't be volatile */
 static uint8_t range = 0;
-static bool ADXL_triggered = false;
 static bool ADXL_VDD_initialized = false;
 
 
@@ -148,11 +149,6 @@ void ADXL_enableSPI (bool enabled)
 		GPIO_PinModeSet(ADXL_NCS_PORT, ADXL_NCS_PIN, gpioModePushPull, 1);   /* US0_CS is push pull */
 		GPIO_PinModeSet(ADXL_MOSI_PORT, ADXL_MOSI_PIN, gpioModePushPull, 1); /* US0_TX (MOSI) is push pull */
 		GPIO_PinModeSet(ADXL_MISO_PORT, ADXL_MISO_PIN, gpioModeInput, 1);    /* US0_RX (MISO) is input */
-
-#ifdef DEBUGGING /* DEBUGGING */
-		dbinfo("SPI functionality enabled");
-#endif /* DEBUGGING */
-
 	}
 	else
 	{
@@ -165,11 +161,6 @@ void ADXL_enableSPI (bool enabled)
 		GPIO_PinModeSet(ADXL_NCS_PORT, ADXL_NCS_PIN, gpioModeDisabled, 1);
 		GPIO_PinModeSet(ADXL_MOSI_PORT, ADXL_MOSI_PIN, gpioModeDisabled, 1);
 		GPIO_PinModeSet(ADXL_MISO_PORT, ADXL_MISO_PIN, gpioModeDisabled, 1);
-
-#ifdef DEBUGGING /* DEBUGGING */
-		dbinfo("SPI functionality disabled");
-#endif /* DEBUGGING */
-
 	}
 }
 
@@ -218,6 +209,7 @@ void ADXL_enableMeasure (bool enabled)
 #ifdef DEBUGGING /* DEBUGGING */
 		dbinfo("ADXL362: Measurement disabled (standby)");
 #endif /* DEBUGGING */
+
 	}
 }
 
@@ -243,17 +235,29 @@ void ADXL_configRange (uint8_t givenRange)
 	/* OR with new setting bits */
 
 	/* Set measurement range (first two bits) */
-	if (givenRange == 0) {
+	if (givenRange == 0)
+	{
 		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000000));
 		range = 0;
 	}
-	else if (givenRange == 1) {
+	else if (givenRange == 1)
+	{
 		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b01000000));
 		range = 1;
 	}
-	else if (givenRange == 2) {
+	else if (givenRange == 2)
+	{
 		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b10000000));
 		range = 2;
+	}
+	else
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Non-existing range selected!");
+#endif /* DEBUGGING */
+
+		error(7);
 	}
 
 #ifdef DEBUGGING /* DEBUGGING */
@@ -289,12 +293,21 @@ void ADXL_configODR (uint8_t givenODR)
 
 	/* Set ODR (last three bits) */
 	if (givenODR == 0) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000000));
-	if (givenODR == 1) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000001));
-	if (givenODR == 2) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000010));
-	if (givenODR == 3) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000011));
-	if (givenODR == 4) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000100));
-	if (givenODR == 5) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000101));
-	else writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000011));
+	else if (givenODR == 1) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000001));
+	else if (givenODR == 2) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000010));
+	else if (givenODR == 3) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000011));
+	else if (givenODR == 4) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000100));
+	else if (givenODR == 5) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000101));
+	else
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Non-existing ODR selected!");
+#endif /* DEBUGGING */
+
+		error(6);
+	}
+
 
 #ifdef DEBUGGING /* DEBUGGING */
 	if (givenODR == 0) dbinfo("ADXL362: ODR set at 12.5 Hz");
@@ -303,7 +316,6 @@ void ADXL_configODR (uint8_t givenODR)
 	else if (givenODR == 3) dbinfo("ADXL362: ODR set at 100 Hz");
 	else if (givenODR == 4) dbinfo("ADXL362: ODR set at 200 Hz");
 	else if (givenODR == 5) dbinfo("ADXL362: ODR set at 400 Hz");
-	else dbinfo("ADXL362: ODR set at 100 Hz (reset default)");
 #endif /* DEBUGGING */
 
 }
@@ -335,7 +347,15 @@ void ADXL_configActivity (uint8_t gThreshold)
 	if (range == 0) threshold = gThreshold * 1000;
 	else if (range == 1) threshold = gThreshold * 500;
 	else if (range == 2) threshold = gThreshold * 250;
-	else threshold = 0;
+	else
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Range wrong, can't set gThreshold!");
+#endif /* DEBUGGING */
+
+		error(5);
+	}
 
 	/* Isolate bits using masks and shifting */
 	uint8_t low  = (threshold & 0b0011111111);
@@ -717,5 +737,15 @@ static int32_t convertGRangeToGValue (int8_t sensorValue)
 	if (range == 0) return ((2*2*1000 / 255) * sensorValue);
 	else if (range == 1) return ((2*4*1000 / 255) * sensorValue);
 	else if (range == 2) return ((2*8*1000 / 255) * sensorValue);
-	else return (0);
+	else
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Range wrong, can't calculate mg value!");
+#endif /* DEBUGGING */
+
+		error(4);
+
+		return (0);
+	}
 }

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 1.6
+ * @version 1.5
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -25,10 +25,9 @@
  *              => UDelay uses RTCC, Use timers instead! (timer + prescaler, every microsecond an interrupt?)
  *         1) Fix cable-checking method.
  *         1) Add VCOMP and WDOG functionality.
+ *         1) Start using linked-loop mode for ADXL to fix the strange interrupt behaviour!
  *
- *         2) Remove UART calls in interrupt.c, state machine in main?
  *         2) Move some information above methods to the top of the source file, sometimes reference these source files from the main?
- *
  *         2) Disable unused peripherals and oscillators/clocks (see emodes.c) and check if nothing breaks.
  *              => Do this consistently in each method
  *              => Perhaps use a boolean argument so that in the case of sending more bytes
@@ -126,6 +125,8 @@ int main (void)
 	//dbprint_INIT(USART1, 0, false, false); /* US1_TX = PC0 */
 #endif /* DEBUGGING */
 
+	led(true); /* Enable (and initialize) LED */
+
 	/* Initialize GPIO wakeup */
 	initGPIOwakeup();
 
@@ -149,21 +150,17 @@ int main (void)
 		/* Enable measurements */
 		ADXL_enableMeasure(true);
 
+		delay(100); /* TODO: Weird INT behavour, try to fix this with link-looped mode! */
+
+		/* ADXL gives interrupt, capture this */
+		ADXL_ackInterrupt(); /* Acknowledge ADXL interrupt */
+
 		/* Disable SPI after the initializations */
 		ADXL_enableSPI(false);
+
+		/* ADXL give interrupt, capture this */
+		ADXL_setTriggered(false); /* Reset variable again */
 	}
-
-	/* Initialize temperature sensor VDD pin */
-	initVDD_DS18B20(); /* TODO: make static and move functionality in readTemp*/
-
-	/* TODO: not working atm due to UDelay_calibrate being disabled */
-	Temperature = readTempDS18B20(); // 1 meting duurt 550 ms
-#ifdef DEBUGGING /* DEBUGGING */
-	dbinfoInt("Temperature: ", Temperature, "°C");
-#endif /* DEBUGGING */
-
-	powerDS18B20(false); /* TODO: make static */
-
 
 	while(1)
 	{
@@ -171,25 +168,47 @@ int main (void)
 
 		delay(500);
 
+		if (BTN_getTriggered(0))
+		{
+
+#ifdef DEBUGGING /* DEBUGGING */
+			dbprintln_color("PB0 pushed!", 4);
+#endif /* DEBUGGING */
+
+			BTN_setTriggered(0, false); /* Clear static variable */
+		}
+
+		if (BTN_getTriggered(1))
+		{
+
+#ifdef DEBUGGING /* DEBUGGING */
+			dbprintln_color("PB1 pushed!", 4);
+#endif /* DEBUGGING */
+
+			BTN_setTriggered(1, false); /* Clear static variable */
+		}
+
+
 		/* Read status register to acknowledge interrupt
 		 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL)
 		 * TODO this can perhaps fix the bug where too much movenent breaks interrupt wakeup ... */
 		if (ADXL_getTriggered())
 		{
+
+#ifdef DEBUGGING /* DEBUGGING */
+			dbprintln_color("INT-PD7 triggered!", 4);
+#endif /* DEBUGGING */
+
 			ADXL_enableSPI(true);  /* Enable SPI functionality */
 			ADXL_ackInterrupt();   /* Acknowledge ADXL interrupt */
 			ADXL_enableSPI(false); /* Disable SPI functionality */
 		}
 
-		powerDS18B20(true); /* TODO: make static */
-
 		/* TODO: not working atm due to UDelay_calibrate being disabled */
-		Temperature = readTempDS18B20(); // 1 meting duurt 550 ms
+		Temperature = readTempDS18B20(); /* A measurement takes about 550 ms */
 #ifdef DEBUGGING /* DEBUGGING */
 		dbinfoInt("Temperature: ", Temperature, "°C");
 #endif /* DEBUGGING */
-
-		powerDS18B20(false); /* TODO: make static */
 
 		if (checkCable())
 		{

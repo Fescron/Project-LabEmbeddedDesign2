@@ -17,8 +17,9 @@
  *   v1.2: Removed some unnecessary GPIO lines and added comments about "out" (DOUT) argument.
  *   v1.3: Changed some methods to be static (~hidden).
  *   v1.4: Cleaned up includes.
+ *   v1.5: Make more methods static.
  *
- *   TODO: Remove stdint and stdbool includes?
+ *   TODO: Remove stdint includes?
  *         Use internal pull-up resistor for DATA pin using DOUT argument.
  *           => Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
  *         Enter EM1 when the MCU is waiting in a delay method?
@@ -28,18 +29,25 @@
 
 /* Includes necessary for this source file */
 //#include <stdint.h>             /* (u)intXX_t */
-//#include <stdbool.h>            /* "bool", "true", "false" */
+#include <stdbool.h>            /* "bool", "true", "false" */
 #include "em_cmu.h"             /* Clock Management Unit */
 #include "em_gpio.h"            /* General Purpose IO (GPIO) peripheral API */
 #include "../inc/udelay.h"      /* Microsecond delay routine */
 
 #include "../inc/DS18B20.h"     /* Corresponding header file */
+#include "../inc/util.h"    	/* Utility functions */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
 #include "../inc/debugging.h"   /* Enable or disable printing to UART */
 
 
+/* Static variable only available and used in this file */
+static bool DS18B20_VDD_initialized = false;
+
+
 /* Prototypes for static methods only used by other methods in this file
  * (Not available to be used elsewhere) */
+static void powerDS18B20 (bool enabled);
+static bool init_DS18B20 (void);
 static void writeByteToDS18B20 (uint8_t data);
 static uint8_t readByteFromDS18B20 (void);
 static float convertTempData (uint8_t tempLS, uint8_t tempMS);
@@ -50,14 +58,16 @@ static float convertTempData (uint8_t tempLS, uint8_t tempMS);
  *   Get a temperature value from the DS18B20.
  *
  * @details
- *   One measurement takes 550 ms.
+ *   One measurement takes about 550 ms.
  *
  * @return
- *   The read temperature data (float). An impossible value is returned
- *   if the initialization (reset) failed.
+ *   The read temperature data (float).
  *****************************************************************************/
 float readTempDS18B20 (void)
 {
+	/* Initialize and power VDD pin */
+	powerDS18B20(true);
+
 	/* Raw data bytes */
 	uint8_t rawDataFromDS18B20Arr[9] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
 
@@ -78,6 +88,9 @@ float readTempDS18B20 (void)
 			rawDataFromDS18B20Arr[n] = readByteFromDS18B20();
 		}
 
+		/* Disable the VDD pin */
+		powerDS18B20(false);
+
 		/* Return the converted byte */
 		return (convertTempData(rawDataFromDS18B20Arr[0], rawDataFromDS18B20Arr[1]));
 	}
@@ -87,26 +100,10 @@ float readTempDS18B20 (void)
 		dbcrit("DS18B20 measurement failed");
 #endif /* DEBUGGING */
 
-		/* Return an impossible value if the measurement failed */
-		return (10000);
+		error(11);
+
+		return (0);
 	}
-}
-
-
-/**************************************************************************//**
- * @brief
- *   Initialize the VDD pin for the DS18B20.
- *****************************************************************************/
-void initVDD_DS18B20 (void)
-{
-	/* Enable necessary clocks (just in case) */
-	CMU_ClockEnable(cmuClock_HFPER, true); /* GPIO is a High Frequency Peripheral */
-	CMU_ClockEnable(cmuClock_GPIO, true);
-
-	/* In the case of gpioModePushPull", the last argument directly sets the
-	 * the pin low if the value is "0" or high if the value is "1". */
-	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 1);
-
 }
 
 
@@ -114,14 +111,37 @@ void initVDD_DS18B20 (void)
  * @brief
  *   Enable or disable the power to the temperature sensor.
  *
+ * @details
+ *   This method also initializes the pin-mode if necessary.
+ *
+ * @note
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
+ *
  * @param[in] enabled
  *   @li True - Enable the GPIO pin connected to the VDD pin of the temperature sensor.
  *   @li False - Disable the GPIO pin connected to the VDD pin of the temperature sensor.
  *****************************************************************************/
-void powerDS18B20 (bool enabled)
+static void powerDS18B20 (bool enabled)
 {
-	if (enabled) GPIO_PinOutSet(TEMP_VDD_PORT, TEMP_VDD_PIN);
-	else GPIO_PinOutClear(TEMP_VDD_PORT, TEMP_VDD_PIN);
+	/* Enable necessary clocks (just in case) */
+	CMU_ClockEnable(cmuClock_HFPER, true); /* GPIO is a High Frequency Peripheral */
+	CMU_ClockEnable(cmuClock_GPIO, true);
+
+	/* Initialize VDD pin if not already the case */
+	if (!DS18B20_VDD_initialized)
+	{
+		/* In the case of gpioModePushPull", the last argument directly sets the
+		 * the pin low if the value is "0" or high if the value is "1". */
+		GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, enabled);
+
+		DS18B20_VDD_initialized = true;
+	}
+	else
+	{
+		if (enabled) GPIO_PinOutSet(TEMP_VDD_PORT, TEMP_VDD_PIN); /* Enable VDD pin */
+		else GPIO_PinOutClear(TEMP_VDD_PORT, TEMP_VDD_PIN); /* Disable VDD pin */
+	}
 }
 
 
@@ -133,7 +153,7 @@ void powerDS18B20 (bool enabled)
  *   @li true - Initialization (reset) successful.
  *   @li false - Initialization (reset) failed.
  *****************************************************************************/
-bool init_DS18B20 (void)
+static bool init_DS18B20 (void)
 {
 	uint16_t counter = 0;
 
@@ -143,7 +163,7 @@ bool init_DS18B20 (void)
 	UDELAY_Delay(480);
 
 	/* Change pin-mode to input */
-	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0); /* TODO: Try to use internal pullup */
+	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0); /* TODO: Try to use internal pullup? */
 
 	/* Check if the line becomes HIGH during the maximum waiting time */
 	while (counter++ <= MAX_TIME_CTR && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 1)
@@ -254,7 +274,7 @@ static uint8_t readByteFromDS18B20 (void)
 	for (uint8_t i = 0; i < 8; i++)
 	{
 		/* Change pin-mode to input */
-		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0); /* TODO: Try to use internal pullup */
+		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0); /* TODO: Try to use internal pullup? */
 
 		/* Right shift bits once */
 		data >>= 1;

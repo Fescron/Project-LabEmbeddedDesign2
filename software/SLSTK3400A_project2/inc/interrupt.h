@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file interrupt.h
- * @brief GPIO wakeup initialization method and interrupt handlers.
- * @version 1.4
+ * @brief Interrupt functionality.
+ * @version 1.5
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -11,8 +11,15 @@
 #define _INTERRUPT_H_
 
 
-/* Prototype for method available to be used elsewhere */
+/* Includes necessary for this header file */
+#include <stdint.h>  /* (u)intXX_t */
+#include <stdbool.h> /* "bool", "true", "false" */
+
+
+/* Prototypes for methods available to be used elsewhere */
 void initGPIOwakeup (void);
+bool BTN_getTriggered (uint8_t number);
+void BTN_setTriggered (uint8_t number, bool value);
 
 
 #endif /* _INTERRUPT_H_ */

@@ -21,6 +21,7 @@
  *         Check the sections about Energy monitor and Crystals and RC oscillators
  *           => DRAMCO has perhaps chosen the crystal because this was more stable for
  *              high frequency (baudrate) communication. (leuart RNxxx...)
+ *         Add checks if delay fits in field?
  *
  * ******************************************************************************
  *
@@ -85,6 +86,7 @@ static void initRTCcomp (void);
  * @details
  *   The type of delay (using SysTick or RTCcompare) can be selected by
  *   (un)commenting "#define SYSTICKDELAY" in "delay.h"
+ *   This method also initializes SysTick/RTCcompare if necessary.
  *
  * @param[in] msDelay
  *   The delay time in milliseconds.
@@ -184,7 +186,7 @@ static void initRTCcomp (void)
 	RTC_Init(&rtc);
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("RTCC initialized");
+	dbinfo("RTCC initialized\n\r");
 #endif /* DEBUGGING */
 
 	RTCC_initialized = true;
@@ -213,7 +215,7 @@ void sleep (uint32_t sSleep)
 	}
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbwarnInt("Sleeping in EM2 for ", sSleep, " s\n\r");
+	dbwarnInt("Sleeping in EM2 for ", sSleep, " s");
 #endif /* DEBUGGING */
 
 	/* Set RTC compare value for RTC compare register 0 */

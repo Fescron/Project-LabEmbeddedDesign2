@@ -15,18 +15,14 @@
 
 /* Includes necessary for this header file */
 #include <stdint.h>  /* (u)intXX_t */
-#include <stdbool.h> /* "bool", "true", "false" */
 
 
 /* Maximum waiting value before a reset becomes "failed" */
 #define MAX_TIME_CTR 2000
 
 
-/* Prototypes for methods available to be used elsewhere */
+/* Prototype for method available to be used elsewhere */
 float readTempDS18B20 (void);
-void initVDD_DS18B20 (void);
-void powerDS18B20 (bool enabled);
-bool init_DS18B20 (void);
 
 
 #endif /* _DS18B20_H_ */
