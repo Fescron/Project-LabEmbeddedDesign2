@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.h
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.3
+ * @version 1.4
  * @author
  *   Alec Vanderhaegen & Sarah Goossens
  *   Modified by Brecht Van Eeckhoudt
@@ -13,21 +13,16 @@
 #define _DS18B20_H_
 
 
-#include <stdint.h>             /* (u)intXX_t */
-#include <stdbool.h>            /* "bool", "true", "false" */
-#include "em_cmu.h"             /* Clock Management Unit */
-#include "em_gpio.h"            /* General Purpose IO (GPIO) peripheral API */
-#include "../inc/udelay.h"      /* Microsecond delay routine */
-
-#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
-#include "../inc/debugging.h"   /* Enable or disable printing to UART */
+/* Includes necessary for this header file */
+#include <stdint.h>  /* (u)intXX_t */
+#include <stdbool.h> /* "bool", "true", "false" */
 
 
 /* Maximum waiting value before a reset becomes "failed" */
 #define MAX_TIME_CTR 2000
 
 
-/* Prototypes */
+/* Prototypes for methods available to be used elsewhere */
 float readTempDS18B20 (void);
 void initVDD_DS18B20 (void);
 void powerDS18B20 (bool enabled);

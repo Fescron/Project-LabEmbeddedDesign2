@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file handlers.h
  * @brief Interrupt handlers.
- * @version 1.1
+ * @version 1.2
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -11,16 +11,11 @@
 #define _HANDLERS_H_
 
 
-#include <stdint.h>    /* (u)intXX_t */
-#include <stdbool.h>   /* "bool", "true", "false" */
-#include "em_device.h" /* Include necessary MCU-specific header file */
-#include "em_gpio.h"   /* General Purpose IO */
-#include "em_rtc.h"    /* Real Time Counter (RTC) */
-
-#include "../inc/debugging.h" /* Enable or disable printing to UART */
+/* Include necessary for this header file */
+#include <stdbool.h> /* "bool", "true", "false" */
 
 
-/* Global variables (project-wide accessible) */
+/* Global variable (project-wide accessible) */
 extern volatile bool triggered; /* Accelerometer triggered interrupt */
 
 

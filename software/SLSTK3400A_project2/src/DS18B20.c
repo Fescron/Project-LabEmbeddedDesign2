@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.3
+ * @version 1.4
  * @author
  *   Alec Vanderhaegen & Sarah Goossens
  *   Modified by Brecht Van Eeckhoudt
@@ -16,18 +16,30 @@
  *         DOUT values of VDD pin.
  *   v1.2: Removed some unnecessary GPIO lines and added comments about "out" (DOUT) argument.
  *   v1.3: Changed some methods to be static (~hidden).
+ *   v1.4: Cleaned up includes.
  *
- *   TODO: Use internal pull-up resistor for DATA pin using DOUT argument.
- *           -> Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
- *         Enter EM1 when the MCU is waiting in a delay method.
+ *   TODO: Remove stdint and stdbool includes?
+ *         Use internal pull-up resistor for DATA pin using DOUT argument.
+ *           => Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
+ *         Enter EM1 when the MCU is waiting in a delay method?
  *
  ******************************************************************************/
 
 
-#include "../inc/DS18B20.h"
+/* Includes necessary for this source file */
+//#include <stdint.h>             /* (u)intXX_t */
+//#include <stdbool.h>            /* "bool", "true", "false" */
+#include "em_cmu.h"             /* Clock Management Unit */
+#include "em_gpio.h"            /* General Purpose IO (GPIO) peripheral API */
+#include "../inc/udelay.h"      /* Microsecond delay routine */
+
+#include "../inc/DS18B20.h"     /* Corresponding header file */
+#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
+#include "../inc/debugging.h"   /* Enable or disable printing to UART */
 
 
-/* Prototypes for static (~hidden) methods */
+/* Prototypes for static methods only used by other methods in this file
+ * (Not available to be used elsewhere) */
 static void writeByteToDS18B20 (uint8_t data);
 static uint8_t readByteFromDS18B20 (void);
 static float convertTempData (uint8_t tempLS, uint8_t tempMS);

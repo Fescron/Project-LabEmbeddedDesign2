@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.3
+ * @version 1.4
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -14,21 +14,42 @@
  *   v1.2: Changed last argument in GPIO_PinModeSet in method initADXL_VCC to
  *         change the pin mode and enable the pin in one statement.
  *   v1.3: Changed some methods and global variables to be static (~hidden).
+ *   v1.4: Changed delay method and cleaned up includes.
  *
- *   TODO: Too much movement breaks interrupt functionality, register not cleared
+ *   TODO: Remove stdint and stdbool includes?
+ *         Too much movement breaks interrupt functionality, register not cleared
  *         good but new movement already detected?
+ *         Make more methods static.
  *
  ******************************************************************************/
 
 
-#include "../inc/ADXL362.h"
+/* Includes necessary for this source file */
+//#include <stdint.h>     /* (u)intXX_t */
+//#include <stdbool.h>    /* "bool", "true", "false" */
+#include "em_cmu.h"     /* Clock Management Unit */
+#include "em_gpio.h"    /* General Purpose IO (GPIO) peripheral API */
+#include "em_usart.h"   /* Universal synchr./asynchr. receiver/transmitter (USART/UART) Peripheral API */
+
+#include "../inc/ADXL362.h"     /* Corresponding header file */
+#include "../inc/delay.h"     	/* Delay functionality */
+#include "../inc/util.h"     	/* Utility functions */
+#include "../inc/handlers.h" 	/* Interrupt handlers */
+#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
+
+#include "../inc/debugging.h" /* Enable or disable printing to UART */
 
 
-/* Global variables */
+/* Global variable */
 volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
-static uint8_t range = 0; /* ~hidden */
 
-/* Prototypes for static (~hidden) methods */
+
+/* Static variable only available and used in this file */
+static uint8_t range = 0;
+
+
+/* Prototypes for static methods only used by other methods in this file
+ * (Not available to be used elsewhere) */
 static void softResetADXL (void);
 static bool checkID_ADXL (void);
 static int32_t convertGRangeToGValue (int8_t sensorValue);
@@ -180,7 +201,7 @@ void testADXL (void)
 	dbwarn("Waiting 5 seconds...");
 #endif /* DEBUGGING */
 
-	Delay(5000);
+	delay(5000);
 
 #ifdef DEBUGGING /* DEBUGGING */
 	dbwarn("Starting...");
@@ -197,7 +218,7 @@ void testADXL (void)
 	softResetADXL();
 
 	/* Standby */
-	Delay(1000);
+	delay(1000);
 
 	/* ODR 12,5Hz */
 	writeADXL(ADXL_REG_FILTER_CTL, 0b00010000); /* last 3 bits are ODR */
@@ -205,27 +226,27 @@ void testADXL (void)
 	/* Enable measurements */
 	writeADXL(ADXL_REG_POWER_CTL, 0b00000010); /* last 2 bits are measurement mode */
 
-	Delay(1000);
+	delay(1000);
 
 	/* ODR 25Hz */
 	writeADXL(ADXL_REG_FILTER_CTL, 0b00010001); /* last 3 bits are ODR */
-	Delay(1000);
+	delay(1000);
 
 	/* ODR 50Hz */
 	writeADXL(ADXL_REG_FILTER_CTL, 0b00010010); /* last 3 bits are ODR */
-	Delay(1000);
+	delay(1000);
 
 	/* ODR 100Hz (default) */
 	writeADXL(ADXL_REG_FILTER_CTL, 0b00010011); /* last 3 bits are ODR */
-	Delay(1000);
+	delay(1000);
 
 	/* ODR 200Hz */
 	writeADXL(ADXL_REG_FILTER_CTL, 0b00010100); /* last 3 bits are ODR */
-	Delay(1000);
+	delay(1000);
 
 	/* ODR 400Hz */
 	writeADXL(ADXL_REG_FILTER_CTL, 0b00010101); /* last 3 bits are ODR */
-	Delay(1000);
+	delay(1000);
 
 	/* Soft reset ADXL */
 	softResetADXL();
@@ -280,13 +301,14 @@ void readValuesADXL (void)
 
 		counter++;
 
-		Delay(100);
+		delay(100);
 
 		/* Read status register to acknowledge interrupt
 		 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL) */
 		if (triggered)
 		{
-			Delay(1000);
+			delay(1000);
+
 			readADXL(ADXL_REG_STATUS);
 			triggered = false;
 		}
@@ -314,7 +336,7 @@ void resetHandlerADXL (void)
 	{
 		retries++;
 
-		Delay(1000);
+		delay(1000);
 
 		/* Soft reset */
 		softResetADXL();
@@ -324,7 +346,7 @@ void resetHandlerADXL (void)
 		{
 			retries++;
 
-			Delay(1000);
+			delay(1000);
 
 			/* Soft reset */
 			softResetADXL();
@@ -336,10 +358,12 @@ void resetHandlerADXL (void)
 				retries++;
 
 				powerADXL(false);
-				Delay(1000);
+
+				delay(1000);
+
 				powerADXL(true);
 
-				Delay(1000);
+				delay(1000);
 
 				/* Soft reset */
 				softResetADXL();
@@ -371,7 +395,7 @@ void resetHandlerADXL (void)
  * @return
  *   The response (one byte, uint8_t).
  *****************************************************************************/
-uint8_t readADXL (uint8_t address)
+uint8_t readADXL (uint8_t address) /* TODO: Make this static */
 {
 	uint8_t response;
 
@@ -401,7 +425,7 @@ uint8_t readADXL (uint8_t address)
  * @param[in] data
  *   The data to write to the address (one byte, uint8_t).
  *****************************************************************************/
-void writeADXL (uint8_t address, uint8_t data)
+void writeADXL (uint8_t address, uint8_t data) /* TODO: Make this static */
 {
 	/* Set CS low (active low!) */
 	GPIO_PinOutClear(ADXL_NCS_PORT, ADXL_NCS_PIN);

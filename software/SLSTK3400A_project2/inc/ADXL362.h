@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.h
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.3
+ * @version 1.4
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -11,18 +11,9 @@
 #define _ACCEL_H_
 
 
-#include <stdint.h>     /* (u)intXX_t */
-#include <stdbool.h>    /* "bool", "true", "false" */
-#include "em_cmu.h"     /* Clock Management Unit */
-#include "em_gpio.h"    /* General Purpose IO (GPIO) peripheral API */
-#include "em_usart.h"   /* Universal synchr./asynchr. receiver/transmitter (USART/UART) Peripheral API */
-
-#include "../inc/delay.h"     	/* Delay functionality */
-#include "../inc/util.h"     	/* Utility functions */
-#include "../inc/handlers.h" 	/* Interrupt handlers */
-#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
-
-#include "../inc/debugging.h" /* Enable or disable printing to UART */
+/* Includes necessary for this header file */
+#include <stdint.h>  /* (u)intXX_t */
+#include <stdbool.h> /* "bool", "true", "false" */
 
 
 /* ADXL REGISTERS */
@@ -46,7 +37,7 @@
 #define ADXL_REG_POWER_CTL 		0x2D /* Write xxxx xxMM (MM = 10) to: measurement mode */
 
 
-/* Prototypes */
+/* Prototypes for methods available to be used elsewhere */
 void initADXL_VCC (void);
 void powerADXL (bool enabled);
 

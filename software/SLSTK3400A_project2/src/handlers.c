@@ -2,8 +2,8 @@
  * @file handlers.c
  * @brief
  *   Interrupt handlers for the RTC and GPIO wakeup functionality.
- *   More interrupt handlers can be found in "delay.c".
- * @version 1.1
+ *   Another interrupt handler can be found in "delay.c".
+ * @version 1.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -13,16 +13,30 @@
  *   v1.0: Started from https://github.com/Fescron/Project-LabEmbeddedDesign1
  *   v1.1: Added dbprintln(""); above dbinfo statements in IRQ handlers to fix
  *         overwriting of text.
+ *   v1.2: Disabled the RTC counter if GPIO handlers are called, only added necessary includes
+ *         in header file, moved the others to the source file, updated documentation.
  *
  *   TODO: Make "triggered" static using getter?
+ *           => Add triggerd to ADXL362.c, use getters and setters to modify them
+ *              from main.c or handlers.c (more "readable" in main.c)
+ *         Remove those UART calls, state machine in main?
+ *         Remove stdbool include?
  *
  ******************************************************************************/
 
 
-#include "../inc/handlers.h"
+/* Includes necessary for this source file */
+#include <stdint.h>    /* (u)intXX_t */
+//#include <stdbool.h>   /* "bool", "true", "false" */
+#include "em_device.h" /* Include necessary MCU-specific header file */
+#include "em_gpio.h"   /* General Purpose IO */
+#include "em_rtc.h"    /* Real Time Counter (RTC) */
+
+#include "../inc/handlers.h"  /* Corresponding header file */
+#include "../inc/debugging.h" /* Enable or disable printing to UART */
 
 
-/* Global variables */
+/* Global variable (project-wide accessible) */
 volatile bool triggered = false; /* TODO: make static using getter? Accelerometer triggered interrupt */
 
 
@@ -52,6 +66,9 @@ void RTC_IRQHandler (void)
  *****************************************************************************/
 void GPIO_EVEN_IRQHandler(void)
 {
+	/* Disable the counter */
+	RTC_Enable(false);
+
 	/* Read interrupt flags */
 	uint32_t flags = GPIO_IntGet();
 
@@ -75,6 +92,9 @@ void GPIO_EVEN_IRQHandler(void)
  *****************************************************************************/
 void GPIO_ODD_IRQHandler(void)
 {
+	/* Disable the counter */
+	RTC_Enable(false);
+
 	/* Read interrupt flags */
 	uint32_t flags = GPIO_IntGet();
 

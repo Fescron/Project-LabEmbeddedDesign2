@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.h
  * @brief Delay functions.
- * @version 1.1
+ * @version 1.3
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -11,16 +11,8 @@
 #define _DELAY_H_
 
 
-#include <stdint.h>    /* (u)intXX_t */
-#include <stdbool.h>   /* "bool", "true", "false" */
-#include "em_device.h" /* Include necessary MCU-specific header file */
-#include "em_cmu.h"    /* Clock management unit */
-#include "em_emu.h"    /* Energy Management Unit */
-#include "em_gpio.h"   /* General Purpose IO */
-#include "em_rtc.h"    /* Real Time Counter (RTC) */
-
-#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
-#include "../inc/debugging.h" 	/* Enable or disable printing to UART */
+/* Include necessary for this header file */
+#include <stdint.h> /* (u)intXX_t */
 
 
 /* Definitions for RTC compare interrupts */
@@ -28,13 +20,15 @@
 #define LFXOFREQ_MS 32.768
 
 
-/* Prototypes */
+/* Definition to select which delay to use
+ * Comment this line to use EM2 delays, otherwise use SysTick delay */
+//#define SYSTICKDELAY /* TODO: Move to source file? */
+
+
+/* Prototypes for methods available to be used elsewhere */
+void delay (uint32_t msDelay);
+void sleep (uint32_t sSleep);
 void initRTCcomp (void);
-void delayRTCC_EM1 (uint32_t msDelay);
-void delayRTCC_EM2 (uint32_t msDelay);
-void sleepRTCC_EM2 (uint32_t sleep);
-void Delay (uint32_t dlyTicks);
-void systickInterrupts (bool enabled);
 
 
 #endif /* _DELAY_H_ */

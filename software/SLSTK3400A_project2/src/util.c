@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.c
  * @brief Utility functions.
- * @version 2.1
+ * @version 2.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -15,18 +15,35 @@
  *   v1.4: Moved delay functionality to specific header and source files.
  *   v2.0: Changed "Error()" to "error()", added a global variable to keep the error number and initialize the pin of the LED automatically.
  *   v2.1: Changed initLED to be a static (~hidden) method and also made the global variables static.
+ *   v2.2: Added peripheral clock enable/disable functionality for energy saving purposes, only added necessary includes in header file,
+ *         moved the others to the source file, updated documentation, replaced SysTick delay with RTCC delay, changed error delay length.
+ *
+ *   TODO: Also enable/disable "cmuClock_HFPER"?
+ *         Remove stdint and stdbool includes?
  *
  ******************************************************************************/
 
 
-#include "../inc/util.h"
+/* Includes necessary for this source file */
+//#include <stdint.h>    /* (u)intXX_t */
+//#include <stdbool.h>   /* "bool", "true", "false" */
+#include "em_device.h" /* Include necessary MCU-specific header file */
+#include "em_cmu.h"    /* Clock Management Unit */
+#include "em_gpio.h"   /* General Purpose IO */
+
+#include "../inc/util.h"        /* Corresponding header file */
+#include "../inc/delay.h"     	/* Delay functionality */
+#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
+#include "../inc/debugging.h" 	/* Enable or disable printing to UART */
 
 
-/* Static (~hidden) global variables */
+/* Static variables only available and used in this file */
 static uint8_t errorNumber = 0;
-static bool LEDinitialized = false;
+static bool LED_init = false;
 
-/* Prototypes for static (~hidden) methods */
+
+/* Prototype for static method only used by other methods in this file
+ * (Not available to be used elsewhere) */
 static void initLED (void);
 
 
@@ -44,11 +61,22 @@ static void initLED (void);
 void led (bool enabled)
 {
 	/* Initialize LED if not already the case */
-	if (!LEDinitialized) initLED();
+	if (!LED_init)
+	{
+		initLED();
+	}
+	else
+	{
+		/* Enable necessary clock */
+		CMU_ClockEnable(cmuClock_GPIO, true);
+	}
 
 	/* Set the selected state */
 	if (enabled) GPIO_PinOutSet(LED_PORT, LED_PIN);
 	else GPIO_PinOutClear(LED_PORT, LED_PIN);
+
+	/* Disable used clock */
+	CMU_ClockEnable(cmuClock_GPIO, false);
 }
 
 
@@ -67,7 +95,15 @@ void led (bool enabled)
 void error (uint8_t number)
 {
 	/* Initialize LED if not already the case */
-	if (!LEDinitialized) initLED();
+	if (!LED_init)
+	{
+		initLED();
+	}
+	else
+	{
+		/* Enable necessary clock */
+		CMU_ClockEnable(cmuClock_GPIO, true);
+	}
 
 	/* Save the given number in the global variable */
 	errorNumber = number;
@@ -78,7 +114,7 @@ void error (uint8_t number)
 
 	while(1)
 	{
-		Delay(100);
+		delay(100);
 		GPIO_PinOutToggle(LED_PORT, LED_PIN); /* Toggle LED */
 	}
 }
@@ -94,7 +130,7 @@ void error (uint8_t number)
  *****************************************************************************/
 static void initLED (void)
 {
-	/* Enable necessary clock (just in case) */
+	/* Enable necessary clock */
 	CMU_ClockEnable(cmuClock_GPIO, true);
 
 	/* In the case of gpioModePushPull", the last argument directly sets the
@@ -106,5 +142,5 @@ static void initLED (void)
 	dbinfo("LED pin initialized");
 #endif /* DEBUGGING */
 
-	LEDinitialized = true;
+	LED_init = true;
 }

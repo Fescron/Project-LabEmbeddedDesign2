@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file pin_mapping.h
  * @brief The pin definitions for the regular and custom Happy Gecko board.
- * @version 1.1
+ * @version 1.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -10,6 +10,7 @@
  *
  *   v1.0: Started with custom board pinout.
  *   v1.1: Added regular board pinout, selectable with define statement.
+ *   v1.2: Added documentation.
  *
  ******************************************************************************/
 
@@ -18,7 +19,10 @@
 #ifndef _PIN_MAPPING_H_
 #define _PIN_MAPPING_H_
 
-#include <em_gpio.h>
+
+/* Include necessary for this header file */
+#include <em_gpio.h> /* General Purpose IO */
+
 
 /* Select custom Happy Gecko board pinout or regular one */
 //#define CUSTOM_BOARD /* Comment this line if using the regular Happy Gecko board */

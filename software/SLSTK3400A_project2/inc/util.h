@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.h
  * @brief Utility functions.
- * @version 2.1
+ * @version 2.2
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -11,18 +11,12 @@
 #define _UTIL_H_
 
 
-#include <stdint.h>    /* (u)intXX_t */
-#include <stdbool.h>   /* "bool", "true", "false" */
-#include "em_device.h" /* Include necessary MCU-specific header file */
-#include "em_cmu.h"    /* Clock Management Unit */
-#include "em_gpio.h"   /* General Purpose IO */
-
-#include "../inc/delay.h"     	/* Delay functionality */
-#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
-#include "../inc/debugging.h" 	/* Enable or disable printing to UART */
+/* Includes necessary for this header file */
+#include <stdint.h>  /* (u)intXX_t */
+#include <stdbool.h> /* "bool", "true", "false" */
 
 
-/* Prototypes */
+/* Prototypes for methods available to be used elsewhere */
 void led (bool enabled);
 void error (uint8_t number);
 

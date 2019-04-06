@@ -17,17 +17,27 @@
  *   v1.2: Moved initRTCcomp method to "util.c".
  *   v1.3: Stopped using deprecated function "GPIO_IntConfig".
  *
- *   TODO: 1) Use EM3 instead of EM2 as sleep mode.
- *         2) Disable unused peripherals and clocks (see emodes.c) and check if nothing breaks.
- *         2) Use EM2 when in a Delay.
- *         2) Initialize more stuff like delayRTC (led, adxl)
- *         3) RTCcomp is broken when UDELAY_Calibrate() is called.
+ *   TODO: 1) RTCcomp is broken when UDELAY_Calibrate() is called.
  *              -> When UDELAY_Calibrate is called after initRTCcomp this is fixed but
  *                 the temperature sensor code stops working.
  *              => UDelay uses RTCC, Use timers instead! (timer + prescaler, every microsecond an interrupt?)
- *         3) Fix cable-checking method.
- *         4) Add VCOMP and WDOG functionality.
- *         5) Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
+ *         1) Fix cable-checking method.
+ *         1) Add VCOMP and WDOG functionality.
+ *
+ *         2) Disable unused peripherals and oscillators/clocks (see emodes.c) and check if nothing breaks.
+ *              => Do this consistently in each method
+ *              => Perhaps use a boolean argument so that in the case of sending more bytes
+ *                 the clock can be disabled only after sending the latest one.
+ *                   => static variable in method?
+ *              => Also enable/disable "cmuClock_HFPER" when "cmuClock_GPIO" is used?
+ *         2) Use global "firstBoot" instead of xxx_init global variables?
+ *         2) Initialize more stuff like delayRTC (led, adxl)
+ *
+ *         3) Add getters & setters and call them using the IRQ handlers.
+ *         3) Remove those UART calls in handlers.c, state machine in main?
+ *
+ *         4) Watch out with "under the hood" initialization! Can sometimes take some time for, for example a sensor.
+ *         4) Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
  *
  ******************************************************************************/
 
@@ -118,7 +128,7 @@ bool checkCable (void)
 	/* Change mode of second pin and also set it high with the last argument */
 	GPIO_PinModeSet(BREAK2_PORT, BREAK2_PIN, gpioModePushPull, 1);
 
-	Delay(50);
+	delay(50);
 
 	/* Check the connection */
 	if (!GPIO_PinInGet(BREAK1_PORT,BREAK1_PIN)) check = true;
@@ -140,11 +150,7 @@ int main (void)
 	/* Initialize chip */
 	CHIP_Init();
 
-	//UDELAY_Calibrate(); /* TODO: maybe remove this later? */ TIMERS!
-
-	/* Initialize and start systick
-	 * Number of ticks between interrupt = cmuClock_CORE/1000 */
-	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000)) while (1); /* TODO: move this to delay.c */
+	//UDELAY_Calibrate(); /* TODO: maybe remove this later? TIMERS! */
 
 #ifdef DEBUGGING /* DEBUGGING */
 	dbprint_INIT(USART1, 4, true, false); /* VCOM */
@@ -196,23 +202,6 @@ int main (void)
 #endif /* DEBUGGING */
 	powerDS18B20(false);
 
-	led(true);
-	Delay(2000);
-	led(false);
-
-	delayRTCC_EM2(500);
-
-	led(true);
-	Delay(2000);
-	led(false);
-
-	delayRTCC_EM1(500); /* TODO: fix this method */
-
-	led(true);
-	Delay(2000);
-	led(false);
-
-
 	/* Enable measurements */
 	measureADXL(true);
 
@@ -223,7 +212,11 @@ int main (void)
 	while(1)
 	{
 		led(true); /* Enable LED */
-		Delay(1000);
+
+		/* Enable necessary clock */
+		CMU_ClockEnable(cmuClock_GPIO, true); /* TODO: for debugging purposes here (already changed in LED but not elsewhere) */
+
+		delay(1000);
 
 		/* Read status register to acknowledge interrupt
 		 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL)
@@ -250,18 +243,17 @@ int main (void)
 			dbcrit("Cable broken!");
 		}
 
-#ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("Disabling systick & going to sleep...");
-#endif /* DEBUGGING */
-
 		led(false); /* Disable LED */
 
-		systickInterrupts(false); /* Disable SysTick interrupts */
+		/* Enable necessary clock */
+		CMU_ClockEnable(cmuClock_GPIO, true); /* TODO: for debugging purposes here (already changed in LED but not elsewhere) */
+
 		enableSPIpinsADXL(false); /* Disable SPI pins */
 
-		sleepRTCC_EM2(10); /* Go to sleep for 10 seconds */
+		/* TODO: cmuClock_GPIO needs to be enabled for the MCU to immediately react to interrupts!
+		 * It seems to log the interrupts but not wake up the MCU... */
+		sleep(10); /* Go to sleep for 10 seconds */
 
 		enableSPIpinsADXL(true); /* Enable SPI pins */
-		systickInterrupts(true); /* Enable SysTick interrupts */
 	}
 }
