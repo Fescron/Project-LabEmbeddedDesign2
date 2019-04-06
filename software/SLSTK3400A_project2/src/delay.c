@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.c
  * @brief Utility functions.
- * @version 1.3
+ * @version 1.4
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -13,11 +13,11 @@
  *   v1.2: Removed EM1 delay method (see note in delayRTCC_EM2).
  *   v1.3: Cleaned up includes, added option to select SysTick/EM2 delay functionality
  *         and moved all of the logic in one "delay" method. Renamed sleep method.
+ *   v1.4: Changed names of static variables, made initRTCcomp static.
  *
  *   TODO: Enable disable/enable clock functionality? (slows down the logic a lot last time tested...)
  *         RTC calendar (RTCC =/= RTCcompare?) could perhaps be better to wake the MCU every hour?
  *           => Possible in EM3 when using an external crystal?
- *         Make initRTCcomp static?
  *         Check the sections about Energy monitor and Crystals and RC oscillators
  *           => DRAMCO has perhaps chosen the crystal because this was more stable for
  *              high frequency (baudrate) communication. (leuart RNxxx...)
@@ -66,8 +66,16 @@
 
 /* Static variables only available and used in this file */
 static volatile uint32_t msTicks; /* Volatile because it's a global variable that's modified by an interrupt service routine */
-static bool SysTick_init = false;
-static bool RTCC_init = false;
+static bool RTCC_initialized = false;
+
+#ifdef SYSTICKDELAY /* SysTick delay selected */
+static bool SysTick_initialized = false;
+#endif /* SysTick/RTCC selection */
+
+
+/* Prototype for static method only used by other methods in this file
+ * (Not available to be used elsewhere) */
+static void initRTCcomp (void);
 
 
 /**************************************************************************//**
@@ -87,7 +95,7 @@ void delay (uint32_t msDelay)
 #ifdef SYSTICKDELAY /* SysTick delay selected */
 
 	/* Initialize SysTick if not already the case */
-	if (!SysTick_init)
+	if (!SysTick_initialized)
 	{
 		/* Initialize and start SysTick
 		 * Number of ticks between interrupt = cmuClock_CORE/1000 */
@@ -97,17 +105,13 @@ void delay (uint32_t msDelay)
 	dbinfo("SysTick initialized");
 #endif /* DEBUGGING */
 
-		SysTick_init = true;
+		SysTick_initialized = true;
 	}
 	else
 	{
 		/* Enable SysTick interrupt and counter by setting their bits. */
 		SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 	}
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbwarnInt("Waiting for ", msDelay, " ms\n\r");
-#endif /* DEBUGGING */
 
 	/* Wait a certain amount of ticks */
 	uint32_t curTicks = msTicks;
@@ -119,11 +123,7 @@ void delay (uint32_t msDelay)
 #else /* EM2 RTCC delay selected */
 
 	/* Initialize RTCC if not already the case */
-	if (!RTCC_init) initRTCcomp();
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbwarnInt("Waiting in EM2 for ", msDelay, " ms\n\r");
-#endif /* DEBUGGING */
+	if (!RTCC_initialized) initRTCcomp();
 
 	/* Set RTC compare value for RTC compare register 0 */
 	RTC_CompareSet(0, (LFXOFREQ_MS * msDelay)); /* <= 0x00ffffff = 16777215 */
@@ -139,7 +139,7 @@ void delay (uint32_t msDelay)
 //	CMU_ClockEnable(cmuClock_HFLE, false);
 //	CMU_ClockEnable(cmuClock_RTC, false);
 
-#endif
+#endif /* SysTick/RTCC selection */
 
 }
 
@@ -151,8 +151,12 @@ void delay (uint32_t msDelay)
  * @details
  *   The RTC compare functionality uses the low-frequency crystal oscillator
  *   (LFXO) as the source.
+ *
+ * @note
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *****************************************************************************/
-void initRTCcomp (void)
+static void initRTCcomp (void)
 {
 	/* Enable the low-frequency crystal oscillator for the RTC */
 	CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
@@ -183,7 +187,7 @@ void initRTCcomp (void)
 	dbinfo("RTCC initialized");
 #endif /* DEBUGGING */
 
-	RTCC_init = true;
+	RTCC_initialized = true;
 }
 
 
@@ -197,7 +201,7 @@ void initRTCcomp (void)
 void sleep (uint32_t sSleep)
 {
 	/* Initialize RTCC if not already the case */
-	if (!RTCC_init){
+	if (!RTCC_initialized){
 		initRTCcomp();
 	}
 	else
@@ -209,7 +213,7 @@ void sleep (uint32_t sSleep)
 	}
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbwarnInt("Sleeping in EM2 for ", sSleep, "s\n\r");
+	dbwarnInt("Sleeping in EM2 for ", sSleep, " s\n\r");
 #endif /* DEBUGGING */
 
 	/* Set RTC compare value for RTC compare register 0 */

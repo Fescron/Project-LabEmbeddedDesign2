@@ -1,14 +1,14 @@
 /***************************************************************************//**
  * @file ADXL362.h
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.4
+ * @version 1.6
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
 
 /* Include guards prevent multiple inclusions of the same header */
-#ifndef _ACCEL_H_
-#define _ACCEL_H_
+#ifndef _ADXL362_H_
+#define _ADXL362_H_
 
 
 /* Includes necessary for this header file */
@@ -38,26 +38,26 @@
 
 
 /* Prototypes for methods available to be used elsewhere */
-void initADXL_VCC (void);
-void powerADXL (bool enabled);
+void initADXL (void);
 
-void enableSPIpinsADXL (bool enabled);
-void initADXL_SPI (void);
+void ADXL_setTriggered (bool triggered);
+bool ADXL_getTriggered (void);
+void ADXL_ackInterrupt (void);
 
-void testADXL (void);
+void ADXL_enableSPI (bool enabled);
+void ADXL_enableMeasure (bool enabled);
 
-void readValuesADXL (void);
-void resetHandlerADXL (void);
+void ADXL_configRange (uint8_t givenRange);
+void ADXL_configODR (uint8_t givenODR);
+void ADXL_configActivity (uint8_t gThreshold);
 
-uint8_t readADXL (uint8_t address);
-void writeADXL (uint8_t address, uint8_t data);
-void readADXL_XYZDATA (void);
-
-void measureADXL (bool enabled);
-void configADXL_range (uint8_t givenRange);
-void configADXL_ODR (uint8_t givenODR);
-void configADXL_activity (uint8_t gThreshold);
+void ADXL_readValues (void);
 
 
-#endif /* _ACCEL_H_ */
+
+
+
+
+
+#endif /* _ADXL362_H_ */
 

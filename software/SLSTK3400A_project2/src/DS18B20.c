@@ -83,6 +83,10 @@ float readTempDS18B20 (void)
 	}
 	else
 	{
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("DS18B20 measurement failed");
+#endif /* DEBUGGING */
+
 		/* Return an impossible value if the measurement failed */
 		return (10000);
 	}
@@ -95,19 +99,13 @@ float readTempDS18B20 (void)
  *****************************************************************************/
 void initVDD_DS18B20 (void)
 {
-	/* Enable High-frequency peripheral clock */
-	//CMU_ClockEnable(cmuClock_HFPER, true); /* TODO: Check if and why this is needed here */
-
-	/* Enable oscillator to GPIO (keeping it here just in case...) */
-	CMU_ClockEnable(cmuClock_GPIO, true); /* TODO: Maybe move this to readTempDS18B20 when clocks are disabled on sleep */
+	/* Enable necessary clocks (just in case) */
+	CMU_ClockEnable(cmuClock_HFPER, true); /* GPIO is a High Frequency Peripheral */
+	CMU_ClockEnable(cmuClock_GPIO, true);
 
 	/* In the case of gpioModePushPull", the last argument directly sets the
 	 * the pin low if the value is "0" or high if the value is "1". */
 	GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, 1);
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("DS18B20 VDD pin initialized and enabled");
-#endif /* DEBUGGING */
 
 }
 
@@ -122,24 +120,8 @@ void initVDD_DS18B20 (void)
  *****************************************************************************/
 void powerDS18B20 (bool enabled)
 {
-	if (enabled)
-	{
-		GPIO_PinOutSet(TEMP_VDD_PORT, TEMP_VDD_PIN);
-
-#ifdef DEBUGGING /* DEBUGGING */
-		dbinfo("DS18B20 VDD pin enabled");
-#endif /* DEBUGGING */
-
-	}
-	else
-	{
-		GPIO_PinOutClear(TEMP_VDD_PORT, TEMP_VDD_PIN);
-
-#ifdef DEBUGGING /* DEBUGGING */
-		dbinfo("DS18B20 VDD pin disabled");
-#endif /* DEBUGGING */
-
-	}
+	if (enabled) GPIO_PinOutSet(TEMP_VDD_PORT, TEMP_VDD_PIN);
+	else GPIO_PinOutClear(TEMP_VDD_PORT, TEMP_VDD_PIN);
 }
 
 
@@ -202,10 +184,6 @@ bool init_DS18B20 (void)
 
 	/* Continue waiting and finally return that the reset was successful */
 	UDELAY_Delay(480);
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("DS18B20 initialized");
-#endif /* DEBUGGING */
 
 	return (true);
 }

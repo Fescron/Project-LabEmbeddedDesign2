@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.4
+ * @version 1.6
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -15,11 +15,13 @@
  *         change the pin mode and enable the pin in one statement.
  *   v1.3: Changed some methods and global variables to be static (~hidden).
  *   v1.4: Changed delay method and cleaned up includes.
+ *   v1.5: Added get/set method for the static variable "ADXL_triggered".
+ *   v1.6: Changed a lot of things...
  *
  *   TODO: Remove stdint and stdbool includes?
- *         Too much movement breaks interrupt functionality, register not cleared
- *         good but new movement already detected?
- *         Make more methods static.
+ *         Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
+ *
+ *         Enable wake-up mode: writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit
  *
  ******************************************************************************/
 
@@ -34,100 +36,377 @@
 #include "../inc/ADXL362.h"     /* Corresponding header file */
 #include "../inc/delay.h"     	/* Delay functionality */
 #include "../inc/util.h"     	/* Utility functions */
-#include "../inc/handlers.h" 	/* Interrupt handlers */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
 
-#include "../inc/debugging.h" /* Enable or disable printing to UART */
+#include "../inc/debugging.h"   /* Enable or disable printing to UART */
 
 
-/* Global variable */
-volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
-
-
-/* Static variable only available and used in this file */
+/* Static variables only available and used in this file */
+static volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
 static uint8_t range = 0;
+static bool ADXL_triggered = false;
+static bool ADXL_VDD_initialized = false;
 
 
 /* Prototypes for static methods only used by other methods in this file
  * (Not available to be used elsewhere) */
+static void powerADXL (bool enabled);
+static void initADXL_SPI (void);
 static void softResetADXL (void);
+static void resetHandlerADXL (void);
+static uint8_t readADXL (uint8_t address);
+static void writeADXL (uint8_t address, uint8_t data);
+static void readADXL_XYZDATA (void);
 static bool checkID_ADXL (void);
 static int32_t convertGRangeToGValue (int8_t sensorValue);
 
 
 /**************************************************************************//**
  * @brief
- *   Initialize the GPIO pin to supply the accelerometer with power.
- *****************************************************************************/
-void initADXL_VCC (void)
-{
-	/* In the case of gpioModePushPull", the last argument directly sets the
-	 * the pin low if the value is "0" or high if the value is "1". */
-	GPIO_PinModeSet(ADXL_VDD_PORT, ADXL_VDD_PIN, gpioModePushPull, 1);
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("ADXL362 VDD pin initialized and enabled");
-#endif /* DEBUGGING */
-
-}
-
-/**************************************************************************//**
- * @brief
- *   Enable or disable the power to the accelerometer.
+ *   Initialize the accelerometer.
  *
- * @param[in] enabled
- *   @li True - Enable the GPIO pin connected to the VDD pin of the accelerometer.
- *   @li False - Disable the GPIO pin connected to the VDD pin of the accelerometer.
+ * @details
+ *   This method calls all the other internal necessary functions.
  *****************************************************************************/
-void powerADXL (bool enabled)
+void initADXL (void)
 {
-	if (enabled)
-	{
-		GPIO_PinOutSet(ADXL_VDD_PORT, ADXL_VDD_PIN); /* Enable VDD pin */
+	/* Enable necessary clocks (just in case) */
+	CMU_ClockEnable(cmuClock_HFPER, true); /* GPIO and USART0 are High Frequency Peripherals */
+	CMU_ClockEnable(cmuClock_GPIO, true);
 
-#ifdef DEBUGGING /* DEBUGGING */
-		dbinfo("Accelerometer powered");
-#endif /* DEBUGGING */
+	/* Initialize and power VDD pin */
+	powerADXL(true);
 
-	}
-	else
-	{
-		GPIO_PinOutClear(ADXL_VDD_PORT, ADXL_VDD_PIN); /* Disable VDD pin */
+	/* Enable necessary clock (just in case) */
+	CMU_ClockEnable(cmuClock_USART0, true);
 
-#ifdef DEBUGGING /* DEBUGGING */
-		dbwarn("Accelerometer powered down");
-#endif /* DEBUGGING */
+	/* Initialize USART0 as SPI slave (also initialize CS pin) */
+	initADXL_SPI();
 
-	}
+	/* Soft reset ADXL handler */
+	resetHandlerADXL();
 }
 
 
 /**************************************************************************//**
  * @brief
- *   Enable or disable the SPI pins to the accelerometer.
+ *   Setter for the "ADXL_triggered" static variable.
+ *
+ * @param[in] triggered
+ *    @li True - Set ADXL_triggered to "true".
+ *    @li False - Set ADXL_triggered to "false".
+ *****************************************************************************/
+void ADXL_setTriggered (bool triggered)
+{
+	ADXL_triggered = triggered;
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Getter for the "ADXL_triggered" static variable.
+ *
+ * @return
+ *   The value of ADXL_triggered.
+ *****************************************************************************/
+bool ADXL_getTriggered (void)
+{
+	return (ADXL_triggered);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Acknowledge the interrupt from the accelerometer.
+ *****************************************************************************/
+void ADXL_ackInterrupt (void)
+{
+	readADXL(ADXL_REG_STATUS);
+	ADXL_setTriggered(false);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Enable or disable the SPI pins and USART0 clocks to the accelerometer.
  *
  * @param[in] enabled
- *   @li True - Enable the SPI pins to the accelerometer.
- *   @li False - Disable the SPI pins to the accelerometer.
+ *   @li True - Enable the SPI pins and USART0 clocks to the accelerometer.
+ *   @li False - Disable the SPI pins and USART0 clocks to the accelerometer.
  *****************************************************************************/
-void enableSPIpinsADXL (bool enabled)
+void ADXL_enableSPI (bool enabled)
 {
 	if (enabled)
 	{
+		/* Enable USART0 clock and peripheral */
+		CMU_ClockEnable(cmuClock_USART0, true);
+		USART_Enable(USART0, usartEnable);
+
 		/* In the case of gpioModePushPull", the last argument directly sets the
 		 * the pin low if the value is "0" or high if the value is "1". */
 		GPIO_PinModeSet(ADXL_CLK_PORT, ADXL_CLK_PIN, gpioModePushPull, 0);   /* US0_CLK is push pull */
 		GPIO_PinModeSet(ADXL_NCS_PORT, ADXL_NCS_PIN, gpioModePushPull, 1);   /* US0_CS is push pull */
 		GPIO_PinModeSet(ADXL_MOSI_PORT, ADXL_MOSI_PIN, gpioModePushPull, 1); /* US0_TX (MOSI) is push pull */
 		GPIO_PinModeSet(ADXL_MISO_PORT, ADXL_MISO_PIN, gpioModeInput, 1);    /* US0_RX (MISO) is input */
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbinfo("SPI functionality enabled");
+#endif /* DEBUGGING */
+
 	}
 	else
 	{
+		/* Disable USART0 clock and peripheral */
+		CMU_ClockEnable(cmuClock_USART0, false);
+		USART_Enable(USART0, usartDisable);
+
 		/* gpioModeDisabled: Pull-up if DOUT is set. */
 		GPIO_PinModeSet(ADXL_CLK_PORT, ADXL_CLK_PIN, gpioModeDisabled, 0);
 		GPIO_PinModeSet(ADXL_NCS_PORT, ADXL_NCS_PIN, gpioModeDisabled, 1);
 		GPIO_PinModeSet(ADXL_MOSI_PORT, ADXL_MOSI_PIN, gpioModeDisabled, 1);
 		GPIO_PinModeSet(ADXL_MISO_PORT, ADXL_MISO_PIN, gpioModeDisabled, 1);
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbinfo("SPI functionality disabled");
+#endif /* DEBUGGING */
+
+	}
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Enable or disable measurement mode.
+ *
+ * @param[in] enabled
+ *   @li True - Enable measurement mode.
+ *   @li False - Disable measurement mode (standby).
+ *****************************************************************************/
+void ADXL_enableMeasure (bool enabled)
+{
+	if (enabled)
+	{
+		/* Get value in register */
+		uint8_t reg = readADXL(ADXL_REG_POWER_CTL);
+
+		/* AND with mask to keep the bits we don't want to change */
+		reg = reg & 0b11111100;
+
+		/* OR with new setting bits */
+
+		/* Enable measurements */
+		writeADXL(ADXL_REG_POWER_CTL, reg | 0b00000010); /* Last 2 bits are measurement mode */
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbinfo("ADXL362: Measurement enabled");
+#endif /* DEBUGGING */
+
+	}
+	else
+	{
+		/* Get value in register */
+		uint8_t reg = readADXL(ADXL_REG_POWER_CTL);
+
+		/* AND with mask to keep the bits we don't want to change */
+		reg = reg & 0b11111100;
+
+		/* OR with new setting bits */
+
+		/* Enable measurements */
+		writeADXL(ADXL_REG_POWER_CTL, reg | 0b00000000); /* Last 2 bits are measurement mode */
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbinfo("ADXL362: Measurement disabled (standby)");
+#endif /* DEBUGGING */
+	}
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Configure the measurement range and store the selected one in
+ *   a global variable.
+ *
+ * @param[in] givenRange
+ *   @li 0 - +- 2g
+ *   @li 1 - +- 4g
+ *   @li 2 - +- 8g
+ *****************************************************************************/
+void ADXL_configRange (uint8_t givenRange)
+{
+	/* Get value in register */
+	uint8_t reg = readADXL(ADXL_REG_FILTER_CTL);
+
+	/* AND with mask to keep the bits we don't want to change */
+	reg = reg & 0b00111111;
+
+	/* OR with new setting bits */
+
+	/* Set measurement range (first two bits) */
+	if (givenRange == 0) {
+		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000000));
+		range = 0;
+	}
+	else if (givenRange == 1) {
+		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b01000000));
+		range = 1;
+	}
+	else if (givenRange == 2) {
+		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b10000000));
+		range = 2;
+	}
+
+#ifdef DEBUGGING /* DEBUGGING */
+	if (range == 0) dbinfo("ADXL362: Measurement mode +- 2g selected");
+	else if (range == 1) dbinfo("ADXL362: Measurement mode +- 4g selected");
+	else if (range == 2) dbinfo("ADXL362: Measurement mode +- 8g selected");
+#endif /* DEBUGGING */
+
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Configure the Output Data Rate (ODR).
+ *
+ * @param[in] givenODR
+ *   @li 0 - 12.5 Hz
+ *   @li 1 - 25 Hz
+ *   @li 2 - 50 Hz
+ *   @li 3 - 100 Hz (reset default)
+ *   @li 4 - 200 Hz
+ *   @li 5 - 400 Hz
+ *****************************************************************************/
+void ADXL_configODR (uint8_t givenODR)
+{
+	/* Get value in register */
+	uint8_t reg = readADXL(ADXL_REG_FILTER_CTL);
+
+	/* AND with mask to keep the bits we don't want to change */
+	reg = reg & 0b11111000;
+
+	/* OR with new setting bits */
+
+	/* Set ODR (last three bits) */
+	if (givenODR == 0) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000000));
+	if (givenODR == 1) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000001));
+	if (givenODR == 2) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000010));
+	if (givenODR == 3) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000011));
+	if (givenODR == 4) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000100));
+	if (givenODR == 5) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000101));
+	else writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000011));
+
+#ifdef DEBUGGING /* DEBUGGING */
+	if (givenODR == 0) dbinfo("ADXL362: ODR set at 12.5 Hz");
+	else if (givenODR == 1) dbinfo("ADXL362: ODR set at 25 Hz");
+	else if (givenODR == 2) dbinfo("ADXL362: ODR set at 50 Hz");
+	else if (givenODR == 3) dbinfo("ADXL362: ODR set at 100 Hz");
+	else if (givenODR == 4) dbinfo("ADXL362: ODR set at 200 Hz");
+	else if (givenODR == 5) dbinfo("ADXL362: ODR set at 400 Hz");
+	else dbinfo("ADXL362: ODR set at 100 Hz (reset default)");
+#endif /* DEBUGGING */
+
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Configure the accelerometer to work in activity threshold mode.
+ *
+ * @details
+ *   Route activity detector to INT1 pin using INTMAP1, isolate bits
+ *   and write settings to both threshold registers.
+ *
+ * @param[in] gThreshold
+ *   Threshold [g].
+ *****************************************************************************/
+void ADXL_configActivity (uint8_t gThreshold)
+{
+	/* Map activity detector to INT1 pin  */
+	writeADXL(ADXL_REG_INTMAP1, 0b00010000); /* Bit 4 selects activity detector */
+
+	/* Enable referenced activity threshold mode (last two bits) */
+	writeADXL(ADXL_REG_ACT_INACT_CTL, 0b00000011);
+
+	/* Convert g value to "codes":
+	 * THRESH_ACT [codes] = Threshold Value [g] × Scale Factor [LSB per g] */
+	uint16_t threshold;
+
+	if (range == 0) threshold = gThreshold * 1000;
+	else if (range == 1) threshold = gThreshold * 500;
+	else if (range == 2) threshold = gThreshold * 250;
+	else threshold = 0;
+
+	/* Isolate bits using masks and shifting */
+	uint8_t low  = (threshold & 0b0011111111);
+	uint8_t high = (threshold & 0b1100000000) >> 8;
+
+	/* Set threshold register values (total: 11bit unsigned) */
+	writeADXL(ADXL_REG_THRESH_ACT_L, low);  /* 7:0 bits used */
+	writeADXL(ADXL_REG_THRESH_ACT_H, high); /* 2:0 bits used */
+
+#ifdef DEBUGGING /* DEBUGGING */
+	dbinfoInt("ADXL362: Activity configured: ", gThreshold, " g");
+#endif /* DEBUGGING */
+
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Read and display g values forever with a 100ms interval.
+ *
+ * @details
+ *   The accelerometer is put in measurement mode at 12.5Hz ODR, new
+ *   values are displayed every 100ms, if an interrupt was generated
+ *   a delay of one second is called.
+ *****************************************************************************/
+void ADXL_readValues (void)
+{
+	uint32_t counter = 0;
+
+	/* Enable measurement mode */
+	ADXL_enableMeasure(true);
+
+	/* Infinite loop */
+	while (1)
+	{
+		led(true); /* Enable LED */
+
+		/* Read XYZ sensor data */
+		readADXL_XYZDATA();
+
+#ifdef DEBUGGING /* DEBUGGING */
+		/* Print XYZ sensor data */
+		//dbprint("[");
+		dbprint("\r[");
+		dbprintInt(counter);
+		dbprint("] X: ");
+		dbprintInt(convertGRangeToGValue(XYZDATA[0]));
+		dbprint(" mg | Y: ");
+		dbprintInt(convertGRangeToGValue(XYZDATA[1]));
+		dbprint(" mg | Z: ");
+		dbprintInt(convertGRangeToGValue(XYZDATA[2]));
+		dbprint(" mg   "); /* Extra spacing is to overwrite other data if it's remaining (see \r) */
+		//dbprintln("");
+#endif /* DEBUGGING */
+
+		led(false); /* Disable LED */
+
+		counter++;
+
+		delay(100);
+
+		/* Read status register to acknowledge interrupt
+		 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL)
+		 * TODO this can perhaps fix the bug where too much movenent breaks interrupt wakeup ... */
+		if (ADXL_getTriggered())
+		{
+			delay(1000);
+
+			readADXL(ADXL_REG_STATUS);
+			ADXL_setTriggered(false);
+		}
 	}
 }
 
@@ -138,15 +417,15 @@ void enableSPIpinsADXL (bool enabled)
  *   by the accelerometer.
  *
  * @details
- *   Enable clocks, configure pins, configure USART0 in SPI mode, route
+ *   Configure pins, configure USART0 in SPI mode, route
  *   the pins, enable USART0 and set CS high.
+ *
+ * @note
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *****************************************************************************/
-void initADXL_SPI (void)
+static void initADXL_SPI (void)
 {
-	/* Enable necessary clocks */
-	CMU_ClockEnable(cmuClock_GPIO, true);
-	CMU_ClockEnable(cmuClock_USART0, true);
-
 	/* Configure GPIO
 	 * In the case of gpioModePushPull", the last argument directly sets the
 	 * the pin low if the value is "0" or high if the value is "1". */
@@ -181,138 +460,6 @@ void initADXL_SPI (void)
 
 	/* Set CS high (active low!) */
 	GPIO_PinOutSet(gpioPortE, 13);
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("Accelerometer SPI initialized");
-#endif /* DEBUGGING */
-
-}
-
-
-/**************************************************************************//**
- * @brief
- *   Go through all of the register settings to see the influence
- *   they have on power usage.
- *****************************************************************************/
-void testADXL (void)
-{
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbwarn("Waiting 5 seconds...");
-#endif /* DEBUGGING */
-
-	delay(5000);
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbwarn("Starting...");
-#endif /* DEBUGGING */
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("Testing the ADXL (all in +-2g default measurement range, 7 seconds):");
-	dbprintln("   standby - 1sec - ODR 12,5Hz + enable measurements - 1sec - ODR 25 Hz");
-	dbprintln("   - 1sec - ODR 50 Hz - 1sec - ODR 100 Hz (default on reset) - 1sec -");
-	dbprintln("   200Hz - 1sec - ODR 400 Hz - 1sec - soft Reset");
-#endif /* DEBUGGING */
-
-	/* Soft reset ADXL */
-	softResetADXL();
-
-	/* Standby */
-	delay(1000);
-
-	/* ODR 12,5Hz */
-	writeADXL(ADXL_REG_FILTER_CTL, 0b00010000); /* last 3 bits are ODR */
-
-	/* Enable measurements */
-	writeADXL(ADXL_REG_POWER_CTL, 0b00000010); /* last 2 bits are measurement mode */
-
-	delay(1000);
-
-	/* ODR 25Hz */
-	writeADXL(ADXL_REG_FILTER_CTL, 0b00010001); /* last 3 bits are ODR */
-	delay(1000);
-
-	/* ODR 50Hz */
-	writeADXL(ADXL_REG_FILTER_CTL, 0b00010010); /* last 3 bits are ODR */
-	delay(1000);
-
-	/* ODR 100Hz (default) */
-	writeADXL(ADXL_REG_FILTER_CTL, 0b00010011); /* last 3 bits are ODR */
-	delay(1000);
-
-	/* ODR 200Hz */
-	writeADXL(ADXL_REG_FILTER_CTL, 0b00010100); /* last 3 bits are ODR */
-	delay(1000);
-
-	/* ODR 400Hz */
-	writeADXL(ADXL_REG_FILTER_CTL, 0b00010101); /* last 3 bits are ODR */
-	delay(1000);
-
-	/* Soft reset ADXL */
-	softResetADXL();
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("Testing done");
-#endif /* DEBUGGING */
-
-}
-
-
-/**************************************************************************//**
- * @brief
- *   Read and display g values forever with a 100ms interval.
- *
- * @details
- *   The accelerometer is put in measurement mode at 12.5Hz ODR, new
- *   values are displayed every 100ms, if an interrupt was generated
- *   a delay of one second is called.
- *****************************************************************************/
-void readValuesADXL (void)
-{
-	uint32_t counter = 0;
-
-	/* Enable measurement mode */
-	measureADXL(true);
-
-	/* Infinite loop */
-	while (1)
-	{
-		led(true); /* Enable LED */
-
-		/* Read XYZ sensor data */
-		readADXL_XYZDATA();
-
-#ifdef DEBUGGING /* DEBUGGING */
-		/* Print XYZ sensor data */
-		//dbprint("[");
-		dbprint("\r[");
-		dbprintInt(counter);
-		dbprint("] X: ");
-		dbprintInt(convertGRangeToGValue(XYZDATA[0]));
-		dbprint(" mg | Y: ");
-		dbprintInt(convertGRangeToGValue(XYZDATA[1]));
-		dbprint(" mg | Z: ");
-		dbprintInt(convertGRangeToGValue(XYZDATA[2]));
-		dbprint(" mg   "); /* Extra spacing is to overwrite other data if it's remaining (see \r) */
-		//dbprintln("");
-#endif /* DEBUGGING */
-
-		led(false); /* Disable LED */
-
-		counter++;
-
-		delay(100);
-
-		/* Read status register to acknowledge interrupt
-		 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL) */
-		if (triggered)
-		{
-			delay(1000);
-
-			readADXL(ADXL_REG_STATUS);
-			triggered = false;
-		}
-	}
 }
 
 
@@ -323,8 +470,12 @@ void readValuesADXL (void)
  * @details
  *   If the first ID check fails, the MCU is put on hold for one second
  *   and the ID gets checked again.
+ *
+ * @note
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *****************************************************************************/
-void resetHandlerADXL (void)
+static void resetHandlerADXL (void)
 {
 	uint8_t retries = 0;
 
@@ -378,8 +529,8 @@ void resetHandlerADXL (void)
 	}
 
 #ifdef DEBUGGING /* DEBUGGING */
-	if (retries < 2) dbinfoInt("Soft reset ADXL done (", retries, " retries)");
-	else dbwarnInt("Soft reset ADXL done, had to \"hard reset\" (", retries, " retries)");
+	if (retries < 2) dbinfoInt("ADXL362 initialized (", retries, " soft reset retries)");
+	else dbwarnInt("ADXL362 initialized (had to \"hard reset\", ", retries, " soft reset retries)");
 #endif /* DEBUGGING */
 
 }
@@ -389,13 +540,17 @@ void resetHandlerADXL (void)
  * @brief
  *   Read an SPI byte from the accelerometer (8 bits) using a given address.
  *
+ * @note
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
+ *
  * @param[in] address
  *   The register address to read from.
  *
  * @return
  *   The response (one byte, uint8_t).
  *****************************************************************************/
-uint8_t readADXL (uint8_t address) /* TODO: Make this static */
+static uint8_t readADXL (uint8_t address)
 {
 	uint8_t response;
 
@@ -419,13 +574,17 @@ uint8_t readADXL (uint8_t address) /* TODO: Make this static */
  *   Write an SPI byte to the accelerometer (8 bits) using a given address
  *   and specified data.
  *
+ * @note
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
+ *
  * @param[in] address
  *   The register address to write the data to (one byte, uint8_t).
  *
  * @param[in] data
  *   The data to write to the address (one byte, uint8_t).
  *****************************************************************************/
-void writeADXL (uint8_t address, uint8_t data) /* TODO: Make this static */
+static void writeADXL (uint8_t address, uint8_t data)
 {
 	/* Set CS low (active low!) */
 	GPIO_PinOutClear(ADXL_NCS_PORT, ADXL_NCS_PIN);
@@ -446,8 +605,12 @@ void writeADXL (uint8_t address, uint8_t data) /* TODO: Make this static */
  *
  * @details
  *   Response data gets put in XYZDATA array (global volatile variable).
+ *
+ * @note
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *****************************************************************************/
-void readADXL_XYZDATA (void)
+static void readADXL_XYZDATA (void)
 {
 	/* CS low (active low!) */
 	GPIO_PinOutClear(ADXL_NCS_PORT, ADXL_NCS_PIN);
@@ -466,177 +629,34 @@ void readADXL_XYZDATA (void)
 
 /**************************************************************************//**
  * @brief
- *   Configure the Output Data Rate (ODR).
- *
- * @param[in] givenODR
- *   @li 0 - 12.5 Hz
- *   @li 1 - 25 Hz
- *   @li 2 - 50 Hz
- *   @li 3 - 100 Hz (reset default)
- *   @li 4 - 200 Hz
- *   @li 5 - 400 Hz
- *****************************************************************************/
-void configADXL_ODR (uint8_t givenODR)
-{
-	/* Get value in register */
-	uint8_t reg = readADXL(ADXL_REG_FILTER_CTL);
-
-	/* AND with mask to keep the bits we don't want to change */
-	reg = reg & 0b11111000;
-
-	/* OR with new setting bits */
-
-	/* Set ODR (last three bits) */
-	if (givenODR == 0) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000000));
-	if (givenODR == 1) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000001));
-	if (givenODR == 2) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000010));
-	if (givenODR == 3) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000011));
-	if (givenODR == 4) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000100));
-	if (givenODR == 5) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000101));
-	else writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000011));
-
-#ifdef DEBUGGING /* DEBUGGING */
-	if (givenODR == 0) dbinfo("ODR set at 12.5 Hz");
-	else if (givenODR == 1) dbinfo("ODR set at 25 Hz");
-	else if (givenODR == 2) dbinfo("ODR set at 50 Hz");
-	else if (givenODR == 3) dbinfo("ODR set at 100 Hz");
-	else if (givenODR == 4) dbinfo("ODR set at 200 Hz");
-	else if (givenODR == 5) dbinfo("ODR set at 400 Hz");
-	else dbinfo("ODR set at 100 Hz (reset default)");
-#endif /* DEBUGGING */
-
-}
-
-
-/**************************************************************************//**
- * @brief
- *   Configure the measurement range and store the selected one in
- *   a global variable.
- *
- * @param[in] givenRange
- *   @li 0 - +- 2g
- *   @li 1 - +- 4g
- *   @li 2 - +- 8g
- *****************************************************************************/
-void configADXL_range (uint8_t givenRange)
-{
-	/* Get value in register */
-	uint8_t reg = readADXL(ADXL_REG_FILTER_CTL);
-
-	/* AND with mask to keep the bits we don't want to change */
-	reg = reg & 0b00111111;
-
-	/* OR with new setting bits */
-
-	/* Set measurement range (first two bits) */
-	if (givenRange == 0) {
-		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000000));
-		range = 0;
-	}
-	else if (givenRange == 1) {
-		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b01000000));
-		range = 1;
-	}
-	else if (givenRange == 2) {
-		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b10000000));
-		range = 2;
-	}
-
-#ifdef DEBUGGING /* DEBUGGING */
-	if (range == 0) dbinfo("Measurement mode +- 2g selected");
-	else if (range == 1) dbinfo("Measurement mode +- 4g selected");
-	else if (range == 2) dbinfo("Measurement mode +- 8g selected");
-#endif /* DEBUGGING */
-
-}
-
-
-/**************************************************************************//**
- * @brief
- *   Configure the accelerometer to work in activity threshold mode.
+ *   Enable or disable the power to the accelerometer.
  *
  * @details
- *   Route activity detector to INT1 pin using INTMAP1, isolate bits
- *   and write settings to both threshold registers.
+ *   This method also initializes the pin-mode if necessary.
  *
- * @param[in] gThreshold
- *   Threshold [g].
- *****************************************************************************/
-void configADXL_activity (uint8_t gThreshold)
-{
-	/* Map activity detector to INT1 pin  */
-	writeADXL(ADXL_REG_INTMAP1, 0b00010000); /* Bit 4 selects activity detector */
-
-	/* Enable referenced activity threshold mode (last two bits) */
-	writeADXL(ADXL_REG_ACT_INACT_CTL, 0b00000011);
-
-	/* Convert g value to "codes":
-	 * THRESH_ACT [codes] = Threshold Value [g] × Scale Factor [LSB per g] */
-	uint16_t threshold;
-
-	if (range == 0) threshold = gThreshold * 1000;
-	else if (range == 1) threshold = gThreshold * 500;
-	else if (range == 2) threshold = gThreshold * 250;
-	else threshold = 0;
-
-	/* Isolate bits using masks and shifting */
-	uint8_t low  = (threshold & 0b0011111111);
-	uint8_t high = (threshold & 0b1100000000) >> 8;
-
-	/* Set threshold register values (total: 11bit unsigned) */
-	writeADXL(ADXL_REG_THRESH_ACT_L, low);  /* 7:0 bits used */
-	writeADXL(ADXL_REG_THRESH_ACT_H, high); /* 2:0 bits used */
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbinfoInt("Activity configured: ", gThreshold, " g");
-#endif /* DEBUGGING */
-
-}
-
-/**************************************************************************//**
- * @brief
- *   Enable or disable measurement mode.
+ * @note
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *
  * @param[in] enabled
- *   @li True - Enable measurement mode.
- *   @li False - Disable measurement mode (standby).
+ *   @li True - Enable the GPIO pin connected to the VDD pin of the accelerometer.
+ *   @li False - Disable the GPIO pin connected to the VDD pin of the accelerometer.
  *****************************************************************************/
-void measureADXL (bool enabled)
+static void powerADXL (bool enabled)
 {
-	if (enabled)
+	/* Initialize VDD pin if not already the case */
+	if (!ADXL_VDD_initialized)
 	{
-		/* Get value in register */
-		uint8_t reg = readADXL(ADXL_REG_POWER_CTL);
+		/* In the case of gpioModePushPull", the last argument directly sets the
+		 * the pin low if the value is "0" or high if the value is "1". */
+		GPIO_PinModeSet(ADXL_VDD_PORT, ADXL_VDD_PIN, gpioModePushPull, enabled);
 
-		/* AND with mask to keep the bits we don't want to change */
-		reg = reg & 0b11111100;
-
-		/* OR with new setting bits */
-
-		/* Enable measurements */
-		writeADXL(ADXL_REG_POWER_CTL, reg | 0b00000010); /* Last 2 bits are measurement mode */
-
-#ifdef DEBUGGING /* DEBUGGING */
-		dbinfo("Measurement enabled");
-#endif /* DEBUGGING */
-
+		ADXL_VDD_initialized = true;
 	}
 	else
 	{
-		/* Get value in register */
-		uint8_t reg = readADXL(ADXL_REG_POWER_CTL);
-
-		/* AND with mask to keep the bits we don't want to change */
-		reg = reg & 0b11111100;
-
-		/* OR with new setting bits */
-
-		/* Enable measurements */
-		writeADXL(ADXL_REG_POWER_CTL, reg | 0b00000000); /* Last 2 bits are measurement mode */
-
-#ifdef DEBUGGING /* DEBUGGING */
-		dbinfo("Measurement disabled (standby)");
-#endif /* DEBUGGING */
+		if (enabled) GPIO_PinOutSet(ADXL_VDD_PORT, ADXL_VDD_PIN); /* Enable VDD pin */
+		else GPIO_PinOutClear(ADXL_VDD_PORT, ADXL_VDD_PIN); /* Disable VDD pin */
 	}
 }
 
@@ -646,8 +666,8 @@ void measureADXL (bool enabled)
  *   Soft reset accelerometer.
  *
  * @note
- *   This is a static (~hidden) method because it's only internally used
- *   in this file and called by other methods if necessary.
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *****************************************************************************/
 static void softResetADXL (void)
 {
@@ -659,8 +679,8 @@ static void softResetADXL (void)
  * @brief Check if the ID is correct.
  *
  * @note
- *   This is a static (~hidden) method because it's only internally used
- *   in this file and called by other methods if necessary.
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *
  * @return
  *   @li true - Correct ID returned.
@@ -678,8 +698,8 @@ static bool checkID_ADXL (void)
  *
  * @note
  *   Info found at http://ozzmaker.com/accelerometer-to-g/
- *   This is a static (~hidden) method because it's only internally used
- *   in this file and called by other methods if necessary.
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *
  * @param[in] sensorValue
  *   Value in g-range returned by sensor.

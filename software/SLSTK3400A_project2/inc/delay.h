@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.h
  * @brief Delay functions.
- * @version 1.3
+ * @version 1.4
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -28,7 +28,6 @@
 /* Prototypes for methods available to be used elsewhere */
 void delay (uint32_t msDelay);
 void sleep (uint32_t sSleep);
-void initRTCcomp (void);
 
 
 #endif /* _DELAY_H_ */

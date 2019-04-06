@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.c
  * @brief Utility functions.
- * @version 2.2
+ * @version 2.4
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -17,9 +17,20 @@
  *   v2.1: Changed initLED to be a static (~hidden) method and also made the global variables static.
  *   v2.2: Added peripheral clock enable/disable functionality for energy saving purposes, only added necessary includes in header file,
  *         moved the others to the source file, updated documentation, replaced SysTick delay with RTCC delay, changed error delay length.
+ *   v2.3: Changed name of static variable, simplified some logic.
+ *   v2.4: Stopped disabling the GPIO clock.
  *
- *   TODO: Also enable/disable "cmuClock_HFPER"?
- *         Remove stdint and stdbool includes?
+ *   TODO: Remove stdint and stdbool includes?
+ *         Add disableClocks functionality from "emodes.c" here?
+ *
+ * ******************************************************************************
+ *
+ * @section cmuClock_GPIO
+ *
+ *   At one point in the development phase the clock to the GPIO peripheral was
+ *   always enabled when necessary and disabled afterwards. Because the GPIO
+ *   clock needs to be enabled for almost everything, even during EM2 so the MCU
+ *   can react (and not only log) pin interrupts, this behaviour was later scrapped.
  *
  ******************************************************************************/
 
@@ -39,7 +50,7 @@
 
 /* Static variables only available and used in this file */
 static uint8_t errorNumber = 0;
-static bool LED_init = false;
+static bool LED_initialized = false;
 
 
 /* Prototype for static method only used by other methods in this file
@@ -61,22 +72,11 @@ static void initLED (void);
 void led (bool enabled)
 {
 	/* Initialize LED if not already the case */
-	if (!LED_init)
-	{
-		initLED();
-	}
-	else
-	{
-		/* Enable necessary clock */
-		CMU_ClockEnable(cmuClock_GPIO, true);
-	}
+	if (!LED_initialized) initLED();
 
 	/* Set the selected state */
 	if (enabled) GPIO_PinOutSet(LED_PORT, LED_PIN);
 	else GPIO_PinOutClear(LED_PORT, LED_PIN);
-
-	/* Disable used clock */
-	CMU_ClockEnable(cmuClock_GPIO, false);
 }
 
 
@@ -95,15 +95,7 @@ void led (bool enabled)
 void error (uint8_t number)
 {
 	/* Initialize LED if not already the case */
-	if (!LED_init)
-	{
-		initLED();
-	}
-	else
-	{
-		/* Enable necessary clock */
-		CMU_ClockEnable(cmuClock_GPIO, true);
-	}
+	if (!LED_initialized) initLED();
 
 	/* Save the given number in the global variable */
 	errorNumber = number;
@@ -125,12 +117,13 @@ void error (uint8_t number)
  *   Initialize the LED.
  *
  * @note
- *   This is a static (~hidden) method because it's only internally used
- *   in this file and called by other methods if necessary.
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *****************************************************************************/
 static void initLED (void)
 {
-	/* Enable necessary clock */
+	/* Enable necessary clocks (just in case) */
+	CMU_ClockEnable(cmuClock_HFPER, true); /* GPIO is a High Frequency Peripheral */
 	CMU_ClockEnable(cmuClock_GPIO, true);
 
 	/* In the case of gpioModePushPull", the last argument directly sets the
@@ -142,5 +135,5 @@ static void initLED (void)
 	dbinfo("LED pin initialized");
 #endif /* DEBUGGING */
 
-	LED_init = true;
+	LED_initialized = true;
 }
