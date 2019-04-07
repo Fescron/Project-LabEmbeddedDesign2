@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.h
  * @brief Delay functionality.
- * @version 1.5
+ * @version 1.6
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -21,7 +21,8 @@
 
 
 /* Definition to select which delay to use
- * Comment this line to use EM2 delays, otherwise use SysTick delay */
+ *   => Uncomment define to use SysTick delays
+ *   => Comment define to use EM2 RTC compare delays */
 //#define SYSTICKDELAY
 
 

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.c
  * @brief Delay functionality.
- * @version 1.5
+ * @version 1.6
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -15,13 +15,13 @@
  *         and moved all of the logic in one "delay" method. Renamed sleep method.
  *   v1.4: Changed names of static variables, made initRTCcomp static.
  *   v1.5: Updated documentation.
+ *   v1.6: Changed RTCcomp names to RTC
  *
  *   TODO: Remove stdint include?
  *         Enable disable/enable clock functionality? (slows down the logic a lot last time tested...)
- *         RTC calendar (RTCC =/= RTCcompare?) could perhaps be better to wake the MCU every hour?
- *           => Possible in EM3 when using an external crystal?
  *         Add checks if delay fits in field?
  *         Check if HFLE needs to be enabled.
+ *         Use cmuSelect_ULFRCO?
  *
  ******************************************************************************/
 
@@ -42,16 +42,16 @@
 
 /* Static variables only available and used in this file */
 static volatile uint32_t msTicks; /* Volatile because it's a global variable that's modified by an interrupt service routine */
-static bool RTCC_initialized = false;
+static bool RTC_initialized = false;
 
 #ifdef SYSTICKDELAY /* SysTick delay selected */
 static bool SysTick_initialized = false;
-#endif /* SysTick/RTCC selection */
+#endif /* SysTick/RTC selection */
 
 
 /* Prototype for static method only used by other methods in this file
  * (Not available to be used elsewhere) */
-static void initRTCcomp (void);
+static void initRTC (void);
 
 
 /**************************************************************************//**
@@ -59,9 +59,9 @@ static void initRTCcomp (void);
  *   Wait for a certain amount of milliseconds.
  *
  * @details
- *   The type of delay (using SysTick or RTCcompare) can be selected by
- *   (un)commenting "#define SYSTICKDELAY" in "delay.h"
- *   This method also initializes SysTick/RTCcompare if necessary.
+ *   The type of delay (using SysTick or the RTC compare functionality) can be
+ *   selected by (un)commenting "#define SYSTICKDELAY" in "delay.h"
+ *   This method also initializes SysTick/RTC if necessary.
  *
  * @param[in] msDelay
  *   The delay time in milliseconds.
@@ -97,10 +97,10 @@ void delay (uint32_t msDelay)
 	/* Disable SysTick interrupt and counter (needs to be done before entering EM2) by clearing their bits. */
 	SysTick->CTRL &= ~SysTick_CTRL_TICKINT_Msk & ~SysTick_CTRL_ENABLE_Msk;
 
-#else /* EM2 RTCC delay selected */
+#else /* EM2 RTC delay selected */
 
-	/* Initialize RTCC if not already the case */
-	if (!RTCC_initialized) initRTCcomp();
+	/* Initialize RTC if not already the case */
+	if (!RTC_initialized) initRTC();
 
 	/* Set RTC compare value for RTC compare register 0 */
 	RTC_CompareSet(0, (LFXOFREQ_MS * msDelay)); /* <= 0x00ffffff = 16777215 TODO: add check if it fits */
@@ -116,7 +116,7 @@ void delay (uint32_t msDelay)
 //	CMU_ClockEnable(cmuClock_HFLE, false);
 //	CMU_ClockEnable(cmuClock_RTC, false);
 
-#endif /* SysTick/RTCC selection */
+#endif /* SysTick/RTC selection */
 
 }
 
@@ -130,8 +130,8 @@ void delay (uint32_t msDelay)
  *****************************************************************************/
 void sleep (uint32_t sSleep)
 {
-	/* Initialize RTCC if not already the case */
-	if (!RTCC_initialized) initRTCcomp();
+	/* Initialize RTC if not already the case */
+	if (!RTC_initialized) initRTC();
 	else
 	{
 		/* Enable necessary oscillator and clocks */
@@ -162,17 +162,17 @@ void sleep (uint32_t sSleep)
 
 /**************************************************************************//**
  * @brief
- *   RTCC initialization
+ *   RTC initialization.
  *
  * @details
- *   The RTC compare functionality uses the low-frequency crystal oscillator
+ *   The RTC (compare) functionality uses the low-frequency crystal oscillator
  *   (LFXO) as the source.
  *
  * @note
  *   This is a static method because it's only internally used in this file
  *   and called by other methods if necessary.
  *****************************************************************************/
-static void initRTCcomp (void)
+static void initRTC (void)
 {
 	/* Enable the low-frequency crystal oscillator for the RTC */
 	CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
@@ -200,10 +200,10 @@ static void initRTCcomp (void)
 	RTC_Init(&rtc);
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("RTCC initialized\n\r");
+	dbinfo("RTC initialized\n\r");
 #endif /* DEBUGGING */
 
-	RTCC_initialized = true;
+	RTC_initialized = true;
 }
 
 

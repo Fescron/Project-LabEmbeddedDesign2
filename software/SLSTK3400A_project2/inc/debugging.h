@@ -15,14 +15,13 @@
 #define _DEBUGGING_H_
 
 
-/* Comment the line below to remove all USART1 debugging stuff (TX = PC0 ~ VCOM @ 115200) */
-#define DEBUGGING /* Comment to remove all USART1 stuff */
+/* Comment the line below to remove all USART debugging stuff */
+#define DEBUGGING
 
 
 #ifdef DEBUGGING /* DEBUGGING */
 #include "dbprint.h"
 #endif /* DEBUGGING */
-
 
 
 #endif /* _DEBUGGING_H_ */

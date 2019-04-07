@@ -97,7 +97,6 @@ void initADXL (void)
 
 	}
 
-
 	/* Initialize USART0/1 as SPI slave (also initialize CS pin) */
 	initADXL_SPI();
 
