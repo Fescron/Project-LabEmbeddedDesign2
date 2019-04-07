@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 1.5
+ * @version 1.6
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -18,6 +18,7 @@
  *   v1.3: Stopped using deprecated function "GPIO_IntConfig".
  *   v1.4: Started using get/set method for the static variable "ADXL_triggered".
  *   v1.5: Reworked the code a lot (stopped disabling cmuClock_GPIO, ...).
+ *   v1.6: Moved all documentation above source files to this file.
  *
  *   TODO: 1) RTCcomp is broken when UDELAY_Calibrate() is called.
  *              -> When UDELAY_Calibrate is called after initRTCcomp this is fixed but
@@ -27,7 +28,9 @@
  *         1) Add VCOMP and WDOG functionality.
  *         1) Start using linked-loop mode for ADXL to fix the strange interrupt behaviour!
  *
- *         2) Move some information above methods to the top of the source file, sometimes reference these source files from the main?
+ *         2) Check the sections about Energy monitor and Crystals and RC oscillators
+ *              => DRAMCO has perhaps chosen the crystal because this was more stable for
+ *                 high frequency (baudrate) communication. (leuart RNxxx...)
  *         2) Disable unused peripherals and oscillators/clocks (see emodes.c) and check if nothing breaks.
  *              => Do this consistently in each method
  *              => Perhaps use a boolean argument so that in the case of sending more bytes
@@ -35,14 +38,77 @@
  *                   => Static variable in method to keep it's value between calls, recursion?
  *              => Doing this for cmuClock_GPIO is unnecessary, see section in "util.c".
  *
+ *         3) Add info about systick/EM2 delay selection
  *         3) Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
+ *
+ *
+ *         UTIL.C: Remove stdint and stdbool includes?
+ *                 Add disableClocks functionality from "emodes.c" here?
+ *
+ *         INTERRUPT.C: Remove stdint and stdbool includes?
+ *                      Check if clear pending interrupts is necessary?
+ *                      GPIO_IntClear(0xFFFF); vs NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);?
+ *
+ *         DS18B20.C: Remove stdint include?
+ *                    Use internal pull-up resistor for DATA pin using DOUT argument.
+ *                      => Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
+ *                    Enter EM1 when the MCU is waiting in a delay method?
+ *
+ *         DELAY.C: Remove stdint include?
+ *                  Enable disable/enable clock functionality? (slows down the logic a lot last time tested...)
+ *                  RTC calendar (RTCC =/= RTCcompare?) could perhaps be better to wake the MCU every hour?
+ *                    => Possible in EM3 when using an external crystal?
+ *                  Add checks if delay fits in field?
+ *                  Check if HFLE needs to be enabled.
+ *
+ *         ADXL362:  Check if variable need to be volatile.
+ *                   Remove stdint and stdbool includes?
+ *                   Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
+ *                     => Debugging it atm with "triggercounter", remove this variable later.
+ *
+ *                   Enable wake-up mode: writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit
  *
  * ******************************************************************************
  *
  * @section Initializations
  *
- *   Initializations for the methods "led(bool enabled);" and "delay(uint32_t msDelay);"
- *   happen automatically. This is why the first call sometimes takes longer to finish.
+ *   Initializations for the methods "led(bool enabled);", "delay(uint32_t msDelay);"
+ *   and "sleep(uint32_t sSleep);" happen automatically. This is why the first call
+ *   sometimes takes longer to finish.
+ *
+ * ******************************************************************************
+ *
+ * @section cmuClock_GPIO
+ *
+ *   At one point in the development phase the clock to the GPIO peripheral was
+ *   always enabled when necessary and disabled afterwards. Because the GPIO
+ *   clock needs to be enabled for almost everything, even during EM2 so the MCU
+ *   can react (and not only log) pin interrupts, this behaviour was later scrapped.
+ *
+ * ******************************************************************************
+ *
+ * @section Energy monitor and energy modes
+ *
+ *   When in "debug" mode, the MCU doesn't really go lower than <TODO: check this> EM1. Use the
+ *   energy profiler and manually reset the MCU once for it to go in the right energy modes.
+ *
+ *   At one point a method was developed to go in EM1 when waiting in a delay.
+ *   However this didn't seem to work as intended and EM2 would also be fine.
+ *   Because of this, development for this EM1 delay method was halted.
+ *   EM1 is sometimes used when waiting on bits to be set.
+ *
+ *   When the MCU is in EM3, it can normally only be woken up using a pin
+ *   change interrupt, not using the RTC.
+ *
+ * ******************************************************************************
+ *
+ * @section Crystals and RC oscillators
+ *
+ *   Apparently it's more energy efficient to use an external oscillator/crystal
+ *   instead of the internal one. They only reason to use an internal one could be
+ *   to reduce the part count. At one point I tried to use the Ultra low-frequency
+ *   RC oscillator (ULFRCO) based on an example from SiliconLabs's GitHub (rtc_ulfrco),
+ *   but development was halted shortly after this finding.
  *
  ******************************************************************************/
 
@@ -123,6 +189,7 @@ int main (void)
 #ifdef DEBUGGING /* DEBUGGING */
 	dbprint_INIT(USART1, 4, true, false); /* VCOM */
 	//dbprint_INIT(USART1, 0, false, false); /* US1_TX = PC0 */
+	//dbprint_INIT(DBG_UART, DBG_UART_LOC, false, false);
 #endif /* DEBUGGING */
 
 	led(true); /* Enable (and initialize) LED */
@@ -162,6 +229,8 @@ int main (void)
 		ADXL_setTriggered(false); /* Reset variable again */
 	}
 
+
+	/* Infinite loop */
 	while(1)
 	{
 		led(true); /* Enable LED */

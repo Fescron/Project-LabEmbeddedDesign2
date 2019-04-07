@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.h
- * @brief Utility functions.
- * @version 2.4
+ * @brief Utility functionality.
+ * @version 2.5
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 

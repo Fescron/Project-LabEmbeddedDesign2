@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.c
- * @brief Utility functions.
- * @version 2.4
+ * @brief Utility functionality.
+ * @version 2.5
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -19,18 +19,10 @@
  *         moved the others to the source file, updated documentation, replaced SysTick delay with RTCC delay, changed error delay length.
  *   v2.3: Changed name of static variable, simplified some logic.
  *   v2.4: Stopped disabling the GPIO clock.
+ *   v2.5: Moved documentation.
  *
  *   TODO: Remove stdint and stdbool includes?
  *         Add disableClocks functionality from "emodes.c" here?
- *
- * ******************************************************************************
- *
- * @section cmuClock_GPIO
- *
- *   At one point in the development phase the clock to the GPIO peripheral was
- *   always enabled when necessary and disabled afterwards. Because the GPIO
- *   clock needs to be enabled for almost everything, even during EM2 so the MCU
- *   can react (and not only log) pin interrupts, this behaviour was later scrapped.
  *
  ******************************************************************************/
 
@@ -85,7 +77,7 @@ void led (bool enabled)
  *   Error method.
  *
  * @details
- *   Flashes the LED, displays a UART message and holds
+ *   This method flashes the LED, displays a UART message and holds
  *   the microcontroller forever in a loop until it gets reset. Also
  *   stores the error number in a global variable.
  *
@@ -126,9 +118,7 @@ static void initLED (void)
 	CMU_ClockEnable(cmuClock_HFPER, true); /* GPIO is a High Frequency Peripheral */
 	CMU_ClockEnable(cmuClock_GPIO, true);
 
-	/* In the case of gpioModePushPull", the last argument directly sets the
-	 * the pin low if the value is "0" or high if the value is "1".
-	 * This means that "GPIO_PinOutClear(...)" is not necessary after this mode change.*/
+	/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 	GPIO_PinModeSet(LED_PORT, LED_PIN, gpioModePushPull, 0);
 
 #ifdef DEBUGGING /* DEBUGGING */

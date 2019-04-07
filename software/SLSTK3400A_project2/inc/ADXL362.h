@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.h
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.6
+ * @version 1.7
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -16,7 +16,7 @@
 #include <stdbool.h> /* "bool", "true", "false" */
 
 
-/* ADXL REGISTERS */
+/* ADXL362 register definitions */
 #define ADXL_REG_DEVID_AD 		0x00 /* Reset: 0xAD */
 #define ADXL_REG_DEVID_MST 		0x01 /* Reset: 0x1D */
 #define ADXL_REG_PARTID 		0x02 /* Reset: 0xF2 */

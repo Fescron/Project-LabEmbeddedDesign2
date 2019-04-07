@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.h
- * @brief Delay functions.
- * @version 1.4
+ * @brief Delay functionality.
+ * @version 1.5
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -22,7 +22,7 @@
 
 /* Definition to select which delay to use
  * Comment this line to use EM2 delays, otherwise use SysTick delay */
-//#define SYSTICKDELAY /* TODO: Move to source file? */
+//#define SYSTICKDELAY
 
 
 /* Prototypes for methods available to be used elsewhere */

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.6
+ * @version 1.7
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -17,10 +17,12 @@
  *   v1.4: Changed delay method and cleaned up includes.
  *   v1.5: Added get/set method for the static variable "ADXL_triggered".
  *   v1.6: Changed a lot of things...
+ *   v1.7: Updated documentation and chanced "USART0" to "ADXL_SPI".
  *
- *   TODO: Check if variables need to be volatile.
+ *   TODO: Check if variable need to be volatile.
  *         Remove stdint and stdbool includes?
  *         Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
+ *           => Debugging it atm with "triggercounter", remove this variable later.
  *
  *         Enable wake-up mode: writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit
  *
@@ -43,10 +45,11 @@
 
 
 /* Static variables only available and used in this file */
-static volatile bool ADXL_triggered = false; /* TODO: Perhaps this shouldn't be volatile */
+static volatile bool ADXL_triggered = false;
 static volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 }; /* TODO: Perhaps this shouldn't be volatile */
 static uint8_t range = 0;
 static bool ADXL_VDD_initialized = false;
+static uint16_t triggercounter = 0; /* TODO: remove this later */
 
 
 /* Prototypes for static methods only used by other methods in this file
@@ -68,20 +71,34 @@ static int32_t convertGRangeToGValue (int8_t sensorValue);
  *
  * @details
  *   This method calls all the other internal necessary functions.
+ *   Clock enable functionality is gathered here instead of in
+ *   "lower" (static) functions.
  *****************************************************************************/
 void initADXL (void)
 {
 	/* Enable necessary clocks (just in case) */
-	CMU_ClockEnable(cmuClock_HFPER, true); /* GPIO and USART0 are High Frequency Peripherals */
+	CMU_ClockEnable(cmuClock_HFPER, true); /* GPIO and USART0/1 are High Frequency Peripherals */
 	CMU_ClockEnable(cmuClock_GPIO, true);
 
 	/* Initialize and power VDD pin */
 	powerADXL(true);
 
 	/* Enable necessary clock (just in case) */
-	CMU_ClockEnable(cmuClock_USART0, true);
+	if (ADXL_SPI == USART0) CMU_ClockEnable(cmuClock_USART0, true);
+	else if (ADXL_SPI == USART1) CMU_ClockEnable(cmuClock_USART1, true);
+	else
+	{
 
-	/* Initialize USART0 as SPI slave (also initialize CS pin) */
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Wrong peripheral selected!");
+#endif /* DEBUGGING */
+
+		error(12);
+
+	}
+
+
+	/* Initialize USART0/1 as SPI slave (also initialize CS pin) */
 	initADXL_SPI();
 
 	/* Soft reset ADXL handler */
@@ -100,6 +117,7 @@ void initADXL (void)
 void ADXL_setTriggered (bool triggered)
 {
 	ADXL_triggered = triggered;
+	triggercounter++; /* TODO: Remove this later */
 }
 
 
@@ -119,32 +137,46 @@ bool ADXL_getTriggered (void)
 /**************************************************************************//**
  * @brief
  *   Acknowledge the interrupt from the accelerometer.
+ *
+ * @details
+ *   Read a certain register (necessary if the accelerometer is not in
+ *   linked-loop mode) and clear the static variable.
  *****************************************************************************/
 void ADXL_ackInterrupt (void)
 {
 	readADXL(ADXL_REG_STATUS);
-	ADXL_setTriggered(false);
+	ADXL_triggered = false;
 }
 
 
 /**************************************************************************//**
  * @brief
- *   Enable or disable the SPI pins and USART0 clocks to the accelerometer.
+ *   Enable or disable the SPI pins and USART0/1 clock and peripheral to the accelerometer.
  *
  * @param[in] enabled
- *   @li True - Enable the SPI pins and USART0 clocks to the accelerometer.
- *   @li False - Disable the SPI pins and USART0 clocks to the accelerometer.
+ *   @li True - Enable the SPI pins and USART0/1 clock and peripheral to the accelerometer.
+ *   @li False - Disable the SPI pins and USART0/1 clock and peripheral to the accelerometer.
  *****************************************************************************/
 void ADXL_enableSPI (bool enabled)
 {
 	if (enabled)
 	{
-		/* Enable USART0 clock and peripheral */
-		CMU_ClockEnable(cmuClock_USART0, true);
-		USART_Enable(USART0, usartEnable);
+		/* Enable USART clock and peripheral */
+		if (ADXL_SPI == USART0) CMU_ClockEnable(cmuClock_USART0, true);
+		else if (ADXL_SPI == USART1) CMU_ClockEnable(cmuClock_USART1, true);
+		else
+		{
 
-		/* In the case of gpioModePushPull", the last argument directly sets the
-		 * the pin low if the value is "0" or high if the value is "1". */
+	#ifdef DEBUGGING /* DEBUGGING */
+			dbcrit("Wrong peripheral selected!");
+	#endif /* DEBUGGING */
+
+			error(13);
+
+		}
+		USART_Enable(ADXL_SPI, usartEnable);
+
+		/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 		GPIO_PinModeSet(ADXL_CLK_PORT, ADXL_CLK_PIN, gpioModePushPull, 0);   /* US0_CLK is push pull */
 		GPIO_PinModeSet(ADXL_NCS_PORT, ADXL_NCS_PIN, gpioModePushPull, 1);   /* US0_CS is push pull */
 		GPIO_PinModeSet(ADXL_MOSI_PORT, ADXL_MOSI_PIN, gpioModePushPull, 1); /* US0_TX (MOSI) is push pull */
@@ -152,9 +184,20 @@ void ADXL_enableSPI (bool enabled)
 	}
 	else
 	{
-		/* Disable USART0 clock and peripheral */
-		CMU_ClockEnable(cmuClock_USART0, false);
-		USART_Enable(USART0, usartDisable);
+		/* Disable USART clock and peripheral */
+		if (ADXL_SPI == USART0) CMU_ClockEnable(cmuClock_USART0, false);
+		else if (ADXL_SPI == USART1) CMU_ClockEnable(cmuClock_USART1, false);
+		else
+		{
+
+	#ifdef DEBUGGING /* DEBUGGING */
+			dbcrit("Wrong peripheral selected!");
+	#endif /* DEBUGGING */
+
+			error(14);
+
+		}
+		USART_Enable(ADXL_SPI, usartDisable);
 
 		/* gpioModeDisabled: Pull-up if DOUT is set. */
 		GPIO_PinModeSet(ADXL_CLK_PORT, ADXL_CLK_PIN, gpioModeDisabled, 0);
@@ -183,9 +226,7 @@ void ADXL_enableMeasure (bool enabled)
 		/* AND with mask to keep the bits we don't want to change */
 		reg = reg & 0b11111100;
 
-		/* OR with new setting bits */
-
-		/* Enable measurements */
+		/* Enable measurements (OR with new setting bits) */
 		writeADXL(ADXL_REG_POWER_CTL, reg | 0b00000010); /* Last 2 bits are measurement mode */
 
 #ifdef DEBUGGING /* DEBUGGING */
@@ -201,9 +242,7 @@ void ADXL_enableMeasure (bool enabled)
 		/* AND with mask to keep the bits we don't want to change */
 		reg = reg & 0b11111100;
 
-		/* OR with new setting bits */
-
-		/* Enable measurements */
+		/* Disable measurements (OR with new setting bits) */
 		writeADXL(ADXL_REG_POWER_CTL, reg | 0b00000000); /* Last 2 bits are measurement mode */
 
 #ifdef DEBUGGING /* DEBUGGING */
@@ -217,7 +256,7 @@ void ADXL_enableMeasure (bool enabled)
 /**************************************************************************//**
  * @brief
  *   Configure the measurement range and store the selected one in
- *   a global variable.
+ *   a global variable for later (internal) use.
  *
  * @param[in] givenRange
  *   @li 0 - +- 2g
@@ -232,9 +271,7 @@ void ADXL_configRange (uint8_t givenRange)
 	/* AND with mask to keep the bits we don't want to change */
 	reg = reg & 0b00111111;
 
-	/* OR with new setting bits */
-
-	/* Set measurement range (first two bits) */
+	/* Set measurement range (OR with new setting bits, first two bits) */
 	if (givenRange == 0)
 	{
 		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000000));
@@ -289,9 +326,7 @@ void ADXL_configODR (uint8_t givenODR)
 	/* AND with mask to keep the bits we don't want to change */
 	reg = reg & 0b11111000;
 
-	/* OR with new setting bits */
-
-	/* Set ODR (last three bits) */
+	/* Set ODR (OR with new setting bits, last three bits) */
 	if (givenODR == 0) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000000));
 	else if (givenODR == 1) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000001));
 	else if (givenODR == 2) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000010));
@@ -307,7 +342,6 @@ void ADXL_configODR (uint8_t givenODR)
 
 		error(6);
 	}
-
 
 #ifdef DEBUGGING /* DEBUGGING */
 	if (givenODR == 0) dbinfo("ADXL362: ODR set at 12.5 Hz");
@@ -393,8 +427,7 @@ void ADXL_readValues (void)
 	{
 		led(true); /* Enable LED */
 
-		/* Read XYZ sensor data */
-		readADXL_XYZDATA();
+		readADXL_XYZDATA(); /* Read XYZ sensor data */
 
 #ifdef DEBUGGING /* DEBUGGING */
 		/* Print XYZ sensor data */
@@ -439,6 +472,7 @@ void ADXL_readValues (void)
  * @details
  *   Configure pins, configure USART0 in SPI mode, route
  *   the pins, enable USART0 and set CS high.
+ *   Necessary clocks are enabled in a previous method.
  *
  * @note
  *   This is a static method because it's only internally used in this file
@@ -446,9 +480,8 @@ void ADXL_readValues (void)
  *****************************************************************************/
 static void initADXL_SPI (void)
 {
-	/* Configure GPIO
-	 * In the case of gpioModePushPull", the last argument directly sets the
-	 * the pin low if the value is "0" or high if the value is "1". */
+	/* Configure GPIO */
+	/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 	GPIO_PinModeSet(ADXL_CLK_PORT, ADXL_CLK_PIN, gpioModePushPull, 0);   /* US0_CLK is push pull */
 	GPIO_PinModeSet(ADXL_NCS_PORT, ADXL_NCS_PIN, gpioModePushPull, 1);   /* US0_CS is push pull */
 	GPIO_PinModeSet(ADXL_MOSI_PORT, ADXL_MOSI_PIN, gpioModePushPull, 1); /* US0_TX (MOSI) is push pull */
@@ -469,14 +502,14 @@ static void initADXL_SPI (void)
 	config.autoTx = false; 					/* If enabled: Enable AUTOTX mode. Transmits as long as RX is not full. Generates underflows if TX is empty. */
 	config.autoCsEnable = false;            /* CS pin controlled by hardware, not firmware */
 
-	/* Initialize USART0 with the configured parameters */
-	USART_InitSync(USART0, &config);
+	/* Initialize USART0/1 with the configured parameters */
+	USART_InitSync(ADXL_SPI, &config);
 
-	/* Set the pin location for USART0 */
-	USART0->ROUTE = USART_ROUTE_CLKPEN | USART_ROUTE_CSPEN | USART_ROUTE_TXPEN | USART_ROUTE_RXPEN | USART_ROUTE_LOCATION_LOC0;
+	/* Set the pin location for USART0/1 (before: USART_ROUTE_LOCATION_LOC0) */
+	ADXL_SPI->ROUTE = USART_ROUTE_CLKPEN | USART_ROUTE_CSPEN | USART_ROUTE_TXPEN | USART_ROUTE_RXPEN | ADXL_SPI_LOC;
 
-	/* Enable USART0 */
-	USART_Enable(USART0, usartEnable);
+	/* Enable USART0/1 */
+	USART_Enable(ADXL_SPI, usartEnable);
 
 	/* Set CS high (active low!) */
 	GPIO_PinOutSet(gpioPortE, 13);
@@ -578,9 +611,9 @@ static uint8_t readADXL (uint8_t address)
 	GPIO_PinOutClear(ADXL_NCS_PORT, ADXL_NCS_PIN);
 
 	/* 3-byte operation according to datasheet */
-	USART_SpiTransfer(USART0, 0x0B);            /* "read" instruction */
-	USART_SpiTransfer(USART0, address);         /* Address */
-	response = USART_SpiTransfer(USART0, 0x00); /* Read response */
+	USART_SpiTransfer(ADXL_SPI, 0x0B);            /* "read" instruction */
+	USART_SpiTransfer(ADXL_SPI, address);         /* Address */
+	response = USART_SpiTransfer(ADXL_SPI, 0x00); /* Read response */
 
 	/* Set CS high */
 	GPIO_PinOutSet(ADXL_NCS_PORT, ADXL_NCS_PIN);
@@ -610,9 +643,9 @@ static void writeADXL (uint8_t address, uint8_t data)
 	GPIO_PinOutClear(ADXL_NCS_PORT, ADXL_NCS_PIN);
 
 	/* 3-byte operation according to datasheet */
-	USART_SpiTransfer(USART0, 0x0A);    /* "write" instruction */
-	USART_SpiTransfer(USART0, address); /* Address */
-	USART_SpiTransfer(USART0, data);    /* Data */
+	USART_SpiTransfer(ADXL_SPI, 0x0A);    /* "write" instruction */
+	USART_SpiTransfer(ADXL_SPI, address); /* Address */
+	USART_SpiTransfer(ADXL_SPI, data);    /* Data */
 
 	/* Set CS high */
 	GPIO_PinOutSet(ADXL_NCS_PORT, ADXL_NCS_PIN);
@@ -636,11 +669,11 @@ static void readADXL_XYZDATA (void)
 	GPIO_PinOutClear(ADXL_NCS_PORT, ADXL_NCS_PIN);
 
 	/* Burst read (address auto-increments) */
-	USART_SpiTransfer(USART0, 0x0B);				/* "read" instruction */
-	USART_SpiTransfer(USART0, ADXL_REG_XDATA); 		/* Address */
-	XYZDATA[0] = USART_SpiTransfer(USART0, 0x00);	/* Read response */
-	XYZDATA[1] = USART_SpiTransfer(USART0, 0x00);	/* Read response */
-	XYZDATA[2] = USART_SpiTransfer(USART0, 0x00);	/* Read response */
+	USART_SpiTransfer(ADXL_SPI, 0x0B);				/* "read" instruction */
+	USART_SpiTransfer(ADXL_SPI, ADXL_REG_XDATA); 		/* Address */
+	XYZDATA[0] = USART_SpiTransfer(ADXL_SPI, 0x00);	/* Read response */
+	XYZDATA[1] = USART_SpiTransfer(ADXL_SPI, 0x00);	/* Read response */
+	XYZDATA[2] = USART_SpiTransfer(ADXL_SPI, 0x00);	/* Read response */
 
 	/* CS high */
 	GPIO_PinOutSet(ADXL_NCS_PORT, ADXL_NCS_PIN);
@@ -653,6 +686,7 @@ static void readADXL_XYZDATA (void)
  *
  * @details
  *   This method also initializes the pin-mode if necessary.
+ *   Necessary clocks are enabled in a previous method.
  *
  * @note
  *   This is a static method because it's only internally used in this file
@@ -667,8 +701,7 @@ static void powerADXL (bool enabled)
 	/* Initialize VDD pin if not already the case */
 	if (!ADXL_VDD_initialized)
 	{
-		/* In the case of gpioModePushPull", the last argument directly sets the
-		 * the pin low if the value is "0" or high if the value is "1". */
+		/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 		GPIO_PinModeSet(ADXL_VDD_PORT, ADXL_VDD_PIN, gpioModePushPull, enabled);
 
 		ADXL_VDD_initialized = true;

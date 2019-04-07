@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.4
+ * @version 1.6
  * @author
  *   Alec Vanderhaegen & Sarah Goossens
  *   Modified by Brecht Van Eeckhoudt
@@ -17,7 +17,8 @@
  *   v1.2: Removed some unnecessary GPIO lines and added comments about "out" (DOUT) argument.
  *   v1.3: Changed some methods to be static (~hidden).
  *   v1.4: Cleaned up includes.
- *   v1.5: Make more methods static.
+ *   v1.5: Made more methods static.
+ *   v1.6: Updated documentation.
  *
  *   TODO: Remove stdint includes?
  *         Use internal pull-up resistor for DATA pin using DOUT argument.
@@ -35,7 +36,7 @@
 #include "../inc/udelay.h"      /* Microsecond delay routine */
 
 #include "../inc/DS18B20.h"     /* Corresponding header file */
-#include "../inc/util.h"    	/* Utility functions */
+#include "../inc/util.h"    	/* Utility functionality */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
 #include "../inc/debugging.h"   /* Enable or disable printing to UART */
 
@@ -131,8 +132,7 @@ static void powerDS18B20 (bool enabled)
 	/* Initialize VDD pin if not already the case */
 	if (!DS18B20_VDD_initialized)
 	{
-		/* In the case of gpioModePushPull", the last argument directly sets the
-		 * the pin low if the value is "0" or high if the value is "1". */
+		/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 		GPIO_PinModeSet(TEMP_VDD_PORT, TEMP_VDD_PIN, gpioModePushPull, enabled);
 
 		DS18B20_VDD_initialized = true;
@@ -149,6 +149,10 @@ static void powerDS18B20 (bool enabled)
  * @brief
  *   Initialize (reset) DS18B20.
  *
+ * @note
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
+ *
  * @return
  *   @li true - Initialization (reset) successful.
  *   @li false - Initialization (reset) failed.
@@ -157,8 +161,7 @@ static bool init_DS18B20 (void)
 {
 	uint16_t counter = 0;
 
-	/* In the case of gpioModePushPull", the last argument directly sets the
-	 * the pin low if the value is "0" or high if the value is "1". */
+	/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0);
 	UDELAY_Delay(480);
 
@@ -214,16 +217,15 @@ static bool init_DS18B20 (void)
  *   Write a byte (uint8_t) to the DS18B20.
  *
  * @note
- *   This is a static (~hidden) method because it's only internally used
- *   in this file and called by other methods if necessary.
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *
  * @param[in] data
  *   The data to write to the DS18B20.
  *****************************************************************************/
 static void writeByteToDS18B20 (uint8_t data)
 {
-	/* In the case of gpioModePushPull", the last argument directly sets the
-	 * the pin low if the value is "0" or high if the value is "1". */
+	/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0);
 
 	/* Write the byte, bit by bit */
@@ -259,8 +261,8 @@ static void writeByteToDS18B20 (uint8_t data)
  *   Read a byte (uint8_t) from the DS18B20.
  *
  * @note
- *   This is a static (~hidden) method because it's only internally used
- *   in this file and called by other methods if necessary.
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *
  * @return
  *   The byte read from the DS18B20.
@@ -283,8 +285,7 @@ static uint8_t readByteFromDS18B20 (void)
 		 * 0x80 = 1000 0000 */
 		if (GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN)) data |= 0x80;
 
-		/* In the case of gpioModePushPull", the last argument directly sets the
-		 * the pin low if the value is "0" or high if the value is "1". */
+		/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 1);
 
 
@@ -300,8 +301,8 @@ static uint8_t readByteFromDS18B20 (void)
  *   Convert temperature data.
  *
  * @note
- *   This is a static (~hidden) method because it's only internally used
- *   in this file and called by other methods if necessary.
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *
  * @param[in] tempLS
  *   Least significant byte.

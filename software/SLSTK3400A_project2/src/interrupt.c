@@ -18,8 +18,9 @@
  *   v1.4: Stopped disabling the GPIO clock.
  *   v1.5: Started using getters/setters to indicate an interrupt to "main.c".
  *
- *   TODO: Check if variables need to be volatile.
- *         Remove stdint and stdbool includes?
+ *   TODO: Remove stdint and stdbool includes?
+ *         Check if clear pending interrupts is necessary?
+ *         GPIO_IntClear(0xFFFF); vs NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);?
  *
  * ******************************************************************************
  *
@@ -38,15 +39,15 @@
 #include "em_rtc.h"    /* Real Time Counter (RTC) */
 
 #include "../inc/interrupt.h"   /* Corresponding header file */
-#include "../inc/util.h"     	/* Utility functions */
+#include "../inc/util.h"     	/* Utility functionality */
 #include "../inc/ADXL362.h"     /* Functions related to the accelerometer */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
 #include "../inc/debugging.h"   /* Enable or disable printing to UART */
 
 
 /* Static variables only available and used in this file */
-static volatile bool PB0_triggered = false; /* TODO: Perhaps this shouldn't be volatile */
-static volatile bool PB1_triggered = false; /* TODO: Perhaps this shouldn't be volatile */
+static volatile bool PB0_triggered = false;
+static volatile bool PB1_triggered = false;
 
 
 /**************************************************************************//**
@@ -72,6 +73,9 @@ void initGPIOwakeup (void)
 
 	/* Clear pending interrupts */
 	//GPIO_IntClear(0xFFFF);
+	// Or with:
+	//NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);
+	//NVIC_ClearPendingIRQ(GPIO_EVEN_IRQn);
 
 	/* Enable IRQ for even numbered GPIO pins */
 	NVIC_EnableIRQ(GPIO_EVEN_IRQn);

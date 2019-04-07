@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.c
- * @brief Utility functions.
- * @version 1.4
+ * @brief Delay functionality.
+ * @version 1.5
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -14,39 +14,14 @@
  *   v1.3: Cleaned up includes, added option to select SysTick/EM2 delay functionality
  *         and moved all of the logic in one "delay" method. Renamed sleep method.
  *   v1.4: Changed names of static variables, made initRTCcomp static.
+ *   v1.5: Updated documentation.
  *
- *   TODO: Enable disable/enable clock functionality? (slows down the logic a lot last time tested...)
+ *   TODO: Remove stdint include?
+ *         Enable disable/enable clock functionality? (slows down the logic a lot last time tested...)
  *         RTC calendar (RTCC =/= RTCcompare?) could perhaps be better to wake the MCU every hour?
  *           => Possible in EM3 when using an external crystal?
- *         Check the sections about Energy monitor and Crystals and RC oscillators
- *           => DRAMCO has perhaps chosen the crystal because this was more stable for
- *              high frequency (baudrate) communication. (leuart RNxxx...)
  *         Add checks if delay fits in field?
- *
- * ******************************************************************************
- *
- * @section Energy monitor and energy modes
- *
- *   When in "debug" mode, the MCU doesn't really go lower than <TODO: check this> EM1. Use the
- *   energy profiler and manually reset the MCU once for it to go in the right energy modes.
- *
- *   At one point a method was developed to go in EM1 when waiting in a delay.
- *   However this didn't seem to work as intended and EM2 would also be fine.
- *   Because of this, development for this EM1 delay method was halted.
- *   EM1 is sometimes used when waiting on bits to be set.
- *
- *   When the MCU is in EM3, it can normally only be woken up using a pin
- *   change interrupt, not using the RTC.
- *
- * ******************************************************************************
- *
- * @section Crystals and RC oscillators
- *
- *   Apparently it's more energy efficient to use an external oscillator/crystal
- *   instead of the internal one. They only reason to use an internal one could be
- *   to reduce the part count. At one point I tried to use the Ultra low-frequency
- *   RC oscillator (ULFRCO) based on an example from SiliconLabs's GitHub (rtc_ulfrco),
- *   but development was halted shortly after this finding.
+ *         Check if HFLE needs to be enabled.
  *
  ******************************************************************************/
 
@@ -128,7 +103,7 @@ void delay (uint32_t msDelay)
 	if (!RTCC_initialized) initRTCcomp();
 
 	/* Set RTC compare value for RTC compare register 0 */
-	RTC_CompareSet(0, (LFXOFREQ_MS * msDelay)); /* <= 0x00ffffff = 16777215 */
+	RTC_CompareSet(0, (LFXOFREQ_MS * msDelay)); /* <= 0x00ffffff = 16777215 TODO: add check if it fits */
 
 	/* Start the RTC */
 	RTC_Enable(true);
@@ -143,6 +118,45 @@ void delay (uint32_t msDelay)
 
 #endif /* SysTick/RTCC selection */
 
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Sleep for a certain amount of seconds in EM2.
+ *
+ * @param[in] sSleep
+ *   The sleep time in seconds.
+ *****************************************************************************/
+void sleep (uint32_t sSleep)
+{
+	/* Initialize RTCC if not already the case */
+	if (!RTCC_initialized) initRTCcomp();
+	else
+	{
+		/* Enable necessary oscillator and clocks */
+//		CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
+//		CMU_ClockEnable(cmuClock_HFLE, true);
+//		CMU_ClockEnable(cmuClock_RTC, true);
+	}
+
+#ifdef DEBUGGING /* DEBUGGING */
+	dbwarnInt("Sleeping in EM2 for ", sSleep, " s");
+#endif /* DEBUGGING */
+
+	/* Set RTC compare value for RTC compare register 0 */
+	RTC_CompareSet(0, (LFXOFREQ * sSleep)); /* <= 0x00ffffff = 16777215 TODO: add check if it fits */
+
+	/* Start the RTC */
+	RTC_Enable(true);
+
+	/* Enter EM2 */
+	EMU_EnterEM2(true); /* "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+
+	/* Disable used oscillator and clocks after wakeup */
+//	CMU_OscillatorEnable(cmuOsc_LFXO, false, true);
+//	CMU_ClockEnable(cmuClock_HFLE, false);
+//	CMU_ClockEnable(cmuClock_RTC, false);
 }
 
 
@@ -165,7 +179,7 @@ static void initRTCcomp (void)
 
 	/* Enable the clock to the interface of the low energy modules
 	 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
-	CMU_ClockEnable(cmuClock_HFLE, true);
+	CMU_ClockEnable(cmuClock_HFLE, true); /* TODO: check if this is necessary? (emodes.c) */
 
 	/* Route the LFXO clock to the RTC */
 	CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_LFXO);
@@ -190,47 +204,6 @@ static void initRTCcomp (void)
 #endif /* DEBUGGING */
 
 	RTCC_initialized = true;
-}
-
-
-/**************************************************************************//**
- * @brief
- *   Sleep for a certain amount of seconds in EM2.
- *
- * @param[in] sSleep
- *   The sleep time in seconds.
- *****************************************************************************/
-void sleep (uint32_t sSleep)
-{
-	/* Initialize RTCC if not already the case */
-	if (!RTCC_initialized){
-		initRTCcomp();
-	}
-	else
-	{
-		/* Enable necessary oscillator and clocks */
-//		CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
-//		CMU_ClockEnable(cmuClock_HFLE, true);
-//		CMU_ClockEnable(cmuClock_RTC, true);
-	}
-
-#ifdef DEBUGGING /* DEBUGGING */
-	dbwarnInt("Sleeping in EM2 for ", sSleep, " s");
-#endif /* DEBUGGING */
-
-	/* Set RTC compare value for RTC compare register 0 */
-	RTC_CompareSet(0, (LFXOFREQ * sSleep)); /* <= 0x00ffffff = 16777215 */
-
-	/* Start the RTC */
-	RTC_Enable(true);
-
-	/* Enter EM2 */
-	EMU_EnterEM2(true); /* "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
-
-	/* Disable used oscillator and clocks after wakeup */
-//	CMU_OscillatorEnable(cmuOsc_LFXO, false, true);
-//	CMU_ClockEnable(cmuClock_HFLE, false);
-//	CMU_ClockEnable(cmuClock_RTC, false);
 }
 
 
