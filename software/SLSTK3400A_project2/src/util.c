@@ -21,32 +21,28 @@
  *   v2.4: Stopped disabling the GPIO clock.
  *   v2.5: Moved documentation.
  *
- *   TODO: Remove stdint and stdbool includes?
- *         Add disableClocks functionality from "emodes.c" here?
+ *   TODO: Add disableClocks functionality from "emodes.c" here?
  *
  ******************************************************************************/
 
 
-/* Includes necessary for this source file */
-//#include <stdint.h>    /* (u)intXX_t */
-//#include <stdbool.h>   /* "bool", "true", "false" */
-#include "em_device.h" /* Include necessary MCU-specific header file */
+#include <stdint.h>    /* (u)intXX_t */
+#include <stdbool.h>   /* "bool", "true", "false" */
 #include "em_cmu.h"    /* Clock Management Unit */
 #include "em_gpio.h"   /* General Purpose IO */
 
 #include "../inc/util.h"        /* Corresponding header file */
-#include "../inc/delay.h"     	/* Delay functionality */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
 #include "../inc/debugging.h" 	/* Enable or disable printing to UART */
+#include "../inc/delay.h"     	/* Delay functionality */
 
 
-/* Static variables only available and used in this file */
+/** Local variables */
 static uint8_t errorNumber = 0;
 static bool LED_initialized = false;
 
 
-/* Prototype for static method only used by other methods in this file
- * (Not available to be used elsewhere) */
+/** Local prototype */
 static void initLED (void);
 
 

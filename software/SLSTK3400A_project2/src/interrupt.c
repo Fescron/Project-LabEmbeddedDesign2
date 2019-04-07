@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file interrupt.c
  * @brief Interrupt functionality.
- * @version 1.5
+ * @version 1.6
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -17,35 +17,35 @@
  *         wakeup initialization method here, renamed file.
  *   v1.4: Stopped disabling the GPIO clock.
  *   v1.5: Started using getters/setters to indicate an interrupt to "main.c".
+ *   v1.6: Moved IRQ handler of RTC to this "delay.c".
  *
- *   TODO: Remove stdint and stdbool includes?
- *         Check if clear pending interrupts is necessary?
+ *   TODO: Check if clear pending interrupts is necessary?
  *         GPIO_IntClear(0xFFFF); vs NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);?
  *
  * ******************************************************************************
  *
  * @note
- *   Another interrupt handler can be found in "delay.c".
+ *   Other interrupt handlers can be found in "delay.c" and "other.c".
  *
  ******************************************************************************/
 
 
-/* Includes necessary for this source file */
-//#include <stdint.h>    /* (u)intXX_t */
-//#include <stdbool.h>   /* "bool", "true", "false" */
+#include <stdint.h>    /* (u)intXX_t */
+#include <stdbool.h>   /* "bool", "true", "false" */
 #include "em_device.h" /* Include necessary MCU-specific header file */
 #include "em_cmu.h"    /* Clock management unit */
 #include "em_gpio.h"   /* General Purpose IO */
 #include "em_rtc.h"    /* Real Time Counter (RTC) */
 
 #include "../inc/interrupt.h"   /* Corresponding header file */
-#include "../inc/util.h"     	/* Utility functionality */
-#include "../inc/ADXL362.h"     /* Functions related to the accelerometer */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
 #include "../inc/debugging.h"   /* Enable or disable printing to UART */
+#include "../inc/util.h"     	/* Utility functionality */
+#include "../inc/ADXL362.h"     /* Functions related to the accelerometer */
 
 
-/* Static variables only available and used in this file */
+/** Local variables */
+/* Volatile because they're modified by an interrupt service routine */
 static volatile bool PB0_triggered = false;
 static volatile bool PB1_triggered = false;
 
@@ -122,7 +122,6 @@ bool BTN_getTriggered (uint8_t number)
 		error(9);
 
 		return (false);
-
 	}
 }
 
@@ -151,23 +150,6 @@ void BTN_setTriggered (uint8_t number, bool value)
 
 		error(8);
 	}
-}
-
-
-/**************************************************************************//**
- * @brief
- *   RTCC interrupt service routine.
- *
- * @note
- *   The "weak" definition for this method is located in "system_efm32hg.h".
- *****************************************************************************/
-void RTC_IRQHandler (void)
-{
-	/* Disable the counter */
-	RTC_Enable(false);
-
-	/* Clear the interrupt source */
-	RTC_IntClear(RTC_IFC_COMP0);
 }
 
 

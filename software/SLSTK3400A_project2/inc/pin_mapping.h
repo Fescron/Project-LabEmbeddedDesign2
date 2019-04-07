@@ -20,11 +20,12 @@
 #define _PIN_MAPPING_H_
 
 
-/* Include necessary for this header file */
-#include <em_gpio.h> /* General Purpose IO */
+/** Include necessary for this header file */
+#include "em_device.h" /* Include necessary MCU-specific header file */
+#include "em_gpio.h"   /* General Purpose IO */
 
 
-/* Select custom Happy Gecko board pinout or regular one */
+/** Select custom Happy Gecko board pinout or regular one */
 //#define CUSTOM_BOARD /* Comment this line if using the regular Happy Gecko board */
 
 
@@ -174,7 +175,7 @@
 	#define PM_SENS_EXT_PORT	gpioPortA
 	#define PM_SENS_EXT_PIN		9
 
-#endif /* Board pinout slection */
+#endif /* Board pinout selection */
 
 
 #endif /* _PIN_MAPPING_H_ */

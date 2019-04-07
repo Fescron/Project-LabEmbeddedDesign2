@@ -19,8 +19,7 @@
  *   v1.6: Changed a lot of things...
  *   v1.7: Updated documentation and chanced "USART0" to "ADXL_SPI".
  *
- *   TODO: Check if variable need to be volatile.
- *         Remove stdint and stdbool includes?
+ *   TODO: Check if variables need to be volatile.
  *         Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
  *           => Debugging it atm with "triggercounter", remove this variable later.
  *
@@ -29,31 +28,29 @@
  ******************************************************************************/
 
 
-/* Includes necessary for this source file */
-//#include <stdint.h>     /* (u)intXX_t */
-//#include <stdbool.h>    /* "bool", "true", "false" */
+#include <stdint.h>     /* (u)intXX_t */
+#include <stdbool.h>    /* "bool", "true", "false" */
 #include "em_cmu.h"     /* Clock Management Unit */
 #include "em_gpio.h"    /* General Purpose IO (GPIO) peripheral API */
 #include "em_usart.h"   /* Universal synchr./asynchr. receiver/transmitter (USART/UART) Peripheral API */
 
 #include "../inc/ADXL362.h"     /* Corresponding header file */
-#include "../inc/delay.h"     	/* Delay functionality */
-#include "../inc/util.h"     	/* Utility functions */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
-
 #include "../inc/debugging.h"   /* Enable or disable printing to UART */
+#include "../inc/delay.h"     	/* Delay functionality */
+#include "../inc/util.h"     	/* Utility functionality */
 
 
-/* Static variables only available and used in this file */
-static volatile bool ADXL_triggered = false;
-static volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 }; /* TODO: Perhaps this shouldn't be volatile */
+/** Local variables */
+/* TODO: Perhaps these shouldn't be volatile */
+static volatile bool ADXL_triggered = false; /* Volatile because it's modified by an interrupt service routine */
+static volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
 static uint8_t range = 0;
 static bool ADXL_VDD_initialized = false;
 static uint16_t triggercounter = 0; /* TODO: remove this later */
 
 
-/* Prototypes for static methods only used by other methods in this file
- * (Not available to be used elsewhere) */
+/** Local prototype */
 static void powerADXL (bool enabled);
 static void initADXL_SPI (void);
 static void softResetADXL (void);

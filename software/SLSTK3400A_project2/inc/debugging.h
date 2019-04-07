@@ -15,7 +15,7 @@
 #define _DEBUGGING_H_
 
 
-/* Comment the line below to remove all USART debugging stuff */
+/** Comment the line below to remove all USART debugging stuff */
 #define DEBUGGING
 
 

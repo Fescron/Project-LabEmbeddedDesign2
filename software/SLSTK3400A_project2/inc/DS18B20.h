@@ -13,15 +13,15 @@
 #define _DS18B20_H_
 
 
-/* Includes necessary for this header file */
+/** Include necessary for this header file */
 #include <stdint.h>  /* (u)intXX_t */
 
 
-/* Maximum waiting value before a reset becomes "failed" */
-#define MAX_TIME_CTR 2000
+/** Public definitions */
+#define MAX_TIME_CTR 2000 /* Maximum waiting value before a reset becomes "failed" */
 
 
-/* Prototype for method available to be used elsewhere */
+/** Public prototype */
 float readTempDS18B20 (void);
 
 

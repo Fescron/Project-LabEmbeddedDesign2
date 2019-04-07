@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 1.7
+ * @version 1.8
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -20,14 +20,12 @@
  *   v1.5: Reworked the code a lot (stopped disabling cmuClock_GPIO, ...).
  *   v1.6: Moved all documentation above source files to this file.
  *   v1.7: Updated documentation, started using a state-machine.
+ *   v1.8: Moved checkCable method to "other.c" and started using readVBAT method.
  *
  *   TODO: 1) RTC sleep functionality is broken when UDELAY_Calibrate() is called.
  *              => DS18B20 code depends on this!
  *              => UDelay uses RTCC, Use timers instead!
  *                   => timer + prescaler: every microsecond an interrupt?
- *         1) Fix cable-checking method.
- *         1) Add VCOMP and WDOG functionality.
- *         1) Start using linked-loop mode for ADXL to fix the strange interrupt behavior!
  *
  *         2) Check the sections about Crystals and RC oscillators.
  *         2) Disable unused peripherals and oscillators/clocks (see emodes.c) and check if nothing breaks.
@@ -37,32 +35,33 @@
  *                 this in combination with static variables in the method so they keep their value
  *                 between calls and recursion can be used?
  *
+ *         3) Add WDOG functionality.
  *         3) Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
  *              => Also see AN0007: 2.8 Optimizing Code
  *
  *
- *         UTIL.C: Remove stdint and stdbool includes?
- *                 Add disableClocks functionality from "emodes.c" here?
+ *         UTIL.C: Add disableClocks functionality from "emodes.c" here?
  *
- *         INTERRUPT.C: Remove stdint and stdbool includes?
- *                      Check if clear pending interrupts is necessary?
+ *         OTHER.C: Fix cable-checking method.
+ *                  Use VCOMP?
+ *
+ *         INTERRUPT.C: Check if clear pending interrupts is necessary?
  *                      GPIO_IntClear(0xFFFF); vs NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);?
  *
- *         DS18B20.C: Remove stdint include?
+ *         DS18B20.C: Where is float defined? Is include necessary in header file?
  *                    Use internal pull-up resistor for DATA pin using DOUT argument.
  *                      => Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
- *                    Enter EM1 when the MCU is waiting in a delay method?
+ *                    Enter EM1 when the MCU is waiting in a delay method? (see "other.c">"readVBAT()" )
  *
- *         DELAY.C: Remove stdint include?
- *                  Enable disable/enable clock functionality? (slows down the logic a lot last time tested...)
+ *         DELAY.C: Enable disable/enable clock functionality? (slows down the logic a lot last time tested...)
  *           >>>>>> Add checks if delay fits in field?
  *                  Check if HFLE needs to be enabled.
- *           >>>>>> Use cmuSelect_ULFRCO?
+ *           >>>>>> Use cmuSelect_ULFRCO? (and check sections about Crystals and RC oscillators)
  *
- *         ADXL362.C: Check if variable need to be volatile.
- *                    Remove stdint and stdbool includes?
+ *         ADXL362.C: Check if variables need to be volatile.
  *           >>>>>>>> Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
  *                      => Debugging it right now with "triggercounter", remove this variable later.
+ *                      => Start using linked-loop mode for ADXL to fix the strange interrupt behavior?
  *
  *                    Enable wake-up mode: writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit
  *
@@ -161,6 +160,7 @@
 #include "../inc/interrupt.h"   /* GPIO wakeup initialization and interrupt handlers */
 #include "../inc/ADXL362.h"    	/* Functions related to the accelerometer */
 #include "../inc/DS18B20.h"     /* Functions related to the temperature sensor */
+#include "../inc/other.h"       /* Cable checking and battery voltage functionality. */
 #include "../inc/delay.h"     	/* Delay functionality */
 #include "../inc/util.h"    	/* Utility functions */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
@@ -178,58 +178,6 @@ typedef enum mcu_states{
 
 /* Static variable only available and used in this file */
 static volatile MCU_State_t MCUstate;
-
-
-/* TODO: Remove these variables later */
-float Temperature = 0;
-bool notBroken = false;
-
-
-/**************************************************************************//**
- * @brief
- *   Method to check if the wire is broken.
- *
- * @details
- *   This method sets the mode of the pins, checks the connection
- *   between them and also disables them at the end.
- *
- * @return
- *   @li true - The connection is still okay.
- *   @li false - The connection is broken!
- *****************************************************************************/
-bool checkCable (void)
-{
-	/* TODO: Fix this method */
-	/* TODO: Move this method to "other.c" along with VCOMP? */
-
-	/* Value to eventually return */
-	bool check = false;
-
-	/* Enable oscillator to GPIO (keeping it here just in case...) */
-	CMU_ClockEnable(cmuClock_GPIO, true);
-
-	/* Change mode of first pin */
-	GPIO_PinModeSet(BREAK1_PORT, BREAK1_PIN, gpioModeInput, 1); /* TODO: "1" = filter enabled? */
-
-	/* Change mode of second pin and also set it high with the last argument */
-	GPIO_PinModeSet(BREAK2_PORT, BREAK2_PIN, gpioModePushPull, 1);
-
-	delay(50);
-
-	/* Check the connection */
-	if (!GPIO_PinInGet(BREAK1_PORT,BREAK1_PIN)) check = true;
-
-	/* Disable the pins */
-	GPIO_PinModeSet(BREAK1_PORT, BREAK1_PIN, gpioModeDisabled, 0);
-	GPIO_PinModeSet(BREAK2_PORT, BREAK2_PIN, gpioModeDisabled, 0);
-
-#ifdef DEBUGGING /* DEBUGGING */
-	if (check) dbinfo("Cable still intact");
-	else dbcrit("Cable broken!");
-#endif /* DEBUGGING */
-
-	return (check);
-}
 
 
 /**************************************************************************//**
@@ -281,6 +229,11 @@ void checkInterrupts (void)
  *****************************************************************************/
 int main (void)
 {
+	/* TODO: Remove these variables later? */
+	float temperature = 0;
+	bool notBroken = false;
+	uint32_t voltage = 0;
+
 	while(1)
 	{
 		switch(MCUstate)
@@ -300,6 +253,8 @@ int main (void)
 				led(true); /* Enable (and initialize) LED */
 
 				initGPIOwakeup(); /* Initialize GPIO wakeup */
+
+				initVBAT(); /* Initialize ADC to read battery voltage */
 
 				/* Initialize accelerometer */
 				if (true)
@@ -345,12 +300,18 @@ int main (void)
 				checkInterrupts();
 
 				/* TODO: not working atm due to UDelay_calibrate being disabled */
-				Temperature = readTempDS18B20(); /* A measurement takes about 550 ms */
+				temperature = readTempDS18B20(); /* A measurement takes about 550 ms */
 #ifdef DEBUGGING /* DEBUGGING */
-				dbinfoInt("Temperature: ", Temperature, "°C");
+				dbinfoInt("Temperature: ", temperature, "°C");
 #endif /* DEBUGGING */
 
 				notBroken = checkCable(); /* Check the cable */
+
+				voltage = readVBAT(); /* Read battery voltage */
+#ifdef DEBUGGING /* DEBUGGING */
+				dbinfoInt("Battery voltage: ", voltage, "");
+#endif /* DEBUGGING */
+
 
 				led(false); /* Disable LED */
 

@@ -20,33 +20,32 @@
  *   v1.5: Made more methods static.
  *   v1.6: Updated documentation.
  *
- *   TODO: Remove stdint includes?
+ *   TODO: Where is float defined? Is include necessary in header file?
  *         Use internal pull-up resistor for DATA pin using DOUT argument.
  *           => Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
- *         Enter EM1 when the MCU is waiting in a delay method?
+ *         Enter EM1 when the MCU is waiting in a delay method? (see "other.c">"readVBAT()" )
  *
  ******************************************************************************/
 
 
-/* Includes necessary for this source file */
-//#include <stdint.h>             /* (u)intXX_t */
+#include <stdint.h>             /* (u)intXX_t */
 #include <stdbool.h>            /* "bool", "true", "false" */
 #include "em_cmu.h"             /* Clock Management Unit */
 #include "em_gpio.h"            /* General Purpose IO (GPIO) peripheral API */
-#include "../inc/udelay.h"      /* Microsecond delay routine */
+
+#include "../inc/udelay.h"      /* Microsecond delay routine TODO: use something else*/
 
 #include "../inc/DS18B20.h"     /* Corresponding header file */
-#include "../inc/util.h"    	/* Utility functionality */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
 #include "../inc/debugging.h"   /* Enable or disable printing to UART */
+#include "../inc/util.h"    	/* Utility functionality */
 
 
-/* Static variable only available and used in this file */
+/** Local variables */
 static bool DS18B20_VDD_initialized = false;
 
 
-/* Prototypes for static methods only used by other methods in this file
- * (Not available to be used elsewhere) */
+/** Local prototypes */
 static void powerDS18B20 (bool enabled);
 static bool init_DS18B20 (void);
 static void writeByteToDS18B20 (uint8_t data);

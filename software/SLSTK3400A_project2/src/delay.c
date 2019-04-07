@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.c
  * @brief Delay functionality.
- * @version 1.6
+ * @version 1.7
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -15,19 +15,18 @@
  *         and moved all of the logic in one "delay" method. Renamed sleep method.
  *   v1.4: Changed names of static variables, made initRTCcomp static.
  *   v1.5: Updated documentation.
- *   v1.6: Changed RTCcomp names to RTC
+ *   v1.6: Changed RTCcomp names to RTC.
+ *   v1.7: Moved IRQ handler of RTC to this file.
  *
- *   TODO: Remove stdint include?
- *         Enable disable/enable clock functionality? (slows down the logic a lot last time tested...)
+ *   TODO: Enable disable/enable clock functionality? (slows down the logic a lot last time tested...)
  *         Add checks if delay fits in field?
  *         Check if HFLE needs to be enabled.
- *         Use cmuSelect_ULFRCO?
+ *         Use cmuSelect_ULFRCO? (and check sections about Crystals and RC oscillators)
  *
  ******************************************************************************/
 
 
-/* Includes necessary for this source file */
-//#include <stdint.h>    /* (u)intXX_t */
+#include <stdint.h>    /* (u)intXX_t */
 #include <stdbool.h>   /* "bool", "true", "false" */
 #include "em_device.h" /* Include necessary MCU-specific header file */
 #include "em_cmu.h"    /* Clock management unit */
@@ -40,8 +39,8 @@
 #include "../inc/debugging.h" 	/* Enable or disable printing to UART */
 
 
-/* Static variables only available and used in this file */
-static volatile uint32_t msTicks; /* Volatile because it's a global variable that's modified by an interrupt service routine */
+/** Local variables */
+static volatile uint32_t msTicks; /* Volatile because it's modified by an interrupt service routine */
 static bool RTC_initialized = false;
 
 #ifdef SYSTICKDELAY /* SysTick delay selected */
@@ -49,8 +48,7 @@ static bool SysTick_initialized = false;
 #endif /* SysTick/RTC selection */
 
 
-/* Prototype for static method only used by other methods in this file
- * (Not available to be used elsewhere) */
+/** Local prototype */
 static void initRTC (void);
 
 
@@ -214,4 +212,21 @@ static void initRTC (void)
 void SysTick_Handler (void)
 {
 	msTicks++; /* Increment counter necessary by SysTick delay functionality */
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Interrupt Service Routine for the RTC.
+ *
+ * @note
+ *   The "weak" definition for this method is located in "system_efm32hg.h".
+ *****************************************************************************/
+void RTC_IRQHandler (void)
+{
+	/* Disable the counter */
+	RTC_Enable(false);
+
+	/* Clear the interrupt source */
+	RTC_IntClear(RTC_IFC_COMP0);
 }

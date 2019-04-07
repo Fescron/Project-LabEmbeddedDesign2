@@ -1,14 +1,14 @@
 /***************************************************************************//**
- * @file util.h
- * @brief Utility functionality.
- * @version 2.5
+ * @file other.c
+ * @brief Cable checking and battery voltage functionality.
+ * @version 1.0
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
 
 /* Include guards prevent multiple inclusions of the same header */
-#ifndef _UTIL_H_
-#define _UTIL_H_
+#ifndef _OTHER_H_
+#define _OTHER_H_
 
 
 /** Includes necessary for this header file */
@@ -17,8 +17,9 @@
 
 
 /** Public prototypes */
-void led (bool enabled);
-void error (uint8_t number);
+bool checkCable (void);
+void initVBAT (void);
+uint32_t readVBAT (void);
 
 
-#endif /* _UTIL_H_ */
+#endif /* _OTHER_H_ */
