@@ -20,11 +20,11 @@
  *   @li v1.5: Made more methods static.
  *   @li v1.6: Updated documentation.
  *
- *   @todo @li RTC sleep functionality is broken when UDELAY_Calibrate() is called.
- *             @li UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
- *         @li Use internal pull-up resistor for DATA pin using DOUT argument.
- *             @li Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
- *         @li Enter EM1 when the MCU is waiting in a delay method? (see readVBAT method in `other.c`)
+ *   @todo RTC sleep functionality is broken when `UDELAY_Calibrate()` is called.
+ *           - UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
+ *         Use internal pull-up resistor for DATA pin using DOUT argument.
+ *           - Not working, why? `GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);`
+ *         Enter EM1 when the MCU is waiting in a delay method? (see `readVBAT` method in `other.c`)
  *
  ******************************************************************************/
 
@@ -62,7 +62,7 @@ static float convertTempData (uint8_t tempLS, uint8_t tempMS);
  *   One measurement takes about 550 ms.
  *
  * @return
- *   The read temperature data (float).
+ *   The read temperature data (`float`).
  *****************************************************************************/
 float readTempDS18B20 (void)
 {
@@ -120,8 +120,8 @@ float readTempDS18B20 (void)
  *   and called by other methods if necessary.
  *
  * @param[in] enabled
- *   @li True - Enable the GPIO pin connected to the VDD pin of the temperature sensor.
- *   @li False - Disable the GPIO pin connected to the VDD pin of the temperature sensor.
+ *   @li `true` - Enable the GPIO pin connected to the VDD pin of the temperature sensor.
+ *   @li `talse` - Disable the GPIO pin connected to the VDD pin of the temperature sensor.
  *****************************************************************************/
 static void powerDS18B20 (bool enabled)
 {
@@ -154,8 +154,8 @@ static void powerDS18B20 (bool enabled)
  *   and called by other methods if necessary.
  *
  * @return
- *   @li true - Initialization (reset) successful.
- *   @li false - Initialization (reset) failed.
+ *   @li `true` - Initialization (reset) successful.
+ *   @li `false` - Initialization (reset) failed.
  *****************************************************************************/
 static bool init_DS18B20 (void)
 {
@@ -214,7 +214,7 @@ static bool init_DS18B20 (void)
 
 /**************************************************************************//**
  * @brief
- *   Write a byte (uint8_t) to the DS18B20.
+ *   Write a byte (`uint8_t`) to the DS18B20.
  *
  * @note
  *   This is a static method because it's only internally used in this file
@@ -258,7 +258,7 @@ static void writeByteToDS18B20 (uint8_t data)
 
 /**************************************************************************//**
  * @brief
- *   Read a byte (uint8_t) from the DS18B20.
+ *   Read a byte (`uint8_t`) from the DS18B20.
  *
  * @note
  *   This is a static method because it's only internally used in this file
@@ -311,7 +311,7 @@ static uint8_t readByteFromDS18B20 (void)
  *   Most significant byte
  *
  * @return
- *   The converted temperature data (float).
+ *   The converted temperature data (`float`).
  *****************************************************************************/
 static float convertTempData (uint8_t tempLS, uint8_t tempMS)
 {

@@ -28,35 +28,13 @@
  *   @todo IMPORTANT: Fix cable-checking method.
  *                    Start using linked-loop mode for ADXL interrupt things.
  *
- *         EXTRA THINGS: Check the section about GPIO clock and cmuClock_HFPER
+ *   @todo EXTRA THINGS: Check the section about GPIO clock and cmuClock_HFPER
  *                       Add WDOG functionality. (see "powertest" example)
  *                       Add functionality to read internal temperature
- *                         => Detect problems of overheating?
+ *                         - Detect problems of overheating?
  *                       Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
- *                         => Also see AN0007: 2.8 Optimizing Code
- *
- *
- *         UTIL.C: Add disableClocks functionality from "emodes.c" here?
- *
- *         OTHER.C: Fix cable-checking method.
- *                  Use VCOMP?
- *
- *         INTERRUPT.C: <completed>
- *
- *         DS18B20.C: RTC sleep functionality is broken when UDELAY_Calibrate() is called.
- *                      => UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
- *                    Use internal pull-up resistor for DATA pin using DOUT argument.
- *                      => Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
- *                    Enter EM1 when the MCU is waiting in a delay method? (see readVBAT method in "other.c")
- *
- *         DELAY.C: Enable disable/enable clock functionality?
- *                  Check EMU_EnterEM2/3 true/false effect.
- *
- *         ADXL362.C: Check if variables need to be volatile.
- *                    Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
- *                      => Debugging it right now with "triggercounter", remove this variable later.
- *                      => Start using linked-loop mode for ADXL to fix the strange interrupt behavior?
- *                    Enable wake-up mode: writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit
+ *                         - Also see AN0007: 2.8 Optimizing Code
+ *                       Move sections to corresponding source files?
  *
  * ******************************************************************************
  *
@@ -212,7 +190,7 @@ static volatile MCU_State_t MCUstate;
 
 /**************************************************************************//**
  * @brief
- *   Method to check if any interrupts are triggered.
+ *   Method to check if any interrupts are triggered and react accordingly.
  *****************************************************************************/
 void checkInterrupts (void)
 {

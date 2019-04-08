@@ -8,10 +8,10 @@
  *
  * @section Versions
  *
- *   @li v1.0: Move `checkCable` from main.c to this file and add battery voltage measurement logic.
+ *   @li v1.0: Move `checkCable` from `main.c` to this file and add battery voltage measurement logic.
  *
- *   @todo @li Fix cable-checking method.
- *         @li Use VCOMP?
+ *   @todo Fix cable-checking method.
+ *         Use VCOMP?
  *
  ******************************************************************************/
 
@@ -118,8 +118,8 @@ uint32_t readVBAT (void)
  *   between them and also disables them at the end.
  *
  * @return
- *   @li true - The connection is still okay.
- *   @li false - The connection is broken!
+ *   @li `true` - The connection is still okay.
+ *   @li `false` - The connection is broken!
  *****************************************************************************/
 bool checkCable (void)
 {

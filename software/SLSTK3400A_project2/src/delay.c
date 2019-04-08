@@ -19,8 +19,8 @@
  *   @li v1.7: Moved IRQ handler of RTC to this file.
  *   @li v1.8: Added ULFRCO logic.
  *
- *   @todo @li Enable disable/enable clock functionality?
- *         @li Check EMU_EnterEM2/3 true/false effect.
+ *   @todo Enable disable/enable clock functionality?
+ *         Check `EMU_EnterEM2/3` true/false effect.
  *
  ******************************************************************************/
 
@@ -60,7 +60,7 @@ static void initRTC (void);
  *   This method also initializes SysTick/RTC if necessary.
  *
  * @param[in] msDelay
- *   The delay time in milliseconds.
+ *   The delay time in **milliseconds**.
  *****************************************************************************/
 void delay (uint32_t msDelay)
 {
@@ -163,7 +163,7 @@ void delay (uint32_t msDelay)
  *   This method also initializes the RTC if necessary.
  *
  * @param[in] sSleep
- *   The sleep time in seconds.
+ *   The sleep time in **seconds**.
  *****************************************************************************/
 void sleep (uint32_t sSleep)
 {
@@ -234,10 +234,6 @@ void sleep (uint32_t sSleep)
 /**************************************************************************//**
  * @brief
  *   RTC initialization.
- *
- * @details
- *   The RTC (compare) functionality uses the low-frequency crystal oscillator
- *   (LFXO) as the source.
  *
  * @note
  *   This is a static method because it's only internally used in this file

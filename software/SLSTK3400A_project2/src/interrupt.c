@@ -53,8 +53,8 @@ static volatile bool PB1_triggered = false;
  *   Initialize GPIO wake-up functionality.
  *
  * @details
- *   Initialize buttons PB0 and PB1 on falling-edge interrupts and
- *   ADXL_INT1 on rising-edge interrupts.
+ *   Initialize buttons `PB0` and `PB1` on falling-edge interrupts and
+ *   `ADXL_INT1` on rising-edge interrupts.
  *****************************************************************************/
 void initGPIOwakeup (void)
 {
@@ -105,8 +105,8 @@ void initGPIOwakeup (void)
  *   Getter for the `PB0_triggered` and `PB1_triggered` static variables.
  *
  * @param[in] number
- *   @li 0 - PB0_triggered selected.
- *   @li 1 - PB1_triggered selected.
+ *   @li `0` - `PB0_triggered` selected.
+ *   @li `1` - `PB1_triggered` selected.
  *
  * @return
  *   The value of `PB0_triggered` or `PB1_triggered`.
@@ -134,8 +134,8 @@ bool BTN_getTriggered (uint8_t number)
  *   Setter for the `PB0_triggered` and `PB1_triggered` static variable.
  *
  * @param[in] number
- *   @li 0 - PB0_triggered selected.
- *   @li 1 - PB1_triggered selected.
+ *   @li `0` - `PB0_triggered selected`.
+ *   @li `1` - `PB1_triggered selected`.
  *
  * @param[in] value
  *   The boolean value to set to the selected static variable.

@@ -21,7 +21,7 @@
  *   @li v2.4: Stopped disabling the GPIO clock.
  *   @li v2.5: Moved documentation.
  *
- *   @todo @li Add disableClocks functionality from `emodes.c` here?
+ *   @todo Add disableClocks functionality from `emodes.c` here?
  *
  ******************************************************************************/
 
@@ -54,8 +54,8 @@ static void initLED (void);
  *   This method also initializes the pin-mode if necessary.
  *
  * @param[in] enabled
- *   @li True - Enable LED
- *   @li False - Disable LED.
+ *   @li `true` - Enable LED.
+ *   @li `false` - Disable LED.
  *****************************************************************************/
 void led (bool enabled)
 {

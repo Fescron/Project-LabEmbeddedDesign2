@@ -19,10 +19,11 @@
  *   @li v1.6: Changed a lot of things...
  *   @li v1.7: Updated documentation and chanced `USART0` to `ADXL_SPI`.
  *
- *   @todo @li Check if variables need to be volatile.
- *         @li Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
- *             @li Debugging it atm with `triggercounter`, remove this variable later.
- *         @li Enable wake-up mode: writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit
+ *   @todo Check if variables need to be volatile.
+ *         Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
+ *           - Debugging it right now with `triggercounter`, remove this variable later.
+ *           - Start using linked-loop mode for ADXL to fix the strange interrupt behavior?
+ *         Enable wake-up mode: `writeADXL(ADXL_REG_POWER_CTL, 0b00001000)` // 5th bit
  *
  ******************************************************************************/
 
@@ -106,8 +107,8 @@ void initADXL (void)
  *   Setter for the `ADXL_triggered` static variable.
  *
  * @param[in] triggered
- *    @li True - Set `ADXL_triggered` to `true`.
- *    @li False - Set `ADXL_triggered` to `false`.
+ *    @li `true` - Set `ADXL_triggered` to `true`.
+ *    @li `false` - Set `ADXL_triggered` to `false`.
  *****************************************************************************/
 void ADXL_setTriggered (bool triggered)
 {
@@ -149,8 +150,8 @@ void ADXL_ackInterrupt (void)
  *   Enable or disable the SPI pins and USART0/1 clock and peripheral to the accelerometer.
  *
  * @param[in] enabled
- *   @li True - Enable the SPI pins and USART0/1 clock and peripheral to the accelerometer.
- *   @li False - Disable the SPI pins and USART0/1 clock and peripheral to the accelerometer.
+ *   @li `true` - Enable the SPI pins and USART0/1 clock and peripheral to the accelerometer.
+ *   @li `false` - Disable the SPI pins and USART0/1 clock and peripheral to the accelerometer.
  *****************************************************************************/
 void ADXL_enableSPI (bool enabled)
 {
@@ -208,8 +209,8 @@ void ADXL_enableSPI (bool enabled)
  *   Enable or disable measurement mode.
  *
  * @param[in] enabled
- *   @li True - Enable measurement mode.
- *   @li False - Disable measurement mode (standby).
+ *   @li `true` - Enable measurement mode.
+ *   @li `false` - Disable measurement mode (standby).
  *****************************************************************************/
 void ADXL_enableMeasure (bool enabled)
 {
@@ -254,9 +255,9 @@ void ADXL_enableMeasure (bool enabled)
  *   a global variable for later (internal) use.
  *
  * @param[in] givenRange
- *   @li 0 - +- 2g
- *   @li 1 - +- 4g
- *   @li 2 - +- 8g
+ *   @li `0` - +- 2g
+ *   @li `1` - +- 4g
+ *   @li `2` - +- 8g
  *****************************************************************************/
 void ADXL_configRange (uint8_t givenRange)
 {
@@ -306,12 +307,12 @@ void ADXL_configRange (uint8_t givenRange)
  *   Configure the Output Data Rate (ODR).
  *
  * @param[in] givenODR
- *   @li 0 - 12.5 Hz
- *   @li 1 - 25 Hz
- *   @li 2 - 50 Hz
- *   @li 3 - 100 Hz (reset default)
- *   @li 4 - 200 Hz
- *   @li 5 - 400 Hz
+ *   @li `0` - 12.5 Hz
+ *   @li `1` - 25 Hz
+ *   @li `2` - 50 Hz
+ *   @li `3` - 100 Hz (reset default)
+ *   @li `4` - 200 Hz
+ *   @li `5` - 400 Hz
  *****************************************************************************/
 void ADXL_configODR (uint8_t givenODR)
 {
@@ -403,7 +404,7 @@ void ADXL_configActivity (uint8_t gThreshold)
 
 /**************************************************************************//**
  * @brief
- *   Read and display g values forever with a 100ms interval.
+ *   Read and display "g" values forever with a 100ms interval.
  *
  * @details
  *   The accelerometer is put in measurement mode at 12.5Hz ODR, new
@@ -461,12 +462,12 @@ void ADXL_readValues (void)
 
 /**************************************************************************//**
  * @brief
- *   Initialize USART0 in SPI mode according to the settings required
+ *   Initialize USARTx in SPI mode according to the settings required
  *   by the accelerometer.
  *
  * @details
- *   Configure pins, configure USART0 in SPI mode, route
- *   the pins, enable USART0 and set CS high.
+ *   Configure pins, configure USARTx in SPI mode, route
+ *   the pins, enable USARTx and set CS high.
  *   Necessary clocks are enabled in a previous method.
  *
  * @note
@@ -596,7 +597,7 @@ static void resetHandlerADXL (void)
  *   The register address to read from.
  *
  * @return
- *   The response (one byte, uint8_t).
+ *   The response (one byte, `uint8_t`).
  *****************************************************************************/
 static uint8_t readADXL (uint8_t address)
 {
@@ -627,10 +628,10 @@ static uint8_t readADXL (uint8_t address)
  *   and called by other methods if necessary.
  *
  * @param[in] address
- *   The register address to write the data to (one byte, uint8_t).
+ *   The register address to write the data to (one byte, `uint8_t`).
  *
  * @param[in] data
- *   The data to write to the address (one byte, uint8_t).
+ *   The data to write to the address (one byte, `uint8_t`).
  *****************************************************************************/
 static void writeADXL (uint8_t address, uint8_t data)
 {
@@ -649,10 +650,10 @@ static void writeADXL (uint8_t address, uint8_t data)
 
 /**************************************************************************//**
  * @brief
- *   Read the X-Y-Z data registers in the XYZDATA[] field using burst reads.
+ *   Read the X-Y-Z data registers in the `XYZDATA[]` field using burst reads.
  *
  * @details
- *   Response data gets put in XYZDATA array (global volatile variable).
+ *   Response data gets put in `XYZDATA` array (global volatile variable).
  *
  * @note
  *   This is a static method because it's only internally used in this file
@@ -688,8 +689,8 @@ static void readADXL_XYZDATA (void)
  *   and called by other methods if necessary.
  *
  * @param[in] enabled
- *   @li True - Enable the GPIO pin connected to the VDD pin of the accelerometer.
- *   @li False - Disable the GPIO pin connected to the VDD pin of the accelerometer.
+ *   @li `true` - Enable the GPIO pin connected to the VDD pin of the accelerometer.
+ *   @li `false` - Disable the GPIO pin connected to the VDD pin of the accelerometer.
  *****************************************************************************/
 static void powerADXL (bool enabled)
 {
@@ -731,8 +732,8 @@ static void softResetADXL (void)
  *   and called by other methods if necessary.
  *
  * @return
- *   @li true - Correct ID returned.
- *   @li false - Incorrect ID returned.
+ *   @li `true` - Correct ID returned.
+ *   @li `false` - Incorrect ID returned.
  *****************************************************************************/
 static bool checkID_ADXL (void)
 {
