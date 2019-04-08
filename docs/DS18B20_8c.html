@@ -133,6 +133,166 @@ Versions</h1>
 
 <p class="definition">Definition in file <a class="el" href="DS18B20_8c_source.html">DS18B20.c</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a84d8cb45da1e9ecfbf71aae818823a12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84d8cb45da1e9ecfbf71aae818823a12">&#9670;&nbsp;</a></span>powerDS18B20()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void powerDS18B20 </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>enabled</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Enable or disable the power to the temperature sensor. </p>
+<p>This method also initializes the pin-mode if necessary.</p>
+<dl class="section note"><dt>Note</dt><dd>This is a static method because it's only internally used in this file and called by other methods if necessary.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">enabled</td><td><ul>
+<li>True - Enable the GPIO pin connected to the VDD pin of the temperature sensor. </li>
+<li>False - Disable the GPIO pin connected to the VDD pin of the temperature sensor. </li>
+</ul>
+</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="DS18B20_8c_source.html#l00126">126</a> of file <a class="el" href="DS18B20_8c_source.html">DS18B20.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;{</div><div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="comment">/* Enable necessary clocks (just in case) */</span></div><div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    CMU_ClockEnable(cmuClock_HFPER, <span class="keyword">true</span>); <span class="comment">/* GPIO is a High Frequency Peripheral */</span></div><div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    CMU_ClockEnable(cmuClock_GPIO, <span class="keyword">true</span>);</div><div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div><div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="comment">/* Initialize VDD pin if not already the case */</span></div><div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="DS18B20_8c.html#a762d0c5c4db2a77689f5b7b073d87904">DS18B20_VDD_initialized</a>)</div><div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    {</div><div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <span class="comment">/* In the case of gpioModePushPull&quot;, the last argument directly sets the pin state */</span></div><div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#a9b49e9431941e967d2961f662fafd24d">TEMP_VDD_PORT</a>, <a class="code" href="pin__mapping_8h.html#ac692aef67d9f511152968311fe406dbb">TEMP_VDD_PIN</a>, gpioModePushPull, enabled);</div><div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div><div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        <a class="code" href="DS18B20_8c.html#a762d0c5c4db2a77689f5b7b073d87904">DS18B20_VDD_initialized</a> = <span class="keyword">true</span>;</div><div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    }</div><div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordflow">else</span></div><div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    {</div><div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <span class="keywordflow">if</span> (enabled) GPIO_PinOutSet(<a class="code" href="pin__mapping_8h.html#a9b49e9431941e967d2961f662fafd24d">TEMP_VDD_PORT</a>, <a class="code" href="pin__mapping_8h.html#ac692aef67d9f511152968311fe406dbb">TEMP_VDD_PIN</a>); <span class="comment">/* Enable VDD pin */</span></div><div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <span class="keywordflow">else</span> GPIO_PinOutClear(<a class="code" href="pin__mapping_8h.html#a9b49e9431941e967d2961f662fafd24d">TEMP_VDD_PORT</a>, <a class="code" href="pin__mapping_8h.html#ac692aef67d9f511152968311fe406dbb">TEMP_VDD_PIN</a>); <span class="comment">/* Disable VDD pin */</span></div><div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    }</div><div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;}</div><div class="ttc" id="DS18B20_8c_html_a762d0c5c4db2a77689f5b7b073d87904"><div class="ttname"><a href="DS18B20_8c.html#a762d0c5c4db2a77689f5b7b073d87904">DS18B20_VDD_initialized</a></div><div class="ttdeci">static bool DS18B20_VDD_initialized</div><div class="ttdef"><b>Definition:</b> <a href="DS18B20_8c_source.html#l00046">DS18B20.c:46</a></div></div>
+<div class="ttc" id="pin__mapping_8h_html_ac692aef67d9f511152968311fe406dbb"><div class="ttname"><a href="pin__mapping_8h.html#ac692aef67d9f511152968311fe406dbb">TEMP_VDD_PIN</a></div><div class="ttdeci">#define TEMP_VDD_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00148">pin_mapping.h:148</a></div></div>
+<div class="ttc" id="pin__mapping_8h_html_a9b49e9431941e967d2961f662fafd24d"><div class="ttname"><a href="pin__mapping_8h.html#a9b49e9431941e967d2961f662fafd24d">TEMP_VDD_PORT</a></div><div class="ttdeci">#define TEMP_VDD_PORT</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00147">pin_mapping.h:147</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="afa07203657ccb8eec9f88518640ff70d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa07203657ccb8eec9f88518640ff70d">&#9670;&nbsp;</a></span>init_DS18B20()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool init_DS18B20 </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize (reset) DS18B20. </p>
+<dl class="section note"><dt>Note</dt><dd>This is a static method because it's only internally used in this file and called by other methods if necessary.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><ul>
+<li>true - Initialization (reset) successful. </li>
+<li>false - Initialization (reset) failed. </li>
+</ul>
+</dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="DS18B20_8c_source.html#l00160">160</a> of file <a class="el" href="DS18B20_8c_source.html">DS18B20.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;{</div><div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    uint16_t counter = 0;</div><div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div><div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="comment">/* In the case of gpioModePushPull&quot;, the last argument directly sets the pin state */</span></div><div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>, gpioModePushPull, 0);</div><div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(480);</div><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div><div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="comment">/* Change pin-mode to input */</span></div><div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>, gpioModeInput, 0); <span class="comment">/* TODO: Try to use internal pullup? */</span></div><div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div><div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">/* Check if the line becomes HIGH during the maximum waiting time */</span></div><div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keywordflow">while</span> (counter++ &lt;= <a class="code" href="DS18B20_8h.html#a64ee5ab6a9e20a95acc7b717b2a3b167">MAX_TIME_CTR</a> &amp;&amp; GPIO_PinInGet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>) == 1)</div><div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    {</div><div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="comment">/* TODO: Maybe EMU_EnterEM1() */</span></div><div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    }</div><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;</div><div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="comment">/* Exit the function if the maximum waiting time was reached (reset failed) */</span></div><div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">if</span> (counter == <a class="code" href="DS18B20_8h.html#a64ee5ab6a9e20a95acc7b717b2a3b167">MAX_TIME_CTR</a>)</div><div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    {</div><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;</div><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="preprocessor">#ifdef DEBUGGING </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        dbcrit(<span class="stringliteral">&quot;DS18B20 initialization failed&quot;</span>);</div><div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;</div><div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="keywordflow">return</span> (<span class="keyword">false</span>);</div><div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    }</div><div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;</div><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="comment">/* Reset counter value */</span></div><div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    counter = 0;</div><div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div><div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="comment">/* Check if the line becomes LOW during the maximum waiting time */</span></div><div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordflow">while</span> (counter++ &lt;= <a class="code" href="DS18B20_8h.html#a64ee5ab6a9e20a95acc7b717b2a3b167">MAX_TIME_CTR</a> &amp;&amp; GPIO_PinInGet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>) == 0)</div><div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    {</div><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="comment">/* TODO: Maybe EMU_EnterEM1() */</span></div><div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    }</div><div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div><div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="comment">/* Exit the function if the maximum waiting time was reached (reset failed) */</span></div><div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordflow">if</span> (counter == <a class="code" href="DS18B20_8h.html#a64ee5ab6a9e20a95acc7b717b2a3b167">MAX_TIME_CTR</a>)</div><div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    {</div><div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;</div><div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="preprocessor">#ifdef DEBUGGING </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        dbcrit(<span class="stringliteral">&quot;DS18B20 initialization failed&quot;</span>);</div><div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;</div><div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        <span class="keywordflow">return</span> (<span class="keyword">false</span>);</div><div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    }</div><div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;</div><div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="comment">/* Continue waiting and finally return that the reset was successful */</span></div><div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(480);</div><div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;</div><div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keywordflow">return</span> (<span class="keyword">true</span>);</div><div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;}</div><div class="ttc" id="DS18B20_8h_html_a64ee5ab6a9e20a95acc7b717b2a3b167"><div class="ttname"><a href="DS18B20_8h.html#a64ee5ab6a9e20a95acc7b717b2a3b167">MAX_TIME_CTR</a></div><div class="ttdeci">#define MAX_TIME_CTR</div><div class="ttdef"><b>Definition:</b> <a href="DS18B20_8h_source.html#l00018">DS18B20.h:18</a></div></div>
+<div class="ttc" id="pin__mapping_8h_html_ad72e87ac3f7ae2d8aeb5b0219824094f"><div class="ttname"><a href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a></div><div class="ttdeci">#define TEMP_DATA_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00146">pin_mapping.h:146</a></div></div>
+<div class="ttc" id="pin__mapping_8h_html_af2b5f0565a2bbde4f40c600b1ce98a8c"><div class="ttname"><a href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a></div><div class="ttdeci">#define TEMP_DATA_PORT</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00145">pin_mapping.h:145</a></div></div>
+<div class="ttc" id="group__Udelay_html_ga7b02c652fea1e8305b266ec0356a5ad5"><div class="ttname"><a href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a></div><div class="ttdeci">void UDELAY_Delay(uint32_t usecs)</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a371c1525c598f00d3dd4f1f4b2c66961"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a371c1525c598f00d3dd4f1f4b2c66961">&#9670;&nbsp;</a></span>writeByteToDS18B20()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void writeByteToDS18B20 </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>data</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Write a byte (uint8_t) to the DS18B20. </p>
+<dl class="section note"><dt>Note</dt><dd>This is a static method because it's only internally used in this file and called by other methods if necessary.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The data to write to the DS18B20. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="DS18B20_8c_source.html#l00226">226</a> of file <a class="el" href="DS18B20_8c_source.html">DS18B20.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;{</div><div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="comment">/* In the case of gpioModePushPull&quot;, the last argument directly sets the pin state */</span></div><div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>, gpioModePushPull, 0);</div><div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;</div><div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="comment">/* Write the byte, bit by bit */</span></div><div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordflow">for</span> (uint8_t i = 0; i &lt; 8; i++)</div><div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    {</div><div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        <span class="comment">/* Check if we need to write a &quot;1&quot; */</span></div><div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        <span class="keywordflow">if</span> (data &amp; 0x01)</div><div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        {</div><div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            GPIO_PinOutClear(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>);</div><div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(5);</div><div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            GPIO_PinOutSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>);</div><div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(60);</div><div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        }</div><div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <span class="comment">/* If not, write a &quot;0&quot; */</span></div><div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <span class="keywordflow">else</span></div><div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        {</div><div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;            GPIO_PinOutClear(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>);</div><div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;            <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(60);</div><div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;            GPIO_PinOutSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>);</div><div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;            <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(5);</div><div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        }</div><div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="comment">/* Right shift bits once */</span></div><div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        data &gt;&gt;= 1;</div><div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    }</div><div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;</div><div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="comment">/* Set data line high */</span></div><div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    GPIO_PinOutSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>);</div><div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;}</div><div class="ttc" id="pin__mapping_8h_html_ad72e87ac3f7ae2d8aeb5b0219824094f"><div class="ttname"><a href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a></div><div class="ttdeci">#define TEMP_DATA_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00146">pin_mapping.h:146</a></div></div>
+<div class="ttc" id="pin__mapping_8h_html_af2b5f0565a2bbde4f40c600b1ce98a8c"><div class="ttname"><a href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a></div><div class="ttdeci">#define TEMP_DATA_PORT</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00145">pin_mapping.h:145</a></div></div>
+<div class="ttc" id="group__Udelay_html_ga7b02c652fea1e8305b266ec0356a5ad5"><div class="ttname"><a href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a></div><div class="ttdeci">void UDELAY_Delay(uint32_t usecs)</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ad078b80b8eb65e93150b6e05a1ab2f88"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad078b80b8eb65e93150b6e05a1ab2f88">&#9670;&nbsp;</a></span>readByteFromDS18B20()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint8_t readByteFromDS18B20 </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read a byte (uint8_t) from the DS18B20. </p>
+<dl class="section note"><dt>Note</dt><dd>This is a static method because it's only internally used in this file and called by other methods if necessary.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The byte read from the DS18B20. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="DS18B20_8c_source.html#l00270">270</a> of file <a class="el" href="DS18B20_8c_source.html">DS18B20.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;{</div><div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="comment">/* Data to eventually return */</span></div><div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    uint8_t data = 0x0;</div><div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;</div><div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="comment">/* Read the byte, bit by bit */</span></div><div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="keywordflow">for</span> (uint8_t i = 0; i &lt; 8; i++)</div><div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    {</div><div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;        <span class="comment">/* Change pin-mode to input */</span></div><div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>, gpioModeInput, 0); <span class="comment">/* TODO: Try to use internal pullup? */</span></div><div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;</div><div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <span class="comment">/* Right shift bits once */</span></div><div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        data &gt;&gt;= 1;</div><div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;</div><div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        <span class="comment">/* If the line is high, OR the first bit of the data:</span></div><div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="comment">         * 0x80 = 1000 0000 */</span></div><div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        <span class="keywordflow">if</span> (GPIO_PinInGet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>)) data |= 0x80;</div><div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;</div><div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        <span class="comment">/* In the case of gpioModePushPull&quot;, the last argument directly sets the pin state */</span></div><div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>, gpioModePushPull, 1);</div><div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;</div><div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;</div><div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        <span class="comment">/* Wait some time before going into next loop */</span></div><div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(70);</div><div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    }</div><div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordflow">return</span> (data);</div><div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;}</div><div class="ttc" id="pin__mapping_8h_html_ad72e87ac3f7ae2d8aeb5b0219824094f"><div class="ttname"><a href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a></div><div class="ttdeci">#define TEMP_DATA_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00146">pin_mapping.h:146</a></div></div>
+<div class="ttc" id="pin__mapping_8h_html_af2b5f0565a2bbde4f40c600b1ce98a8c"><div class="ttname"><a href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a></div><div class="ttdeci">#define TEMP_DATA_PORT</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00145">pin_mapping.h:145</a></div></div>
+<div class="ttc" id="group__Udelay_html_ga7b02c652fea1e8305b266ec0356a5ad5"><div class="ttname"><a href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a></div><div class="ttdeci">void UDELAY_Delay(uint32_t usecs)</div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a0276931f539fb531415b2ac9fa7f4e77"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0276931f539fb531415b2ac9fa7f4e77">&#9670;&nbsp;</a></span>convertTempData()</h2>
 
@@ -182,126 +342,6 @@ Versions</h1>
 <div class="fragment"><div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;{</div><div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    uint16_t rawDataMerge;</div><div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    uint16_t reverseRawDataMerge;</div><div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="keywordtype">float</span> finalTemperature;</div><div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;</div><div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <span class="comment">/* Check if it is a negative temperature value</span></div><div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="comment">     * 0xF8 = 0b1111 1000 */</span></div><div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="keywordflow">if</span> (tempMS &amp; 0xF8)</div><div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    {</div><div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;        rawDataMerge = tempMS;</div><div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div><div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;        <span class="comment">/* Left shift 8 times */</span></div><div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;        rawDataMerge &lt;&lt;= 8;</div><div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;</div><div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;        <span class="comment">/* Add the second part */</span></div><div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;        rawDataMerge += tempLS;</div><div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;</div><div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;        <span class="comment">/* Invert the value since we have a negative temperature */</span></div><div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        reverseRawDataMerge = ~rawDataMerge;</div><div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;</div><div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        <span class="comment">/* Calculate the final temperature */</span></div><div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;        finalTemperature = -(reverseRawDataMerge + 1) * 0.0625;</div><div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    }</div><div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    <span class="comment">/* We&#39;re dealing with a positive temperature */</span></div><div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    <span class="keywordflow">else</span></div><div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    {</div><div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;        rawDataMerge = tempMS;</div><div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;</div><div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        <span class="comment">/* Left shift 8 times */</span></div><div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;        rawDataMerge &lt;&lt;= 8;</div><div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;</div><div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;        <span class="comment">/* Add the second part */</span></div><div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;        rawDataMerge += tempLS;</div><div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;</div><div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;        <span class="comment">/* Calculate the final temperature */</span></div><div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;        finalTemperature = rawDataMerge * 0.0625;</div><div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    }</div><div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;</div><div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    <span class="keywordflow">return</span> (finalTemperature);</div><div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
-<a id="afa07203657ccb8eec9f88518640ff70d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa07203657ccb8eec9f88518640ff70d">&#9670;&nbsp;</a></span>init_DS18B20()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool init_DS18B20 </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Initialize (reset) DS18B20. </p>
-<dl class="section note"><dt>Note</dt><dd>This is a static method because it's only internally used in this file and called by other methods if necessary.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd><ul>
-<li>true - Initialization (reset) successful. </li>
-<li>false - Initialization (reset) failed. </li>
-</ul>
-</dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="DS18B20_8c_source.html#l00160">160</a> of file <a class="el" href="DS18B20_8c_source.html">DS18B20.c</a>.</p>
-<div class="fragment"><div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;{</div><div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    uint16_t counter = 0;</div><div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div><div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="comment">/* In the case of gpioModePushPull&quot;, the last argument directly sets the pin state */</span></div><div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>, gpioModePushPull, 0);</div><div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(480);</div><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div><div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="comment">/* Change pin-mode to input */</span></div><div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>, gpioModeInput, 0); <span class="comment">/* TODO: Try to use internal pullup? */</span></div><div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div><div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">/* Check if the line becomes HIGH during the maximum waiting time */</span></div><div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keywordflow">while</span> (counter++ &lt;= <a class="code" href="DS18B20_8h.html#a64ee5ab6a9e20a95acc7b717b2a3b167">MAX_TIME_CTR</a> &amp;&amp; GPIO_PinInGet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>) == 1)</div><div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    {</div><div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="comment">/* TODO: Maybe EMU_EnterEM1() */</span></div><div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    }</div><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;</div><div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="comment">/* Exit the function if the maximum waiting time was reached (reset failed) */</span></div><div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">if</span> (counter == <a class="code" href="DS18B20_8h.html#a64ee5ab6a9e20a95acc7b717b2a3b167">MAX_TIME_CTR</a>)</div><div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    {</div><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;</div><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="preprocessor">#ifdef DEBUGGING </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        dbcrit(<span class="stringliteral">&quot;DS18B20 initialization failed&quot;</span>);</div><div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;</div><div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <span class="keywordflow">return</span> (<span class="keyword">false</span>);</div><div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    }</div><div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;</div><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="comment">/* Reset counter value */</span></div><div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    counter = 0;</div><div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div><div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="comment">/* Check if the line becomes LOW during the maximum waiting time */</span></div><div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordflow">while</span> (counter++ &lt;= <a class="code" href="DS18B20_8h.html#a64ee5ab6a9e20a95acc7b717b2a3b167">MAX_TIME_CTR</a> &amp;&amp; GPIO_PinInGet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>) == 0)</div><div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    {</div><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="comment">/* TODO: Maybe EMU_EnterEM1() */</span></div><div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    }</div><div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div><div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="comment">/* Exit the function if the maximum waiting time was reached (reset failed) */</span></div><div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordflow">if</span> (counter == <a class="code" href="DS18B20_8h.html#a64ee5ab6a9e20a95acc7b717b2a3b167">MAX_TIME_CTR</a>)</div><div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    {</div><div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;</div><div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="preprocessor">#ifdef DEBUGGING </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        dbcrit(<span class="stringliteral">&quot;DS18B20 initialization failed&quot;</span>);</div><div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;</div><div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        <span class="keywordflow">return</span> (<span class="keyword">false</span>);</div><div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    }</div><div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;</div><div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="comment">/* Continue waiting and finally return that the reset was successful */</span></div><div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(480);</div><div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;</div><div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keywordflow">return</span> (<span class="keyword">true</span>);</div><div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;}</div><div class="ttc" id="DS18B20_8h_html_a64ee5ab6a9e20a95acc7b717b2a3b167"><div class="ttname"><a href="DS18B20_8h.html#a64ee5ab6a9e20a95acc7b717b2a3b167">MAX_TIME_CTR</a></div><div class="ttdeci">#define MAX_TIME_CTR</div><div class="ttdef"><b>Definition:</b> <a href="DS18B20_8h_source.html#l00018">DS18B20.h:18</a></div></div>
-<div class="ttc" id="pin__mapping_8h_html_ad72e87ac3f7ae2d8aeb5b0219824094f"><div class="ttname"><a href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a></div><div class="ttdeci">#define TEMP_DATA_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00146">pin_mapping.h:146</a></div></div>
-<div class="ttc" id="pin__mapping_8h_html_af2b5f0565a2bbde4f40c600b1ce98a8c"><div class="ttname"><a href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a></div><div class="ttdeci">#define TEMP_DATA_PORT</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00145">pin_mapping.h:145</a></div></div>
-<div class="ttc" id="group__Udelay_html_ga7b02c652fea1e8305b266ec0356a5ad5"><div class="ttname"><a href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a></div><div class="ttdeci">void UDELAY_Delay(uint32_t usecs)</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a84d8cb45da1e9ecfbf71aae818823a12"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a84d8cb45da1e9ecfbf71aae818823a12">&#9670;&nbsp;</a></span>powerDS18B20()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void powerDS18B20 </td>
-          <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>enabled</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Enable or disable the power to the temperature sensor. </p>
-<p>This method also initializes the pin-mode if necessary.</p>
-<dl class="section note"><dt>Note</dt><dd>This is a static method because it's only internally used in this file and called by other methods if necessary.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">enabled</td><td><ul>
-<li>True - Enable the GPIO pin connected to the VDD pin of the temperature sensor. </li>
-<li>False - Disable the GPIO pin connected to the VDD pin of the temperature sensor. </li>
-</ul>
-</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="DS18B20_8c_source.html#l00126">126</a> of file <a class="el" href="DS18B20_8c_source.html">DS18B20.c</a>.</p>
-<div class="fragment"><div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;{</div><div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="comment">/* Enable necessary clocks (just in case) */</span></div><div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    CMU_ClockEnable(cmuClock_HFPER, <span class="keyword">true</span>); <span class="comment">/* GPIO is a High Frequency Peripheral */</span></div><div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    CMU_ClockEnable(cmuClock_GPIO, <span class="keyword">true</span>);</div><div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div><div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="comment">/* Initialize VDD pin if not already the case */</span></div><div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="DS18B20_8c.html#a762d0c5c4db2a77689f5b7b073d87904">DS18B20_VDD_initialized</a>)</div><div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    {</div><div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <span class="comment">/* In the case of gpioModePushPull&quot;, the last argument directly sets the pin state */</span></div><div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#a9b49e9431941e967d2961f662fafd24d">TEMP_VDD_PORT</a>, <a class="code" href="pin__mapping_8h.html#ac692aef67d9f511152968311fe406dbb">TEMP_VDD_PIN</a>, gpioModePushPull, enabled);</div><div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div><div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        <a class="code" href="DS18B20_8c.html#a762d0c5c4db2a77689f5b7b073d87904">DS18B20_VDD_initialized</a> = <span class="keyword">true</span>;</div><div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    }</div><div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordflow">else</span></div><div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    {</div><div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <span class="keywordflow">if</span> (enabled) GPIO_PinOutSet(<a class="code" href="pin__mapping_8h.html#a9b49e9431941e967d2961f662fafd24d">TEMP_VDD_PORT</a>, <a class="code" href="pin__mapping_8h.html#ac692aef67d9f511152968311fe406dbb">TEMP_VDD_PIN</a>); <span class="comment">/* Enable VDD pin */</span></div><div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <span class="keywordflow">else</span> GPIO_PinOutClear(<a class="code" href="pin__mapping_8h.html#a9b49e9431941e967d2961f662fafd24d">TEMP_VDD_PORT</a>, <a class="code" href="pin__mapping_8h.html#ac692aef67d9f511152968311fe406dbb">TEMP_VDD_PIN</a>); <span class="comment">/* Disable VDD pin */</span></div><div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    }</div><div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;}</div><div class="ttc" id="DS18B20_8c_html_a762d0c5c4db2a77689f5b7b073d87904"><div class="ttname"><a href="DS18B20_8c.html#a762d0c5c4db2a77689f5b7b073d87904">DS18B20_VDD_initialized</a></div><div class="ttdeci">static bool DS18B20_VDD_initialized</div><div class="ttdef"><b>Definition:</b> <a href="DS18B20_8c_source.html#l00046">DS18B20.c:46</a></div></div>
-<div class="ttc" id="pin__mapping_8h_html_ac692aef67d9f511152968311fe406dbb"><div class="ttname"><a href="pin__mapping_8h.html#ac692aef67d9f511152968311fe406dbb">TEMP_VDD_PIN</a></div><div class="ttdeci">#define TEMP_VDD_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00148">pin_mapping.h:148</a></div></div>
-<div class="ttc" id="pin__mapping_8h_html_a9b49e9431941e967d2961f662fafd24d"><div class="ttname"><a href="pin__mapping_8h.html#a9b49e9431941e967d2961f662fafd24d">TEMP_VDD_PORT</a></div><div class="ttdeci">#define TEMP_VDD_PORT</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00147">pin_mapping.h:147</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="ad078b80b8eb65e93150b6e05a1ab2f88"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad078b80b8eb65e93150b6e05a1ab2f88">&#9670;&nbsp;</a></span>readByteFromDS18B20()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static uint8_t readByteFromDS18B20 </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read a byte (uint8_t) from the DS18B20. </p>
-<dl class="section note"><dt>Note</dt><dd>This is a static method because it's only internally used in this file and called by other methods if necessary.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>The byte read from the DS18B20. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="DS18B20_8c_source.html#l00270">270</a> of file <a class="el" href="DS18B20_8c_source.html">DS18B20.c</a>.</p>
-<div class="fragment"><div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;{</div><div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="comment">/* Data to eventually return */</span></div><div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    uint8_t data = 0x0;</div><div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;</div><div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="comment">/* Read the byte, bit by bit */</span></div><div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="keywordflow">for</span> (uint8_t i = 0; i &lt; 8; i++)</div><div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    {</div><div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;        <span class="comment">/* Change pin-mode to input */</span></div><div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>, gpioModeInput, 0); <span class="comment">/* TODO: Try to use internal pullup? */</span></div><div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;</div><div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <span class="comment">/* Right shift bits once */</span></div><div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        data &gt;&gt;= 1;</div><div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;</div><div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        <span class="comment">/* If the line is high, OR the first bit of the data:</span></div><div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="comment">         * 0x80 = 1000 0000 */</span></div><div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        <span class="keywordflow">if</span> (GPIO_PinInGet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>)) data |= 0x80;</div><div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;</div><div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        <span class="comment">/* In the case of gpioModePushPull&quot;, the last argument directly sets the pin state */</span></div><div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>, gpioModePushPull, 1);</div><div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;</div><div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;</div><div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        <span class="comment">/* Wait some time before going into next loop */</span></div><div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(70);</div><div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    }</div><div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordflow">return</span> (data);</div><div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;}</div><div class="ttc" id="pin__mapping_8h_html_ad72e87ac3f7ae2d8aeb5b0219824094f"><div class="ttname"><a href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a></div><div class="ttdeci">#define TEMP_DATA_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00146">pin_mapping.h:146</a></div></div>
-<div class="ttc" id="pin__mapping_8h_html_af2b5f0565a2bbde4f40c600b1ce98a8c"><div class="ttname"><a href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a></div><div class="ttdeci">#define TEMP_DATA_PORT</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00145">pin_mapping.h:145</a></div></div>
-<div class="ttc" id="group__Udelay_html_ga7b02c652fea1e8305b266ec0356a5ad5"><div class="ttname"><a href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a></div><div class="ttdeci">void UDELAY_Delay(uint32_t usecs)</div></div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="a4067fdb03437426a25af1f210622217b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4067fdb03437426a25af1f210622217b">&#9670;&nbsp;</a></span>readTempDS18B20()</h2>
 
@@ -329,46 +369,6 @@ Versions</h1>
 <div class="ttc" id="DS18B20_8c_html_ad078b80b8eb65e93150b6e05a1ab2f88"><div class="ttname"><a href="DS18B20_8c.html#ad078b80b8eb65e93150b6e05a1ab2f88">readByteFromDS18B20</a></div><div class="ttdeci">static uint8_t readByteFromDS18B20(void)</div><div class="ttdoc">Read a byte (uint8_t) from the DS18B20. </div><div class="ttdef"><b>Definition:</b> <a href="DS18B20_8c_source.html#l00270">DS18B20.c:270</a></div></div>
 <div class="ttc" id="DS18B20_8c_html_a0276931f539fb531415b2ac9fa7f4e77"><div class="ttname"><a href="DS18B20_8c.html#a0276931f539fb531415b2ac9fa7f4e77">convertTempData</a></div><div class="ttdeci">static float convertTempData(uint8_t tempLS, uint8_t tempMS)</div><div class="ttdoc">Convert temperature data. </div><div class="ttdef"><b>Definition:</b> <a href="DS18B20_8c_source.html#l00316">DS18B20.c:316</a></div></div>
 <div class="ttc" id="DS18B20_8c_html_afa07203657ccb8eec9f88518640ff70d"><div class="ttname"><a href="DS18B20_8c.html#afa07203657ccb8eec9f88518640ff70d">init_DS18B20</a></div><div class="ttdeci">static bool init_DS18B20(void)</div><div class="ttdoc">Initialize (reset) DS18B20. </div><div class="ttdef"><b>Definition:</b> <a href="DS18B20_8c_source.html#l00160">DS18B20.c:160</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a371c1525c598f00d3dd4f1f4b2c66961"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a371c1525c598f00d3dd4f1f4b2c66961">&#9670;&nbsp;</a></span>writeByteToDS18B20()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void writeByteToDS18B20 </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>data</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Write a byte (uint8_t) to the DS18B20. </p>
-<dl class="section note"><dt>Note</dt><dd>This is a static method because it's only internally used in this file and called by other methods if necessary.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The data to write to the DS18B20. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="DS18B20_8c_source.html#l00226">226</a> of file <a class="el" href="DS18B20_8c_source.html">DS18B20.c</a>.</p>
-<div class="fragment"><div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;{</div><div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="comment">/* In the case of gpioModePushPull&quot;, the last argument directly sets the pin state */</span></div><div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>, gpioModePushPull, 0);</div><div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;</div><div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="comment">/* Write the byte, bit by bit */</span></div><div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordflow">for</span> (uint8_t i = 0; i &lt; 8; i++)</div><div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    {</div><div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        <span class="comment">/* Check if we need to write a &quot;1&quot; */</span></div><div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        <span class="keywordflow">if</span> (data &amp; 0x01)</div><div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        {</div><div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            GPIO_PinOutClear(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>);</div><div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(5);</div><div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            GPIO_PinOutSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>);</div><div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(60);</div><div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        }</div><div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <span class="comment">/* If not, write a &quot;0&quot; */</span></div><div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <span class="keywordflow">else</span></div><div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        {</div><div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;            GPIO_PinOutClear(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>);</div><div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;            <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(60);</div><div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;            GPIO_PinOutSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>);</div><div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;            <a class="code" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a>(5);</div><div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        }</div><div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="comment">/* Right shift bits once */</span></div><div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        data &gt;&gt;= 1;</div><div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    }</div><div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;</div><div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="comment">/* Set data line high */</span></div><div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    GPIO_PinOutSet(<a class="code" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a>, <a class="code" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a>);</div><div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;}</div><div class="ttc" id="pin__mapping_8h_html_ad72e87ac3f7ae2d8aeb5b0219824094f"><div class="ttname"><a href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">TEMP_DATA_PIN</a></div><div class="ttdeci">#define TEMP_DATA_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00146">pin_mapping.h:146</a></div></div>
-<div class="ttc" id="pin__mapping_8h_html_af2b5f0565a2bbde4f40c600b1ce98a8c"><div class="ttname"><a href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">TEMP_DATA_PORT</a></div><div class="ttdeci">#define TEMP_DATA_PORT</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00145">pin_mapping.h:145</a></div></div>
-<div class="ttc" id="group__Udelay_html_ga7b02c652fea1e8305b266ec0356a5ad5"><div class="ttname"><a href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a></div><div class="ttdeci">void UDELAY_Delay(uint32_t usecs)</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -403,7 +403,7 @@ Versions</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_c6fe9a14e775b8c75819cd4ae39c6ec2.html">SLSTK3400A_project2</a></li><li class="navelem"><a class="el" href="dir_7a60880b611f850b1232fda04488b1a4.html">src</a></li><li class="navelem"><a class="el" href="DS18B20_8c.html">DS18B20.c</a></li>
-    <li class="footer">Generated on Mon Apr 8 2019 19:36:08 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Mon Apr 8 2019 20:16:47 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
