@@ -133,39 +133,6 @@ Versions</h1>
 
 <p class="definition">Definition in file <a class="el" href="delay_8c_source.html">delay.c</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="aecf4672ef62001664f5ebc953755da1d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aecf4672ef62001664f5ebc953755da1d">&#9670;&nbsp;</a></span>initRTC()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void initRTC </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>RTC initialization. </p>
-<p>The RTC (compare) functionality uses the low-frequency crystal oscillator (LFXO) as the source.</p>
-<dl class="section note"><dt>Note</dt><dd>This is a static method because it's only internally used in this file and called by other methods if necessary. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="delay_8c_source.html#l00246">246</a> of file <a class="el" href="delay_8c_source.html">delay.c</a>.</p>
-<div class="fragment"><div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;{</div><div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;</div><div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;<span class="preprocessor">#ifdef ULFRCO </span><span class="comment">/* ULFRCO selected */</span><span class="preprocessor"></span></div><div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;</div><div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="comment">/* Enable the ultra low-frequency RC oscillator for the RTC */</span></div><div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="comment">//CMU_OscillatorEnable(cmuOsc_ULFRCO, true, true); /* The ULFRCO is always on */</span></div><div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;</div><div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="comment">/* Enable the clock to the interface of the low energy modules</span></div><div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;<span class="comment">     * cmuClock_CORELE = cmuClock_HFLE (deprecated) */</span></div><div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    CMU_ClockEnable(cmuClock_HFLE, <span class="keyword">true</span>);</div><div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;</div><div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="comment">/* Route the ULFRCO clock to the RTC */</span></div><div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_ULFRCO);</div><div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;</div><div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="preprocessor">#else </span><span class="comment">/* LFXO selected */</span><span class="preprocessor"></span></div><div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;</div><div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <span class="comment">/* Enable the low-frequency crystal oscillator for the RTC */</span></div><div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    CMU_OscillatorEnable(cmuOsc_LFXO, <span class="keyword">true</span>, <span class="keyword">true</span>);</div><div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;</div><div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="comment">/* Enable the clock to the interface of the low energy modules</span></div><div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<span class="comment">     * cmuClock_CORELE = cmuClock_HFLE (deprecated) */</span></div><div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    CMU_ClockEnable(cmuClock_HFLE, <span class="keyword">true</span>);</div><div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;</div><div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="comment">/* Route the LFXO clock to the RTC */</span></div><div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_LFXO);</div><div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;</div><div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* ULFRCO/LFXO selection */</span><span class="preprocessor"></span></div><div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;</div><div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;</div><div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="comment">/* Turn on the RTC clock */</span></div><div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    CMU_ClockEnable(cmuClock_RTC, <span class="keyword">true</span>);</div><div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;</div><div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="comment">/* Allow channel 0 to cause an interrupt */</span></div><div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    RTC_IntEnable(RTC_IEN_COMP0);</div><div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    RTC_IntClear(RTC_IFC_COMP0); <span class="comment">/* TODO: this was in ULFRCO but not in LFXO example? */</span></div><div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    NVIC_ClearPendingIRQ(RTC_IRQn);</div><div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    NVIC_EnableIRQ(RTC_IRQn);</div><div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;</div><div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="comment">/* Configure the RTC settings */</span></div><div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    RTC_Init_TypeDef rtc = RTC_INIT_DEFAULT;</div><div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    rtc.enable = <span class="keyword">false</span>; <span class="comment">/* Don&#39;t start counting when initialization is done */</span></div><div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;</div><div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="comment">/* Initialize RTC with pre-defined settings */</span></div><div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    RTC_Init(&amp;rtc);</div><div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;</div><div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="preprocessor">#ifdef DEBUGGING </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="preprocessor">#ifdef ULFRCO </span><span class="comment">/* ULFRCO selected */</span><span class="preprocessor"></span></div><div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    dbinfo(<span class="stringliteral">&quot;RTC initialized with ULFRCO\n\r&quot;</span>);</div><div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="preprocessor">#else </span><span class="comment">/* LFXO selected */</span><span class="preprocessor"></span></div><div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    dbinfo(<span class="stringliteral">&quot;RTC initialized with LFXO\n\r&quot;</span>);</div><div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* ULFRCO/LFXO selection */</span><span class="preprocessor"></span></div><div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;</div><div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <a class="code" href="delay_8c.html#a31a8d0ba2d09ee649bb6d17829f89712">RTC_initialized</a> = <span class="keyword">true</span>;</div><div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;}</div><div class="ttc" id="delay_8c_html_a31a8d0ba2d09ee649bb6d17829f89712"><div class="ttname"><a href="delay_8c.html#a31a8d0ba2d09ee649bb6d17829f89712">RTC_initialized</a></div><div class="ttdeci">static bool RTC_initialized</div><div class="ttdef"><b>Definition:</b> <a href="delay_8c_source.html#l00044">delay.c:44</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="adb46f4276f5ddf111153701858f85df6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adb46f4276f5ddf111153701858f85df6">&#9670;&nbsp;</a></span>delay()</h2>
 
@@ -199,6 +166,62 @@ Versions</h1>
 <div class="ttc" id="delay_8h_html_a7dfc303d591a9e657e53c979d8e0c664"><div class="ttname"><a href="delay_8h.html#a7dfc303d591a9e657e53c979d8e0c664">ULFRCOFREQ_MS</a></div><div class="ttdeci">#define ULFRCOFREQ_MS</div><div class="ttdef"><b>Definition:</b> <a href="delay_8h_source.html#l00020">delay.h:20</a></div></div>
 <div class="ttc" id="delay_8h_html_acde5abcdec802c050f0fdf095fb28343"><div class="ttname"><a href="delay_8h.html#acde5abcdec802c050f0fdf095fb28343">LFXOFREQ_MS</a></div><div class="ttdeci">#define LFXOFREQ_MS</div><div class="ttdef"><b>Definition:</b> <a href="delay_8h_source.html#l00022">delay.h:22</a></div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="aecf4672ef62001664f5ebc953755da1d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aecf4672ef62001664f5ebc953755da1d">&#9670;&nbsp;</a></span>initRTC()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void initRTC </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>RTC initialization. </p>
+<p>The RTC (compare) functionality uses the low-frequency crystal oscillator (LFXO) as the source.</p>
+<dl class="section note"><dt>Note</dt><dd>This is a static method because it's only internally used in this file and called by other methods if necessary. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="delay_8c_source.html#l00246">246</a> of file <a class="el" href="delay_8c_source.html">delay.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;{</div><div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;</div><div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;<span class="preprocessor">#ifdef ULFRCO </span><span class="comment">/* ULFRCO selected */</span><span class="preprocessor"></span></div><div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;</div><div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="comment">/* Enable the ultra low-frequency RC oscillator for the RTC */</span></div><div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="comment">//CMU_OscillatorEnable(cmuOsc_ULFRCO, true, true); /* The ULFRCO is always on */</span></div><div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;</div><div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="comment">/* Enable the clock to the interface of the low energy modules</span></div><div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;<span class="comment">     * cmuClock_CORELE = cmuClock_HFLE (deprecated) */</span></div><div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    CMU_ClockEnable(cmuClock_HFLE, <span class="keyword">true</span>);</div><div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;</div><div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="comment">/* Route the ULFRCO clock to the RTC */</span></div><div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_ULFRCO);</div><div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;</div><div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="preprocessor">#else </span><span class="comment">/* LFXO selected */</span><span class="preprocessor"></span></div><div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;</div><div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <span class="comment">/* Enable the low-frequency crystal oscillator for the RTC */</span></div><div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    CMU_OscillatorEnable(cmuOsc_LFXO, <span class="keyword">true</span>, <span class="keyword">true</span>);</div><div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;</div><div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="comment">/* Enable the clock to the interface of the low energy modules</span></div><div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<span class="comment">     * cmuClock_CORELE = cmuClock_HFLE (deprecated) */</span></div><div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    CMU_ClockEnable(cmuClock_HFLE, <span class="keyword">true</span>);</div><div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;</div><div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="comment">/* Route the LFXO clock to the RTC */</span></div><div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_LFXO);</div><div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;</div><div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* ULFRCO/LFXO selection */</span><span class="preprocessor"></span></div><div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;</div><div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;</div><div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="comment">/* Turn on the RTC clock */</span></div><div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    CMU_ClockEnable(cmuClock_RTC, <span class="keyword">true</span>);</div><div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;</div><div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="comment">/* Allow channel 0 to cause an interrupt */</span></div><div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    RTC_IntEnable(RTC_IEN_COMP0);</div><div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    RTC_IntClear(RTC_IFC_COMP0); <span class="comment">/* TODO: this was in ULFRCO but not in LFXO example? */</span></div><div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    NVIC_ClearPendingIRQ(RTC_IRQn);</div><div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    NVIC_EnableIRQ(RTC_IRQn);</div><div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;</div><div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="comment">/* Configure the RTC settings */</span></div><div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    RTC_Init_TypeDef rtc = RTC_INIT_DEFAULT;</div><div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    rtc.enable = <span class="keyword">false</span>; <span class="comment">/* Don&#39;t start counting when initialization is done */</span></div><div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;</div><div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="comment">/* Initialize RTC with pre-defined settings */</span></div><div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    RTC_Init(&amp;rtc);</div><div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;</div><div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="preprocessor">#ifdef DEBUGGING </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="preprocessor">#ifdef ULFRCO </span><span class="comment">/* ULFRCO selected */</span><span class="preprocessor"></span></div><div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    dbinfo(<span class="stringliteral">&quot;RTC initialized with ULFRCO\n\r&quot;</span>);</div><div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="preprocessor">#else </span><span class="comment">/* LFXO selected */</span><span class="preprocessor"></span></div><div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    dbinfo(<span class="stringliteral">&quot;RTC initialized with LFXO\n\r&quot;</span>);</div><div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* ULFRCO/LFXO selection */</span><span class="preprocessor"></span></div><div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DEBUGGING */</span><span class="preprocessor"></span></div><div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;</div><div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <a class="code" href="delay_8c.html#a31a8d0ba2d09ee649bb6d17829f89712">RTC_initialized</a> = <span class="keyword">true</span>;</div><div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;}</div><div class="ttc" id="delay_8c_html_a31a8d0ba2d09ee649bb6d17829f89712"><div class="ttname"><a href="delay_8c.html#a31a8d0ba2d09ee649bb6d17829f89712">RTC_initialized</a></div><div class="ttdeci">static bool RTC_initialized</div><div class="ttdef"><b>Definition:</b> <a href="delay_8c_source.html#l00044">delay.c:44</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ab86b9dd0d7b4eacfe38086e1fa4c2312"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab86b9dd0d7b4eacfe38086e1fa4c2312">&#9670;&nbsp;</a></span>RTC_IRQHandler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RTC_IRQHandler </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Interrupt Service Routine for the RTC. </p>
+<dl class="section note"><dt>Note</dt><dd>The <em>weak</em> definition for this method is located in <code>system_efm32hg.h</code>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="delay_8c_source.html#l00321">321</a> of file <a class="el" href="delay_8c_source.html">delay.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;{</div><div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="comment">/* Disable the counter */</span></div><div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    RTC_Enable(<span class="keyword">false</span>);</div><div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;</div><div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="comment">/* Clear the interrupt source */</span></div><div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    RTC_IntClear(RTC_IFC_COMP0);</div><div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="aae86f940455b5957441f4331cdc0828d"></a>
@@ -258,29 +281,6 @@ Versions</h1>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ab86b9dd0d7b4eacfe38086e1fa4c2312"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab86b9dd0d7b4eacfe38086e1fa4c2312">&#9670;&nbsp;</a></span>RTC_IRQHandler()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void RTC_IRQHandler </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Interrupt Service Routine for the RTC. </p>
-<dl class="section note"><dt>Note</dt><dd>The <em>weak</em> definition for this method is located in <code>system_efm32hg.h</code>. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="delay_8c_source.html#l00321">321</a> of file <a class="el" href="delay_8c_source.html">delay.c</a>.</p>
-<div class="fragment"><div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;{</div><div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="comment">/* Disable the counter */</span></div><div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    RTC_Enable(<span class="keyword">false</span>);</div><div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;</div><div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="comment">/* Clear the interrupt source */</span></div><div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    RTC_IntClear(RTC_IFC_COMP0);</div><div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;}</div></div><!-- fragment -->
-</div>
-</div>
 <h2 class="groupheader">Variable Documentation</h2>
 <a id="a0a6e5e17fcb15f3922e278025acabfa2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0a6e5e17fcb15f3922e278025acabfa2">&#9670;&nbsp;</a></span>msTicks</h2>
@@ -336,7 +336,7 @@ Versions</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_c6fe9a14e775b8c75819cd4ae39c6ec2.html">SLSTK3400A_project2</a></li><li class="navelem"><a class="el" href="dir_7a60880b611f850b1232fda04488b1a4.html">src</a></li><li class="navelem"><a class="el" href="delay_8c.html">delay.c</a></li>
-    <li class="footer">Generated on Mon Apr 8 2019 20:16:47 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Mon Apr 8 2019 20:22:55 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
