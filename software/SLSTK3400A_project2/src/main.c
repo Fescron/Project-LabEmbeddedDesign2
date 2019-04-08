@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 1.8
+ * @version 1.9
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -21,23 +21,19 @@
  *   v1.6: Moved all documentation above source files to this file.
  *   v1.7: Updated documentation, started using a state-machine.
  *   v1.8: Moved checkCable method to "other.c" and started using readVBAT method.
+ *   v1.9: Cleaned up documentation and TODO's.
  *
- *   TODO: 1) RTC sleep functionality is broken when UDELAY_Calibrate() is called.
- *              => DS18B20 code depends on this!
- *              => UDelay uses RTCC, Use timers instead!
- *                   => timer + prescaler: every microsecond an interrupt?
  *
- *         2) Check the sections about Crystals and RC oscillators.
- *         2) Disable unused peripherals and oscillators/clocks (see emodes.c) and check if nothing breaks.
- *              => Do this consistently in each method
- *              => Perhaps use a boolean argument so that in the case of sending more bytes
- *                 the clock can be disabled only after sending the latest one. Perhaps use
- *                 this in combination with static variables in the method so they keep their value
- *                 between calls and recursion can be used?
+ *   TODO: IMPORTANT: Fix cable-checking method.
+ *                    Start using linked-loop mode for ADXL interrupt things.
  *
- *         3) Add WDOG functionality.
- *         3) Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
- *              => Also see AN0007: 2.8 Optimizing Code
+ *
+ *         EXTRA THINGS: Check the section about GPIO clock and cmuClock_HFPER
+ *                       Add WDOG functionality. (see "powertest" example)
+ *                       Add functionality to read internal temperature
+ *                         => Detect problems of overheating?
+ *                       Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
+ *                         => Also see AN0007: 2.8 Optimizing Code
  *
  *
  *         UTIL.C: Add disableClocks functionality from "emodes.c" here?
@@ -45,24 +41,21 @@
  *         OTHER.C: Fix cable-checking method.
  *                  Use VCOMP?
  *
- *         INTERRUPT.C: Check if clear pending interrupts is necessary?
- *                      GPIO_IntClear(0xFFFF); vs NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);?
+ *         INTERRUPT.C: <completed>
  *
- *         DS18B20.C: Where is float defined? Is include necessary in header file?
+ *         DS18B20.C: RTC sleep functionality is broken when UDELAY_Calibrate() is called.
+ *                      => UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
  *                    Use internal pull-up resistor for DATA pin using DOUT argument.
  *                      => Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
- *                    Enter EM1 when the MCU is waiting in a delay method? (see "other.c">"readVBAT()" )
+ *                    Enter EM1 when the MCU is waiting in a delay method? (see readVBAT method in "other.c")
  *
- *         DELAY.C: Enable disable/enable clock functionality? (slows down the logic a lot last time tested...)
- *           >>>>>> Add checks if delay fits in field?
- *                  Check if HFLE needs to be enabled.
- *           >>>>>> Use cmuSelect_ULFRCO? (and check sections about Crystals and RC oscillators)
+ *         DELAY.C: Enable disable/enable clock functionality?
+ *                  Check EMU_EnterEM2/3 true/false effect.
  *
  *         ADXL362.C: Check if variables need to be volatile.
- *           >>>>>>>> Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
+ *                    Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
  *                      => Debugging it right now with "triggercounter", remove this variable later.
  *                      => Start using linked-loop mode for ADXL to fix the strange interrupt behavior?
- *
  *                    Enable wake-up mode: writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit
  *
  * ******************************************************************************
@@ -76,23 +69,60 @@
  *
  * ******************************************************************************
  *
- * @section dbprint debugging and SysTick/EM2 delay selection
+ * @section Settings using definitions in dbprint and delay functionality
  *
- *   In the file "debugging.h" dbprint functionality can be enabled/disabled
- *   with the definition "#define DEBUGGING". If this line is commented, all dbprint
+ *   In the file "debugging.h" dbprint functionality can be enabled/disabled with
+ *   the definition "#define DEBUGGING". If this line is commented, all dbprint
  *   statements are disabled throughout the source code because they're all
  *   surrounded with " #ifdef DEBUGGING ... #endif" checks.
  *
- *   In the file "delay.h" one can choose between SysTicks or RTC sleep in EM2
- *   functionality for delays. This can be selected with the definition
- *   "#define SYSTICKDELAY". If this line is commented, the EM2 RTC compare sleep
- *   functionality is used. Otherwise, delays are generated using SysTicks.
+ *   In the file "delay.h" one can choose between SysTicks or RTC sleep functionality
+ *   for delays. This can be selected with the definition "#define SYSTICKDELAY".
+ *   If this line is commented, the RTC compare sleep functionality is used.
+ *   Otherwise, delays are generated using SysTicks.
+ *
+ *   In the file "delay.h" one can also choose between the use of the ultra low-frequency
+ *   RC oscillator (ULFRCO) or the low-frequency crystal oscillator (LFXO) when being
+ *   in a delay or sleeping. If the ULFRCO is selected, the MCU sleeps in EM3 and if
+ *   the LFXO is selected the MCU sleeps in EM2. This can be selected with the definition
+ *   "#define ULFRCO". If this line is commented, the LFXO is used as the clock source.
+ *   Otherwise, the ULFRCO is used.
+ *
+ *   WARNING! Check the next section for more info about this.
+ *
+ * ******************************************************************************
+ *
+ * @section Crystals and RC oscillators (delay.c)
+ *
+ *   Normally using an external oscillator/crystal uses less energy than the internal
+ *   one. This external oscillator/crystal can however be omitted if the design goal
+ *   is to reduce the BOM count as much as possible.
+ *
+ *   In the delay logic, it's possible to select the use of the ultra low-frequency
+ *   RC oscillator (ULFRCO) or the low-frequency crystal oscillator (LFXO) when being
+ *   in a delay or sleeping. If the ULFRCO is selected, the MCU sleeps in EM3 and if
+ *   the LFXO is selected the MCU sleeps in EM2.
+ *
+ *   WARNING: After testing it was noted that the ULFRCO uses less power than the
+ *   LFXO but was less precise for the wake-up times. Take not of this when selecting
+ *   the necessary logic!
+ *
+ *   For the development of the code for the RN2483 shield from DRAMCO, it's possible
+ *   they chose to use the LFXO instead of the ULFRCO in sleep because the crystal was
+ *   more stable for high baudrate communication using the LEUART peripheral.
+ *
+ *   NOTE: For low-power development it's advised to consistently enable peripherals and
+ *   oscillators/clocks when needed and disable them afterwards. For some methods it can
+ *   be useful to provide a boolean argument so that in the case of sending more bytes
+ *   the clock can be disabled only after sending the latest one. Perhaps this can be
+ *   used in combination with static variables in the method so they keep their value
+ *   between calls and recursion can be used.
  *
  * ******************************************************************************
  *
  * @section Initializations
  *
- *   Initializations for the methods "led(bool enabled);", "delay(uint32_t msDelay);"
+ *   WARNING: Initializations for the methods "led(bool enabled);", "delay(uint32_t msDelay);"
  *   and "sleep(uint32_t sSleep);" happen automatically. This is why their first call
  *   sometimes takes longer to finish than later ones.
  *
@@ -104,6 +134,8 @@
  *   always enabled when necessary and disabled afterwards. Because the GPIO
  *   clock needs to be enabled for almost everything, even during EM2 so the MCU
  *   can react (and not only log) pin interrupts, this behavior was later scrapped.
+ *
+ *   TODO: also talk about cmuClock_HFPER?
  *
  * ******************************************************************************
  *
@@ -126,26 +158,17 @@
  *   When the MCU is in EM1, the clock to the CPU is disabled. All peripherals,
  *   as well as RAM and flash, are available.
  *
- *   When the MCU is in EM3, it can normally only be woken up using a pin
- *   change interrupt, not using the RTC. In EM3 no oscillator (except the ULFRCO)
- *   is running. The following modules/functions are are generally still available:
+ *   In EM3, high and low frequency clocks are disabled. No oscillator (except
+ *   the ULFRCO) is running. Furthermore, all unwanted oscillators are disabled
+ *   in EM3. This means that nothing needs to be manually disabled before
+ *   the statement EMU_EnterEM3(true);
+
+ *   The following modules/functions are are generally still available in EM3:
  *     => I2C address check
  *     => Watchdog
  *     => Asynchronous pin interrupt
  *     => Analog comparator (ACMP)
  *     => Voltage comparator (VCMP)
- *
- * ******************************************************************************
- *
- * @section Crystals and RC oscillators <TODO: check this>
- *
- *   Apparently it's more energy efficient to use an external oscillator/crystal
- *   instead of the internal one. They only reason to use an internal one could be
- *   to reduce the part count. At one point I tried to use the Ultra low-frequency
- *   RC oscillator (ULFRCO) based on an example from SiliconLabs's GitHub (rtc_ulfrco),
- *   but development was halted shortly after this finding.
- *     => DRAMCO has perhaps chosen the crystal because this was more stable for
- *        high frequency (baudrate) communication. (leuart RNxxx...)
  *
  ******************************************************************************/
 
@@ -157,17 +180,21 @@
 #include "em_cmu.h"    /* Clock management unit */
 #include "em_gpio.h"   /* General Purpose IO */
 
-#include "../inc/interrupt.h"   /* GPIO wakeup initialization and interrupt handlers */
+#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
+#include "../inc/debugging.h"   /* Enable or disable printing to UART for debugging */
+#include "../inc/delay.h"     	/* Delay functionality */
+#include "../inc/util.h"    	/* Utility functionality */
+#include "../inc/interrupt.h"   /* GPIO wake-up initialization and interrupt handlers */
 #include "../inc/ADXL362.h"    	/* Functions related to the accelerometer */
 #include "../inc/DS18B20.h"     /* Functions related to the temperature sensor */
 #include "../inc/other.h"       /* Cable checking and battery voltage functionality. */
-#include "../inc/delay.h"     	/* Delay functionality */
-#include "../inc/util.h"    	/* Utility functions */
-#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
-#include "../inc/debugging.h"   /* Enable or disable printing to UART for debugging */
 
 
-/* Define enum type for the state machine */
+/** Local define */
+#define WAKE_UP_PERIOD_S 10 /* Time between each wake-up in seconds */
+
+
+/** Define enum type for the state machine */
 typedef enum mcu_states{
 	INIT,
 	MEASURE,
@@ -176,7 +203,7 @@ typedef enum mcu_states{
 } MCU_State_t;
 
 
-/* Static variable only available and used in this file */
+/** Static variable only available and used in this file */
 static volatile MCU_State_t MCUstate;
 
 
@@ -208,7 +235,7 @@ void checkInterrupts (void)
 
 	/* Read status register to acknowledge interrupt
 	 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL)
-	 * TODO this can perhaps fix the bug where too much movenent breaks interrupt wakeup ... */
+	 * TODO this can perhaps fix the bug where too much movement breaks interrupt wake-up ... */
 	if (ADXL_getTriggered())
 	{
 
@@ -252,7 +279,7 @@ int main (void)
 
 				led(true); /* Enable (and initialize) LED */
 
-				initGPIOwakeup(); /* Initialize GPIO wakeup */
+				initGPIOwakeup(); /* Initialize GPIO wake-up */
 
 				initVBAT(); /* Initialize ADC to read battery voltage */
 
@@ -320,7 +347,7 @@ int main (void)
 
 			case SLEEP:
 			{
-				sleep(10); /* Go to sleep for 10 seconds */
+				sleep(WAKE_UP_PERIOD_S); /* Go to sleep for xx seconds */
 
 				MCUstate = WAKE_UP;
 			} break;

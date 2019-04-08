@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.c
  * @brief Delay functionality.
- * @version 1.7
+ * @version 1.8
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -17,11 +17,10 @@
  *   v1.5: Updated documentation.
  *   v1.6: Changed RTCcomp names to RTC.
  *   v1.7: Moved IRQ handler of RTC to this file.
+ *   v1.8: Added ULFRCO logic.
  *
- *   TODO: Enable disable/enable clock functionality? (slows down the logic a lot last time tested...)
- *         Add checks if delay fits in field?
- *         Check if HFLE needs to be enabled.
- *         Use cmuSelect_ULFRCO? (and check sections about Crystals and RC oscillators)
+ *   TODO: Enable disable/enable clock functionality?
+ *         Check EMU_EnterEM2/3 true/false effect.
  *
  ******************************************************************************/
 
@@ -37,6 +36,7 @@
 #include "../inc/delay.h"       /* Corresponding header file */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
 #include "../inc/debugging.h" 	/* Enable or disable printing to UART */
+#include "../inc/util.h"    	/* Utility functionality */
 
 
 /** Local variables */
@@ -57,8 +57,6 @@ static void initRTC (void);
  *   Wait for a certain amount of milliseconds.
  *
  * @details
- *   The type of delay (using SysTick or the RTC compare functionality) can be
- *   selected by (un)commenting "#define SYSTICKDELAY" in "delay.h"
  *   This method also initializes SysTick/RTC if necessary.
  *
  * @param[in] msDelay
@@ -92,27 +90,65 @@ void delay (uint32_t msDelay)
 	uint32_t curTicks = msTicks;
 	while ((msTicks - curTicks) < msDelay);
 
-	/* Disable SysTick interrupt and counter (needs to be done before entering EM2) by clearing their bits. */
+	/* Disable SysTick interrupt and counter (needs to be done before entering EM2/3) by clearing their bits. */
 	SysTick->CTRL &= ~SysTick_CTRL_TICKINT_Msk & ~SysTick_CTRL_ENABLE_Msk;
 
-#else /* EM2 RTC delay selected */
+#else /* EM2/3 RTC delay selected */
+
 
 	/* Initialize RTC if not already the case */
 	if (!RTC_initialized) initRTC();
+	else
+	{
+		/* TODO: Enable necessary oscillator and clocks */
+	}
 
-	/* Set RTC compare value for RTC compare register 0 */
-	RTC_CompareSet(0, (LFXOFREQ_MS * msDelay)); /* <= 0x00ffffff = 16777215 TODO: add check if it fits */
+	/* Set RTC compare value for RTC compare register 0 depending on ULFRCO/LFXO selection */
+
+#ifdef ULFRCO /* ULFRCO selected */
+
+	if ((ULFRCOFREQ_MS * msDelay) <= 0x00ffffff) RTC_CompareSet(0, (ULFRCOFREQ_MS * msDelay));
+	else
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Delay too long, can't fit in the field!");
+#endif /* DEBUGGING */
+
+		error(14);
+	}
+
+#else /* LFXO selected */
+
+	if ((LFXOFREQ_MS * msDelay) <= 0x00ffffff) RTC_CompareSet(0, (LFXOFREQ_MS * msDelay));
+	else
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Delay too long, can't fit in the field!");
+#endif /* DEBUGGING */
+
+		error(15);
+	}
+
+#endif /* ULFRCO/LFXO selection */
+
 
 	/* Start the RTC */
 	RTC_Enable(true);
 
-	/* Enter EM2 */
-	EMU_EnterEM2(true); /* "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+	/* Enter EM2/3 depending on ULFRCO/LFXO selection */
 
-	/* Disable used oscillator and clocks after wakeup */
-//	CMU_OscillatorEnable(cmuOsc_LFXO, false, true);
-//	CMU_ClockEnable(cmuClock_HFLE, false);
-//	CMU_ClockEnable(cmuClock_RTC, false);
+#ifdef ULFRCO /* ULFRCO selected */
+	/* In EM3, high and low frequency clocks are disabled. No oscillator (except the ULFRCO) is running.
+	 * Furthermore, all unwanted oscillators are disabled in EM3. This means that nothing needs to be
+	 * manually disabled before the statement EMU_EnterEM3(true); */
+	EMU_EnterEM3(true); /* TODO: "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+#else /* LFXO selected */
+	EMU_EnterEM2(true); /* TODO: "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+#endif /* ULFRCO/LFXO selection */
+
+	/* TODO: Disable used oscillator and clocks after wake-up */
 
 #endif /* SysTick/RTC selection */
 
@@ -121,7 +157,10 @@ void delay (uint32_t msDelay)
 
 /**************************************************************************//**
  * @brief
- *   Sleep for a certain amount of seconds in EM2.
+ *   Sleep for a certain amount of seconds in EM2/3.
+ *
+ * @details
+ *   This method also initializes the RTC if necessary.
  *
  * @param[in] sSleep
  *   The sleep time in seconds.
@@ -132,29 +171,63 @@ void sleep (uint32_t sSleep)
 	if (!RTC_initialized) initRTC();
 	else
 	{
-		/* Enable necessary oscillator and clocks */
-//		CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
-//		CMU_ClockEnable(cmuClock_HFLE, true);
-//		CMU_ClockEnable(cmuClock_RTC, true);
+		/* TODO: Enable necessary oscillator and clocks */
 	}
 
 #ifdef DEBUGGING /* DEBUGGING */
+#ifdef ULFRCO /* ULFRCO selected */
+	dbwarnInt("Sleeping in EM3 for ", sSleep, " s");
+#else /* LFXO selected */
 	dbwarnInt("Sleeping in EM2 for ", sSleep, " s");
+#endif /* ULFRCO/LFXO selection */
 #endif /* DEBUGGING */
 
-	/* Set RTC compare value for RTC compare register 0 */
-	RTC_CompareSet(0, (LFXOFREQ * sSleep)); /* <= 0x00ffffff = 16777215 TODO: add check if it fits */
+	/* Set RTC compare value for RTC compare register 0 depending on ULFRCO/LFXO selection */
+
+#ifdef ULFRCO /* ULFRCO selected */
+
+	if ((ULFRCOFREQ * sSleep) <= 0x00ffffff) RTC_CompareSet(0, (ULFRCOFREQ * sSleep));
+	else
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Delay too long, can't fit in the field!");
+#endif /* DEBUGGING */
+
+		error(16);
+	}
+
+#else /* LFXO selected */
+
+	if ((LFXOFREQ * sSleep) <= 0x00ffffff) RTC_CompareSet(0, (LFXOFREQ * sSleep));
+	else
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Delay too long, can't fit in the field!");
+#endif /* DEBUGGING */
+
+		error(17);
+	}
+
+#endif /* ULFRCO/LFXO selection */
+
 
 	/* Start the RTC */
 	RTC_Enable(true);
 
-	/* Enter EM2 */
-	EMU_EnterEM2(true); /* "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+	/* Enter EM2/3 depending on ULFRCO/LFXO selection */
 
-	/* Disable used oscillator and clocks after wakeup */
-//	CMU_OscillatorEnable(cmuOsc_LFXO, false, true);
-//	CMU_ClockEnable(cmuClock_HFLE, false);
-//	CMU_ClockEnable(cmuClock_RTC, false);
+#ifdef ULFRCO /* ULFRCO selected */
+	/* In EM3, high and low frequency clocks are disabled. No oscillator (except the ULFRCO) is running.
+	 * Furthermore, all unwanted oscillators are disabled in EM3. This means that nothing needs to be
+	 * manually disabled before the statement EMU_EnterEM3(true); */
+	EMU_EnterEM3(true); /* TODO: "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+#else /* LFXO selected */
+	EMU_EnterEM2(true); /* TODO: "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+#endif /* ULFRCO/LFXO selection */
+
+	/* TODO: Disable used oscillator and clocks after wake-up */
 }
 
 
@@ -172,21 +245,40 @@ void sleep (uint32_t sSleep)
  *****************************************************************************/
 static void initRTC (void)
 {
+
+#ifdef ULFRCO /* ULFRCO selected */
+
+	/* Enable the ultra low-frequency RC oscillator for the RTC */
+	//CMU_OscillatorEnable(cmuOsc_ULFRCO, true, true); /* The ULFRCO is always on */
+
+	/* Enable the clock to the interface of the low energy modules
+	 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
+	CMU_ClockEnable(cmuClock_HFLE, true);
+
+	/* Route the ULFRCO clock to the RTC */
+	CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_ULFRCO);
+
+#else /* LFXO selected */
+
 	/* Enable the low-frequency crystal oscillator for the RTC */
 	CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
 
 	/* Enable the clock to the interface of the low energy modules
 	 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
-	CMU_ClockEnable(cmuClock_HFLE, true); /* TODO: check if this is necessary? (emodes.c) */
+	CMU_ClockEnable(cmuClock_HFLE, true);
 
 	/* Route the LFXO clock to the RTC */
 	CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_LFXO);
+
+#endif /* ULFRCO/LFXO selection */
+
 
 	/* Turn on the RTC clock */
 	CMU_ClockEnable(cmuClock_RTC, true);
 
 	/* Allow channel 0 to cause an interrupt */
 	RTC_IntEnable(RTC_IEN_COMP0);
+	RTC_IntClear(RTC_IFC_COMP0); /* TODO: this was in ULFRCO but not in LFXO example? */
 	NVIC_ClearPendingIRQ(RTC_IRQn);
 	NVIC_EnableIRQ(RTC_IRQn);
 
@@ -198,7 +290,11 @@ static void initRTC (void)
 	RTC_Init(&rtc);
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("RTC initialized\n\r");
+#ifdef ULFRCO /* ULFRCO selected */
+	dbinfo("RTC initialized with ULFRCO\n\r");
+#else /* LFXO selected */
+	dbinfo("RTC initialized with LFXO\n\r");
+#endif /* ULFRCO/LFXO selection */
 #endif /* DEBUGGING */
 
 	RTC_initialized = true;

@@ -22,7 +22,6 @@
  *   TODO: Check if variables need to be volatile.
  *         Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
  *           => Debugging it atm with "triggercounter", remove this variable later.
- *
  *         Enable wake-up mode: writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit
  *
  ******************************************************************************/
@@ -448,7 +447,7 @@ void ADXL_readValues (void)
 
 		/* Read status register to acknowledge interrupt
 		 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL)
-		 * TODO this can perhaps fix the bug where too much movenent breaks interrupt wakeup ... */
+		 * TODO this can perhaps fix the bug where too much movenent breaks interrupt wake-up ... */
 		if (ADXL_getTriggered())
 		{
 			delay(1000);

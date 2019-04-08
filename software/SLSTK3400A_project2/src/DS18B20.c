@@ -20,10 +20,11 @@
  *   v1.5: Made more methods static.
  *   v1.6: Updated documentation.
  *
- *   TODO: Where is float defined? Is include necessary in header file?
+ *   TODO: RTC sleep functionality is broken when UDELAY_Calibrate() is called.
+ *           => UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
  *         Use internal pull-up resistor for DATA pin using DOUT argument.
  *           => Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
- *         Enter EM1 when the MCU is waiting in a delay method? (see "other.c">"readVBAT()" )
+ *         Enter EM1 when the MCU is waiting in a delay method? (see readVBAT method in "other.c")
  *
  ******************************************************************************/
 
@@ -33,7 +34,7 @@
 #include "em_cmu.h"             /* Clock Management Unit */
 #include "em_gpio.h"            /* General Purpose IO (GPIO) peripheral API */
 
-#include "../inc/udelay.h"      /* Microsecond delay routine TODO: use something else*/
+#include "../inc/udelay.h"      /* Microsecond delay routine TODO: Use something else */
 
 #include "../inc/DS18B20.h"     /* Corresponding header file */
 #include "../inc/pin_mapping.h" /* PORT and PIN definitions */
@@ -41,7 +42,7 @@
 #include "../inc/util.h"    	/* Utility functionality */
 
 
-/** Local variables */
+/** Local variable */
 static bool DS18B20_VDD_initialized = false;
 
 

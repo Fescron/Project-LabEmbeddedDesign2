@@ -13,11 +13,7 @@
 #define _DS18B20_H_
 
 
-/** Include necessary for this header file */
-#include <stdint.h>  /* (u)intXX_t */
-
-
-/** Public definitions */
+/** Public definition */
 #define MAX_TIME_CTR 2000 /* Maximum waiting value before a reset becomes "failed" */
 
 

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file interrupt.c
  * @brief Interrupt functionality.
- * @version 1.6
+ * @version 1.7
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -18,9 +18,7 @@
  *   v1.4: Stopped disabling the GPIO clock.
  *   v1.5: Started using getters/setters to indicate an interrupt to "main.c".
  *   v1.6: Moved IRQ handler of RTC to this "delay.c".
- *
- *   TODO: Check if clear pending interrupts is necessary?
- *         GPIO_IntClear(0xFFFF); vs NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);?
+ *   v1.7: Updated clear pending interrupt logic.
  *
  * ******************************************************************************
  *
@@ -52,7 +50,7 @@ static volatile bool PB1_triggered = false;
 
 /**************************************************************************//**
  * @brief
- *   Initialize GPIO wakeup functionality.
+ *   Initialize GPIO wake-up functionality.
  *
  * @details
  *   Initialize buttons PB0 and PB1 on falling-edge interrupts and
@@ -71,11 +69,16 @@ void initGPIOwakeup (void)
 	/* Configure ADXL_INT1 as input, the last argument enables the filter */
 	GPIO_PinModeSet(ADXL_INT1_PORT, ADXL_INT1_PIN, gpioModeInput, 1);
 
-	/* Clear pending interrupts */
-	//GPIO_IntClear(0xFFFF);
-	// Or with:
-	//NVIC_ClearPendingIRQ(GPIO_ODD_IRQn);
-	//NVIC_ClearPendingIRQ(GPIO_EVEN_IRQn);
+
+	/* Clear all odd pin interrupt flags (just in case)
+	 * NVIC_ClearPendingIRQ(GPIO_ODD_IRQn); would also work but is less "readable" */
+	GPIO_IntClear(0xAAAA);
+
+	/* Clear all even pin interrupt flags (just in case)
+	 * NVIC_ClearPendingIRQ(GPIO_EVEN_IRQn); would also work but is less "readable" */
+	GPIO_IntClear(0x5555);
+
+	/* All pending interrupts can be cleared with GPIO_IntClear(0xFFFF); */
 
 	/* Enable IRQ for even numbered GPIO pins */
 	NVIC_EnableIRQ(GPIO_EVEN_IRQn);
@@ -91,7 +94,7 @@ void initGPIOwakeup (void)
 	GPIO_ExtIntConfig(ADXL_INT1_PORT, ADXL_INT1_PIN, ADXL_INT1_PIN, true, false, true);
 
 #ifdef DEBUGGING /* DEBUGGING */
-	dbinfo("GPIO wakeup initialized");
+	dbinfo("GPIO wake-up initialized");
 #endif /* DEBUGGING */
 
 }
