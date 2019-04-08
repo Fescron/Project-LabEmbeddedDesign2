@@ -9,5 +9,6 @@ var main_8c =
       [ "WAKE_UP", "main_8c.html#a68d90e0eaaa236e9664bbfc691bbd4d4a02322edd4ce56f5e7e278a3b230062d1", null ]
     ] ],
     [ "checkInterrupts", "main_8c.html#ad16e16b91af17288b858dbfa6962c056", null ],
-    [ "main", "main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ]
+    [ "main", "main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
+    [ "MCUstate", "main_8c.html#a99665523a55922c9740992dd62c5912a", null ]
 ];
