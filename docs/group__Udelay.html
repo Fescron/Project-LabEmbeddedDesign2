@@ -54,7 +54,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('group___udelay.html','');});
+$(document).ready(function(){initNavTree('group__Udelay.html','');});
 </script>
 <div id="doc-content">
 <div class="header">
@@ -67,15 +67,15 @@ $(document).ready(function(){initNavTree('group___udelay.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga523f858d15b74728046ceca9796f3046"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___udelay.html#ga523f858d15b74728046ceca9796f3046">UDELAY_Calibrate</a> (void)</td></tr>
+<tr class="memitem:ga523f858d15b74728046ceca9796f3046"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Udelay.html#ga523f858d15b74728046ceca9796f3046">UDELAY_Calibrate</a> (void)</td></tr>
 <tr class="memdesc:ga523f858d15b74728046ceca9796f3046"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calibrates the microsecond delay loop.  <a href="#ga523f858d15b74728046ceca9796f3046">More...</a><br /></td></tr>
 <tr class="separator:ga523f858d15b74728046ceca9796f3046"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7b02c652fea1e8305b266ec0356a5ad5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a> (uint32_t usecs)</td></tr>
+<tr class="memitem:ga7b02c652fea1e8305b266ec0356a5ad5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a> (uint32_t usecs)</td></tr>
 <tr class="separator:ga7b02c652fea1e8305b266ec0356a5ad5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Implements active wait microsecond delay.</p>
-<p>The delay is implemented as a loop coded in assembly. The delay loop must be calibrated by calling <a class="el" href="group___udelay.html#ga523f858d15b74728046ceca9796f3046">UDELAY_Calibrate()</a> once. The calibration algorithm is taken from linux 2.4 sources (bogomips).</p>
+<p>The delay is implemented as a loop coded in assembly. The delay loop must be calibrated by calling <a class="el" href="group__Udelay.html#ga523f858d15b74728046ceca9796f3046">UDELAY_Calibrate()</a> once. The calibration algorithm is taken from linux 2.4 sources (bogomips).</p>
 <p>The delay is fairly accurate, the assembly coding will not be optimized by the compiler. The delay function should not be used for longer delays than 1000 us. Calling the delay function with &gt; 1000 will give unpredictable results. Recalibrate the loop when HFCORECLK is changed.</p>
 <p>The calibration uses the RTC clocked by LFRCO to measure time. Better accuracy can be achieved by adding #define UDELAY_LFXO (i.e. add -DUDELAY_LFXO on the commandline). The LFXO oscillator is then used for delay loop calibration.</p>
 <p>The calibration function will restore RTC upon exit. </p>

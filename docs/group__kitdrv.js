@@ -1,4 +1,4 @@
 var group__kitdrv =
 [
-    [ "Udelay", "group___udelay.html", "group___udelay" ]
+    [ "Udelay", "group__Udelay.html", "group__Udelay" ]
 ];
