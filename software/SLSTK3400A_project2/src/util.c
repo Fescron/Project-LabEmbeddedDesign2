@@ -8,20 +8,20 @@
  *
  * @section Versions
  *
- *   v1.0: Started with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
- *   v1.1: Changed PinModeSet DOUT value to 0 in initLED.
- *   v1.2: Removed unnecessary "GPIO_PinOutClear" line in initLED.
- *   v1.3: Moved initRTCcomp method from "main.c" to here, added delay functionality which goes into EM1 or EM2.
- *   v1.4: Moved delay functionality to specific header and source files.
- *   v2.0: Changed "Error()" to "error()", added a global variable to keep the error number and initialize the pin of the LED automatically.
- *   v2.1: Changed initLED to be a static (~hidden) method and also made the global variables static.
- *   v2.2: Added peripheral clock enable/disable functionality for energy saving purposes, only added necessary includes in header file,
- *         moved the others to the source file, updated documentation, replaced SysTick delay with RTCC delay, changed error delay length.
- *   v2.3: Changed name of static variable, simplified some logic.
- *   v2.4: Stopped disabling the GPIO clock.
- *   v2.5: Moved documentation.
+ *   @li v1.0: Started with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
+ *   @li v1.1: Changed PinModeSet DOUT value to 0 in initLED.
+ *   @li v1.2: Removed unnecessary `GPIO_PinOutClear` line in initLED.
+ *   @li v1.3: Moved initRTCcomp method from `main.c` to here, added delay functionality which goes into EM1 or EM2.
+ *   @li v1.4: Moved delay functionality to specific header and source files.
+ *   @li v2.0: Changed `Error()` to `error()`, added a global variable to keep the error number and initialize the pin of the LED automatically.
+ *   @li v2.1: Changed initLED to be a static (~hidden) method and also made the global variables static.
+ *   @li v2.2: Added peripheral clock enable/disable functionality for energy saving purposes, only added necessary includes in header file,
+ *             moved the others to the source file, updated documentation, replaced SysTick delay with RTCC delay, changed error delay length.
+ *   @li v2.3: Changed name of static variable, simplified some logic.
+ *   @li v2.4: Stopped disabling the GPIO clock.
+ *   @li v2.5: Moved documentation.
  *
- *   TODO: Add disableClocks functionality from "emodes.c" here?
+ *   @todo @li Add disableClocks functionality from `emodes.c` here?
  *
  ******************************************************************************/
 
@@ -37,12 +37,12 @@
 #include "../inc/delay.h"     	/* Delay functionality */
 
 
-/** Local variables */
+/* Local variables */
 static uint8_t errorNumber = 0;
 static bool LED_initialized = false;
 
 
-/** Local prototype */
+/* Local prototype */
 static void initLED (void);
 
 
@@ -114,7 +114,7 @@ static void initLED (void)
 	CMU_ClockEnable(cmuClock_HFPER, true); /* GPIO is a High Frequency Peripheral */
 	CMU_ClockEnable(cmuClock_GPIO, true);
 
-	/* In the case of gpioModePushPull", the last argument directly sets the pin state */
+	/* In the case of gpioModePushPull, the last argument directly sets the pin state */
 	GPIO_PinModeSet(LED_PORT, LED_PIN, gpioModePushPull, 0);
 
 #ifdef DEBUGGING /* DEBUGGING */

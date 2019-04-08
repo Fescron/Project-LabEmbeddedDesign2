@@ -11,12 +11,12 @@
 #define _UTIL_H_
 
 
-/** Includes necessary for this header file */
+/* Includes necessary for this header file */
 #include <stdint.h>  /* (u)intXX_t */
 #include <stdbool.h> /* "bool", "true", "false" */
 
 
-/** Public prototypes */
+/* Public prototypes */
 void led (bool enabled);
 void error (uint8_t number);
 

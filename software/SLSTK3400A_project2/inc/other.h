@@ -1,5 +1,5 @@
 /***************************************************************************//**
- * @file other.c
+ * @file other.h
  * @brief Cable checking and battery voltage functionality.
  * @version 1.0
  * @author Brecht Van Eeckhoudt
@@ -11,12 +11,12 @@
 #define _OTHER_H_
 
 
-/** Includes necessary for this header file */
+/* Includes necessary for this header file */
 #include <stdint.h>  /* (u)intXX_t */
 #include <stdbool.h> /* "bool", "true", "false" */
 
 
-/** Public prototypes */
+/* Public prototypes */
 bool checkCable (void);
 void initVBAT (void);
 uint32_t readVBAT (void);

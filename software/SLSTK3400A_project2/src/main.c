@@ -10,30 +10,29 @@
  *
  *   Please check https://github.com/Fescron/Project-LabEmbeddedDesign2/tree/master/software to find the latest version!
  *
- *   v1.0: Started from https://github.com/Fescron/Project-LabEmbeddedDesign1
- *         and added code for the DS18B20 temperature sensor and the selfmade
- *         link breakage sensor. Reformatted some of these imported methods.
- *   v1.1: Removed unused files, add cable-checking method.
- *   v1.2: Moved initRTCcomp method to "util.c".
- *   v1.3: Stopped using deprecated function "GPIO_IntConfig".
- *   v1.4: Started using get/set method for the static variable "ADXL_triggered".
- *   v1.5: Reworked the code a lot (stopped disabling cmuClock_GPIO, ...).
- *   v1.6: Moved all documentation above source files to this file.
- *   v1.7: Updated documentation, started using a state-machine.
- *   v1.8: Moved checkCable method to "other.c" and started using readVBAT method.
- *   v1.9: Cleaned up documentation and TODO's.
+ *   @li v1.0: Started from https://github.com/Fescron/Project-LabEmbeddedDesign1
+ *             and added code for the DS18B20 temperature sensor and the selfmade
+ *             link breakage sensor. Reformatted some of these imported methods.
+ *   @li v1.1: Removed unused files, add cable-checking method.
+ *   @li v1.2: Moved initRTCcomp method to "util.c".
+ *   @li v1.3: Stopped using deprecated function "GPIO_IntConfig".
+ *   @li v1.4: Started using get/set method for the static variable "ADXL_triggered".
+ *   @li v1.5: Reworked the code a lot (stopped disabling cmuClock_GPIO, ...).
+ *   @li v1.6: Moved all documentation above source files to this file.
+ *   @li v1.7: Updated documentation, started using a state-machine.
+ *   @li v1.8: Moved checkCable method to "other.c" and started using readVBAT method.
+ *   @li v1.9: Cleaned up documentation and TODO's.
  *
  *
- *   TODO: IMPORTANT: Fix cable-checking method.
- *                    Start using linked-loop mode for ADXL interrupt things.
+ *   @todo IMPORTANT: @li Fix cable-checking method.
+ *                    @li Start using linked-loop mode for ADXL interrupt things.
  *
- *
- *         EXTRA THINGS: Check the section about GPIO clock and cmuClock_HFPER
- *                       Add WDOG functionality. (see "powertest" example)
- *                       Add functionality to read internal temperature
- *                         => Detect problems of overheating?
- *                       Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
- *                         => Also see AN0007: 2.8 Optimizing Code
+ *   @todo EXTRA THINGS: @li Check the section about GPIO clock and cmuClock_HFPER
+ *                       @li Add WDOG functionality. (see "powertest" example)
+ *                       @li Add functionality to read internal temperature
+ *                           @li Detect problems of overheating?
+ *                       @li Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
+ *                           @li Also see AN0007: 2.8 Optimizing Code
  *
  *
  *         UTIL.C: Add disableClocks functionality from "emodes.c" here?
@@ -60,39 +59,39 @@
  *
  * ******************************************************************************
  *
- * @section Debug mode and Energy monitor
+ * @section DEBUG Debug mode and Energy monitor
  *
- *   WARNING! When in debug mode, the MCU will not go below EM1. This can cause
+ *   @warning When in debug mode, the MCU will not go below EM1. This can cause
  *   some weird behavior. Exit debug mode and reset the MCU after flashing it.
  *   The energy profiler can also be used to program the MCU but it's also
  *   necessary to reset the MCU after flashing it.
  *
  * ******************************************************************************
  *
- * @section Settings using definitions in dbprint and delay functionality
+ *  @section SETTINGS Settings using definitions in dbprint and delay functionality
  *
- *   In the file "debugging.h" dbprint functionality can be enabled/disabled with
- *   the definition "#define DEBUGGING". If this line is commented, all dbprint
+ *   In the file `debugging.h` dbprint functionality can be enabled/disabled with
+ *   the definition `#define DEBUGGING`. If this line is commented, all dbprint
  *   statements are disabled throughout the source code because they're all
- *   surrounded with " #ifdef DEBUGGING ... #endif" checks.
+ *   surrounded with `#ifdef DEBUGGING ... #endif` checks.
  *
- *   In the file "delay.h" one can choose between SysTicks or RTC sleep functionality
- *   for delays. This can be selected with the definition "#define SYSTICKDELAY".
+ *   In the file `delay.h` one can **choose between SysTicks or RTC sleep functionality**
+ *   for delays. This can be selected with the definition `#define SYSTICKDELAY`.
  *   If this line is commented, the RTC compare sleep functionality is used.
  *   Otherwise, delays are generated using SysTicks.
  *
- *   In the file "delay.h" one can also choose between the use of the ultra low-frequency
- *   RC oscillator (ULFRCO) or the low-frequency crystal oscillator (LFXO) when being
+ *   In the file `delay.h` one can also **choose between the use of the ultra low-frequency
+ *   RC oscillator (ULFRCO) or the low-frequency crystal oscillator (LFXO)** when being
  *   in a delay or sleeping. If the ULFRCO is selected, the MCU sleeps in EM3 and if
  *   the LFXO is selected the MCU sleeps in EM2. This can be selected with the definition
- *   "#define ULFRCO". If this line is commented, the LFXO is used as the clock source.
+ *   `#define ULFRCO`. If this line is commented, the LFXO is used as the clock source.
  *   Otherwise, the ULFRCO is used.
  *
- *   WARNING! Check the next section for more info about this.
+ *   @note Check the next section for more info about this.
  *
  * ******************************************************************************
  *
- * @section Crystals and RC oscillators (delay.c)
+ * @section CLOCKS1 Crystals and RC oscillators (delay.c)
  *
  *   Normally using an external oscillator/crystal uses less energy than the internal
  *   one. This external oscillator/crystal can however be omitted if the design goal
@@ -103,7 +102,7 @@
  *   in a delay or sleeping. If the ULFRCO is selected, the MCU sleeps in EM3 and if
  *   the LFXO is selected the MCU sleeps in EM2.
  *
- *   WARNING: After testing it was noted that the ULFRCO uses less power than the
+ *   @warning After testing it was noted that the ULFRCO uses less power than the
  *   LFXO but was less precise for the wake-up times. Take not of this when selecting
  *   the necessary logic!
  *
@@ -111,7 +110,7 @@
  *   they chose to use the LFXO instead of the ULFRCO in sleep because the crystal was
  *   more stable for high baudrate communication using the LEUART peripheral.
  *
- *   NOTE: For low-power development it's advised to consistently enable peripherals and
+ *   @note For low-power development it's advised to consistently enable peripherals and
  *   oscillators/clocks when needed and disable them afterwards. For some methods it can
  *   be useful to provide a boolean argument so that in the case of sending more bytes
  *   the clock can be disabled only after sending the latest one. Perhaps this can be
@@ -122,8 +121,8 @@
  *
  * @section Initializations
  *
- *   WARNING: Initializations for the methods "led(bool enabled);", "delay(uint32_t msDelay);"
- *   and "sleep(uint32_t sSleep);" happen automatically. This is why their first call
+ *   @warning Initializations for the methods `led(bool enabled);`, `delay(uint32_t msDelay);`
+ *   and `sleep(uint32_t sSleep);` happen automatically. This is why their first call
  *   sometimes takes longer to finish than later ones.
  *
  * ******************************************************************************
@@ -135,11 +134,11 @@
  *   clock needs to be enabled for almost everything, even during EM2 so the MCU
  *   can react (and not only log) pin interrupts, this behavior was later scrapped.
  *
- *   TODO: also talk about cmuClock_HFPER?
+ *   @todo Also talk about cmuClock_HFPER?
  *
  * ******************************************************************************
  *
- * @section RTCC (RTC calendar)
+ * @section RTCC RTCC (RTC calendar)
  *
  *   At another point in the development phase there was looked into using
  *   the RTCC (RTC calendar) to wake up the MCU every hour. This peripheral can
@@ -148,7 +147,7 @@
  *
  * ******************************************************************************
  *
- * @section Energy modes (EM1 and EM3)
+ * @section EM Energy modes (EM1 and EM3)
  *
  *   At one point a method was developed to go in EM1 when waiting in a delay.
  *   This however didn't seem to work as intended and EM2 would also be fine.
@@ -161,14 +160,14 @@
  *   In EM3, high and low frequency clocks are disabled. No oscillator (except
  *   the ULFRCO) is running. Furthermore, all unwanted oscillators are disabled
  *   in EM3. This means that nothing needs to be manually disabled before
- *   the statement EMU_EnterEM3(true);
+ *   the statement `EMU_EnterEM3(true);`.
 
  *   The following modules/functions are are generally still available in EM3:
- *     => I2C address check
- *     => Watchdog
- *     => Asynchronous pin interrupt
- *     => Analog comparator (ACMP)
- *     => Voltage comparator (VCMP)
+ *     @li I2C address check
+ *     @li Watchdog
+ *     @li Asynchronous pin interrupt
+ *     @li Analog comparator (ACMP)
+ *     @li Voltage comparator (VCMP)
  *
  ******************************************************************************/
 
@@ -190,11 +189,13 @@
 #include "../inc/other.h"       /* Cable checking and battery voltage functionality. */
 
 
-/** Local define */
-#define WAKE_UP_PERIOD_S 10 /* Time between each wake-up in seconds */
+/* Local definition */
+/** Time between each wake-up in seconds */
+#define WAKE_UP_PERIOD_S 10
 
 
-/** Define enum type for the state machine */
+/* Local definition of new enum type */
+/** Enum type for the state machine */
 typedef enum mcu_states{
 	INIT,
 	MEASURE,
@@ -203,7 +204,8 @@ typedef enum mcu_states{
 } MCU_State_t;
 
 
-/** Static variable only available and used in this file */
+/* Local variable */
+/** Keep the state of the state machine */
 static volatile MCU_State_t MCUstate;
 
 

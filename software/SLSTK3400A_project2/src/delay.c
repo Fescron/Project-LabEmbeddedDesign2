@@ -8,19 +8,19 @@
  *
  * @section Versions
  *
- *   v1.0: Moved delay functionality from "util.c" to this file.
- *   v1.1: Changed global variables to be static (~hidden) and added dbprint "\n\r" fixes.
- *   v1.2: Removed EM1 delay method (see note in delayRTCC_EM2).
- *   v1.3: Cleaned up includes, added option to select SysTick/EM2 delay functionality
- *         and moved all of the logic in one "delay" method. Renamed sleep method.
- *   v1.4: Changed names of static variables, made initRTCcomp static.
- *   v1.5: Updated documentation.
- *   v1.6: Changed RTCcomp names to RTC.
- *   v1.7: Moved IRQ handler of RTC to this file.
- *   v1.8: Added ULFRCO logic.
+ *   @li v1.0: Moved delay functionality from `util.c` to this file.
+ *   @li v1.1: Changed global variables to be static (~hidden) and added dbprint `\ n \ r ` fixes.
+ *   @li v1.2: Removed EM1 delay method (see note in delayRTCC_EM2).
+ *   @li v1.3: Cleaned up includes, added option to select SysTick/EM2 delay functionality
+ *             and moved all of the logic in one `delay` method. Renamed sleep method.
+ *   @li v1.4: Changed names of static variables, made initRTCcomp static.
+ *   @li v1.5: Updated documentation.
+ *   @li v1.6: Changed RTCcomp names to RTC.
+ *   @li v1.7: Moved IRQ handler of RTC to this file.
+ *   @li v1.8: Added ULFRCO logic.
  *
- *   TODO: Enable disable/enable clock functionality?
- *         Check EMU_EnterEM2/3 true/false effect.
+ *   @todo @li Enable disable/enable clock functionality?
+ *         @li Check EMU_EnterEM2/3 true/false effect.
  *
  ******************************************************************************/
 
@@ -39,7 +39,7 @@
 #include "../inc/util.h"    	/* Utility functionality */
 
 
-/** Local variables */
+/* Local variables */
 static volatile uint32_t msTicks; /* Volatile because it's modified by an interrupt service routine */
 static bool RTC_initialized = false;
 
@@ -48,7 +48,7 @@ static bool SysTick_initialized = false;
 #endif /* SysTick/RTC selection */
 
 
-/** Local prototype */
+/* Local prototype */
 static void initRTC (void);
 
 
@@ -316,7 +316,7 @@ void SysTick_Handler (void)
  *   Interrupt Service Routine for the RTC.
  *
  * @note
- *   The "weak" definition for this method is located in "system_efm32hg.h".
+ *   The *weak* definition for this method is located in `system_efm32hg.h`.
  *****************************************************************************/
 void RTC_IRQHandler (void)
 {

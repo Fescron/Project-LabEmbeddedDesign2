@@ -8,22 +8,22 @@
  *
  * @section Versions
  *
- *   v1.0: Started from https://github.com/Fescron/Project-LabEmbeddedDesign1
- *   v1.1: Added dbprintln(""); above dbinfo statements in IRQ handlers to fix
- *         overwriting of text.
- *   v1.2: Disabled the RTC counter if GPIO handlers are called, only added necessary includes
- *         in header file, moved the others to the source file, updated documentation.
- *   v1.3: Started using set method for the static variable "ADXL_triggered", added GPIO
- *         wakeup initialization method here, renamed file.
- *   v1.4: Stopped disabling the GPIO clock.
- *   v1.5: Started using getters/setters to indicate an interrupt to "main.c".
- *   v1.6: Moved IRQ handler of RTC to this "delay.c".
- *   v1.7: Updated clear pending interrupt logic.
+ *   @li v1.0: Started from https://github.com/Fescron/Project-LabEmbeddedDesign1
+ *   @li v1.1: Added dbprintln(""); above dbinfo statements in IRQ handlers to fix
+ *             overwriting of text.
+ *   @li v1.2: Disabled the RTC counter if GPIO handlers are called, only added necessary includes
+ *             in header file, moved the others to the source file, updated documentation.
+ *   @li v1.3: Started using set method for the static variable `ADXL_triggered`, added GPIO
+ *             wakeup initialization method here, renamed file.
+ *   @li v1.4: Stopped disabling the GPIO clock.
+ *   @li v1.5: Started using getters/setters to indicate an interrupt to `main.c`.
+ *   @li v1.6: Moved IRQ handler of RTC to this `delay.c`.
+ *   @li v1.7: Updated clear pending interrupt logic.
  *
  * ******************************************************************************
  *
  * @note
- *   Other interrupt handlers can be found in "delay.c" and "other.c".
+ *   Other interrupt handlers can be found in `delay.c` and `other.c`.
  *
  ******************************************************************************/
 
@@ -42,7 +42,7 @@
 #include "../inc/ADXL362.h"     /* Functions related to the accelerometer */
 
 
-/** Local variables */
+/* Local variables */
 /* Volatile because they're modified by an interrupt service routine */
 static volatile bool PB0_triggered = false;
 static volatile bool PB1_triggered = false;
@@ -102,14 +102,14 @@ void initGPIOwakeup (void)
 
 /**************************************************************************//**
  * @brief
- *   Getter for the "PB0_triggered" and "PB1_triggered" static variables.
+ *   Getter for the `PB0_triggered` and `PB1_triggered` static variables.
  *
  * @param[in] number
  *   @li 0 - PB0_triggered selected.
  *   @li 1 - PB1_triggered selected.
  *
  * @return
- *   The value of "PB0_triggered" or "PB1_triggered".
+ *   The value of `PB0_triggered` or `PB1_triggered`.
  *****************************************************************************/
 bool BTN_getTriggered (uint8_t number)
 {
@@ -131,7 +131,7 @@ bool BTN_getTriggered (uint8_t number)
 
 /**************************************************************************//**
  * @brief
- *   Setter for the "PB0_triggered" and "PB1_triggered" static variable.
+ *   Setter for the `PB0_triggered` and `PB1_triggered` static variable.
  *
  * @param[in] number
  *   @li 0 - PB0_triggered selected.
@@ -161,7 +161,7 @@ void BTN_setTriggered (uint8_t number, bool value)
  *   GPIO Even IRQ for pushbuttons on even-numbered pins.
  *
  * @note
- *   The "weak" definition for this method is located in "system_efm32hg.h".
+ *   The *weak* definition for this method is located in `system_efm32hg.h`.
  *****************************************************************************/
 void GPIO_EVEN_IRQHandler(void)
 {
@@ -193,7 +193,7 @@ void GPIO_EVEN_IRQHandler(void)
  *   GPIO Odd IRQ for pushbuttons on odd-numbered pins.
  *
  * @note
- *   The "weak" definition for this method is located in "system_efm32hg.h".
+ *   The *weak* definition for this method is located in `system_efm32hg.h`.
  *****************************************************************************/
 void GPIO_ODD_IRQHandler(void)
 {

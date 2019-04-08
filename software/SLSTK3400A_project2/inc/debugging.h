@@ -15,7 +15,9 @@
 #define _DEBUGGING_H_
 
 
-/** Comment the line below to remove all USART debugging stuff */
+/** Public definition to enable/disable UART debugging
+ *  @li Uncomment define to enable the UART debugging statements
+ *  @li Comment define to remove all UART debugging statements */
 #define DEBUGGING
 
 

@@ -8,21 +8,21 @@
  *
  * @section Versions
  *
- *   v1.0: Started with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
- *         Changed file name from accel.c to ADXL362.c.
- *   v1.1: Changed PinModeSet "out" value to 0 in initADXL_VCC.
- *   v1.2: Changed last argument in GPIO_PinModeSet in method initADXL_VCC to
- *         change the pin mode and enable the pin in one statement.
- *   v1.3: Changed some methods and global variables to be static (~hidden).
- *   v1.4: Changed delay method and cleaned up includes.
- *   v1.5: Added get/set method for the static variable "ADXL_triggered".
- *   v1.6: Changed a lot of things...
- *   v1.7: Updated documentation and chanced "USART0" to "ADXL_SPI".
+ *   @li v1.0: Started with the code from https://github.com/Fescron/Project-LabEmbeddedDesign1/tree/master/code/SLSTK3400A_ADXL362
+ *             Changed file name from accel.c to ADXL362.c.
+ *   @li v1.1: Changed PinModeSet `out` value to 0 in initADXL_VCC.
+ *   @li v1.2: Changed last argument in GPIO_PinModeSet in method initADXL_VCC to
+ *             change the pin mode and enable the pin in one statement.
+ *   @li v1.3: Changed some methods and global variables to be static (~hidden).
+ *   @li v1.4: Changed delay method and cleaned up includes.
+ *   @li v1.5: Added get/set method for the static variable `ADXL_triggered`.
+ *   @li v1.6: Changed a lot of things...
+ *   @li v1.7: Updated documentation and chanced `USART0` to `ADXL_SPI`.
  *
- *   TODO: Check if variables need to be volatile.
- *         Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
- *           => Debugging it atm with "triggercounter", remove this variable later.
- *         Enable wake-up mode: writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit
+ *   @todo @li Check if variables need to be volatile.
+ *         @li Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
+ *             @li Debugging it atm with `triggercounter`, remove this variable later.
+ *         @li Enable wake-up mode: writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit
  *
  ******************************************************************************/
 
@@ -40,7 +40,7 @@
 #include "../inc/util.h"     	/* Utility functionality */
 
 
-/** Local variables */
+/* Local variables */
 /* TODO: Perhaps these shouldn't be volatile */
 static volatile bool ADXL_triggered = false; /* Volatile because it's modified by an interrupt service routine */
 static volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
@@ -49,7 +49,7 @@ static bool ADXL_VDD_initialized = false;
 static uint16_t triggercounter = 0; /* TODO: remove this later */
 
 
-/** Local prototype */
+/* Local prototypes */
 static void powerADXL (bool enabled);
 static void initADXL_SPI (void);
 static void softResetADXL (void);
@@ -68,7 +68,7 @@ static int32_t convertGRangeToGValue (int8_t sensorValue);
  * @details
  *   This method calls all the other internal necessary functions.
  *   Clock enable functionality is gathered here instead of in
- *   "lower" (static) functions.
+ *   *lower* (static) functions.
  *****************************************************************************/
 void initADXL (void)
 {
@@ -103,11 +103,11 @@ void initADXL (void)
 
 /**************************************************************************//**
  * @brief
- *   Setter for the "ADXL_triggered" static variable.
+ *   Setter for the `ADXL_triggered` static variable.
  *
  * @param[in] triggered
- *    @li True - Set ADXL_triggered to "true".
- *    @li False - Set ADXL_triggered to "false".
+ *    @li True - Set `ADXL_triggered` to `true`.
+ *    @li False - Set `ADXL_triggered` to `false`.
  *****************************************************************************/
 void ADXL_setTriggered (bool triggered)
 {
@@ -118,10 +118,10 @@ void ADXL_setTriggered (bool triggered)
 
 /**************************************************************************//**
  * @brief
- *   Getter for the "ADXL_triggered" static variable.
+ *   Getter for the `ADXL_triggered` static variable.
  *
  * @return
- *   The value of ADXL_triggered.
+ *   The value of `ADXL_triggered`.
  *****************************************************************************/
 bool ADXL_getTriggered (void)
 {

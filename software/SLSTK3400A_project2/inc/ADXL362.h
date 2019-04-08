@@ -11,12 +11,12 @@
 #define _ADXL362_H_
 
 
-/** Includes necessary for this header file */
+/* Includes necessary for this header file */
 #include <stdint.h>  /* (u)intXX_t */
 #include <stdbool.h> /* "bool", "true", "false" */
 
 
-/** ADXL362 register definitions */
+/* ADXL362 register definitions */
 #define ADXL_REG_DEVID_AD 		0x00 /* Reset: 0xAD */
 #define ADXL_REG_DEVID_MST 		0x01 /* Reset: 0x1D */
 #define ADXL_REG_PARTID 		0x02 /* Reset: 0xF2 */
@@ -37,7 +37,7 @@
 #define ADXL_REG_POWER_CTL 		0x2D /* Write xxxx xxMM (MM = 10) to: measurement mode */
 
 
-/** Public prototypes */
+/* Public prototypes */
 void initADXL (void);
 
 void ADXL_setTriggered (bool triggered);

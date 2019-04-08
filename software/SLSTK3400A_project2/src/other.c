@@ -8,10 +8,10 @@
  *
  * @section Versions
  *
- *   v1.0: Move "checkCable" from main.c to this file and add battery voltage measurement logic.
+ *   @li v1.0: Move `checkCable` from main.c to this file and add battery voltage measurement logic.
  *
- *   TODO: Fix cable-checking method.
- *         Use VCOMP?
+ *   @todo @li Fix cable-checking method.
+ *         @li Use VCOMP?
  *
  ******************************************************************************/
 
@@ -30,7 +30,7 @@
 #include "../inc/delay.h"     	/* Delay functionality */
 
 
-/** Local variable */
+/* Local variable */
 static volatile bool adcConversionComplete = false; /* Volatile because it's modified by an interrupt service routine */
 
 
@@ -79,6 +79,9 @@ void initVBAT (void)
  *
  * @details
  *   This method starts the ADC and reads the result.
+ *
+ * @return
+ *   The measured battery voltage.
  *****************************************************************************/
 uint32_t readVBAT (void)
 {

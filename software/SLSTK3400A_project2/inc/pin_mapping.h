@@ -8,9 +8,9 @@
  *
  * @section Versions
  *
- *   v1.0: Started with custom board pinout.
- *   v1.1: Added regular board pinout, selectable with define statement.
- *   v1.2: Added documentation.
+ *   @li v1.0: Started with custom board pinout.
+ *   @li v1.1: Added regular board pinout, selectable with define statement.
+ *   @li v1.2: Added documentation.
  *
  ******************************************************************************/
 
@@ -20,7 +20,7 @@
 #define _PIN_MAPPING_H_
 
 
-/** Include necessary for this header file */
+/* Include necessary for this header file */
 #include "em_device.h" /* Include necessary MCU-specific header file */
 #include "em_gpio.h"   /* General Purpose IO */
 

@@ -13,11 +13,12 @@
 #define _DS18B20_H_
 
 
-/** Public definition */
-#define MAX_TIME_CTR 2000 /* Maximum waiting value before a reset becomes "failed" */
+/* Public definition */
+/** Maximum waiting value before a reset becomes *failed* */
+#define MAX_TIME_CTR 2000
 
 
-/** Public prototype */
+/* Public prototype */
 float readTempDS18B20 (void);
 
 

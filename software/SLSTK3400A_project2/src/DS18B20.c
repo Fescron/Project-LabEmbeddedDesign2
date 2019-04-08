@@ -10,21 +10,21 @@
  *
  * @section Versions
  *
- *   v1.0: Reformatted existing methods to use pin_mapping.h, changed unsigned char to
- *         uint8_t values, added comments and cleaned up includes.
- *   v1.1: Added documentation, removed unnecessary GPIO statements regarding
- *         DOUT values of VDD pin.
- *   v1.2: Removed some unnecessary GPIO lines and added comments about "out" (DOUT) argument.
- *   v1.3: Changed some methods to be static (~hidden).
- *   v1.4: Cleaned up includes.
- *   v1.5: Made more methods static.
- *   v1.6: Updated documentation.
+ *   @li v1.0: Reformatted existing methods to use pin_mapping.h, changed unsigned char to
+ *             uint8_t values, added comments and cleaned up includes.
+ *   @li v1.1: Added documentation, removed unnecessary GPIO statements regarding
+ *             DOUT values of VDD pin.
+ *   @li v1.2: Removed some unnecessary GPIO lines and added comments about `out` (DOUT) argument.
+ *   @li v1.3: Changed some methods to be static (~hidden).
+ *   @li v1.4: Cleaned up includes.
+ *   @li v1.5: Made more methods static.
+ *   @li v1.6: Updated documentation.
  *
- *   TODO: RTC sleep functionality is broken when UDELAY_Calibrate() is called.
- *           => UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
- *         Use internal pull-up resistor for DATA pin using DOUT argument.
- *           => Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
- *         Enter EM1 when the MCU is waiting in a delay method? (see readVBAT method in "other.c")
+ *   @todo @li RTC sleep functionality is broken when UDELAY_Calibrate() is called.
+ *             @li UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
+ *         @li Use internal pull-up resistor for DATA pin using DOUT argument.
+ *             @li Not working, why? GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);
+ *         @li Enter EM1 when the MCU is waiting in a delay method? (see readVBAT method in `other.c`)
  *
  ******************************************************************************/
 
@@ -42,11 +42,11 @@
 #include "../inc/util.h"    	/* Utility functionality */
 
 
-/** Local variable */
+/* Local variable */
 static bool DS18B20_VDD_initialized = false;
 
 
-/** Local prototypes */
+/* Local prototypes */
 static void powerDS18B20 (bool enabled);
 static bool init_DS18B20 (void);
 static void writeByteToDS18B20 (uint8_t data);
