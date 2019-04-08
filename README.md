@@ -8,7 +8,10 @@
 
 <br/>
 
-### PCB-etching files
+## Software documentation
+See https://fescron.github.io/Project-LabEmbeddedDesign2/files.html
+
+## Important hardware files
 - [Top Copper layer (1:1)](https://github.com/Fescron/Project-LabEmbeddedDesign2/blob/master/hardware/project-embeddedSystemDesign2/pdf/project-embeddedSystemDesign2-F_Cu.pdf)
 - [Bottom Copper layer (1:1, mirrored)](https://github.com/Fescron/Project-LabEmbeddedDesign2/blob/master/hardware/project-embeddedSystemDesign2/pdf/project-embeddedSystemDesign2-B_Cu-mirrored.pdf)
 
