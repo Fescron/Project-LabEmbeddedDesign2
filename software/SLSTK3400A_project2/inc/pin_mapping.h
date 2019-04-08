@@ -25,7 +25,7 @@
 #include "em_gpio.h"   /* General Purpose IO */
 
 
-/** Select custom Happy Gecko board pinout or regular one */
+/* Select custom Happy Gecko board pinout or regular one */
 //#define CUSTOM_BOARD /* Comment this line if using the regular Happy Gecko board */
 
 

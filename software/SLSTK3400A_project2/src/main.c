@@ -23,16 +23,17 @@
  *   @li v1.8: Moved checkCable method to "other.c" and started using readVBAT method.
  *   @li v1.9: Cleaned up documentation and TODO's.
  *
+ * ******************************************************************************
  *
- *   @todo IMPORTANT: @li Fix cable-checking method.
- *                    @li Start using linked-loop mode for ADXL interrupt things.
+ *   @todo IMPORTANT: Fix cable-checking method.
+ *                    Start using linked-loop mode for ADXL interrupt things.
  *
- *   @todo EXTRA THINGS: @li Check the section about GPIO clock and cmuClock_HFPER
- *                       @li Add WDOG functionality. (see "powertest" example)
- *                       @li Add functionality to read internal temperature
- *                           @li Detect problems of overheating?
- *                       @li Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
- *                           @li Also see AN0007: 2.8 Optimizing Code
+ *         EXTRA THINGS: Check the section about GPIO clock and cmuClock_HFPER
+ *                       Add WDOG functionality. (see "powertest" example)
+ *                       Add functionality to read internal temperature
+ *                         => Detect problems of overheating?
+ *                       Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
+ *                         => Also see AN0007: 2.8 Optimizing Code
  *
  *
  *         UTIL.C: Add disableClocks functionality from "emodes.c" here?
