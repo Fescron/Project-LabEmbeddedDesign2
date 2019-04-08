@@ -1,9 +1,9 @@
 var dir_d64ebc909b3eac0eb9a70a1ea1efb805 =
 [
-    [ "ADXL362.h", "ADXL362_8h.html", "ADXL362_8h" ],
+    [ "ADXL362.h", "_a_d_x_l362_8h.html", "_a_d_x_l362_8h" ],
     [ "debugging.h", "debugging_8h.html", "debugging_8h" ],
     [ "delay.h", "delay_8h.html", "delay_8h" ],
-    [ "DS18B20.h", "DS18B20_8h.html", "DS18B20_8h" ],
+    [ "DS18B20.h", "_d_s18_b20_8h.html", "_d_s18_b20_8h" ],
     [ "interrupt.h", "interrupt_8h.html", "interrupt_8h" ],
     [ "other.h", "other_8h.html", "other_8h" ],
     [ "pin_mapping.h", "pin__mapping_8h.html", "pin__mapping_8h" ],

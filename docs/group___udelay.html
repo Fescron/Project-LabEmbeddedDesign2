@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Embedded System Design 2 - Project: SLSTK3400A_project2/inc/udelay.h File Reference</title>
+<title>Embedded System Design 2 - Project: Udelay</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -54,45 +54,77 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('udelay_8h.html','');});
+$(document).ready(function(){initNavTree('group___udelay.html','');});
 </script>
 <div id="doc-content">
 <div class="header">
   <div class="summary">
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">udelay.h File Reference</div>  </div>
+<div class="title">Udelay<div class="ingroups"><a class="el" href="group__kitdrv.html">Kitdrv</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>Microsecond delay routine.  
-<a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
-</div>
-<p><a href="udelay_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ga523f858d15b74728046ceca9796f3046"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___udelay.html#ga523f858d15b74728046ceca9796f3046">UDELAY_Calibrate</a> (void)</td></tr>
-<tr class="memdesc:ga523f858d15b74728046ceca9796f3046"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calibrates the microsecond delay loop.  <a href="group___udelay.html#ga523f858d15b74728046ceca9796f3046">More...</a><br /></td></tr>
+<tr class="memdesc:ga523f858d15b74728046ceca9796f3046"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calibrates the microsecond delay loop.  <a href="#ga523f858d15b74728046ceca9796f3046">More...</a><br /></td></tr>
 <tr class="separator:ga523f858d15b74728046ceca9796f3046"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7b02c652fea1e8305b266ec0356a5ad5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___udelay.html#ga7b02c652fea1e8305b266ec0356a5ad5">UDELAY_Delay</a> (uint32_t usecs)</td></tr>
 <tr class="separator:ga7b02c652fea1e8305b266ec0356a5ad5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Microsecond delay routine. </p>
-<dl class="section version"><dt>Version</dt><dd>5.6.0</dd></dl>
-<h1>License</h1>
-<p><b>Copyright 2015 Silicon Labs, Inc. <a href="http://www.silabs.com">http://www.silabs.com</a></b></p>
-<p>This file is licensed under the Silabs License Agreement. See the file "Silabs_License_Agreement.txt" for details. Before using this software for any purpose, you must agree to the terms of that agreement. </p>
+<p>Implements active wait microsecond delay.</p>
+<p>The delay is implemented as a loop coded in assembly. The delay loop must be calibrated by calling <a class="el" href="group___udelay.html#ga523f858d15b74728046ceca9796f3046">UDELAY_Calibrate()</a> once. The calibration algorithm is taken from linux 2.4 sources (bogomips).</p>
+<p>The delay is fairly accurate, the assembly coding will not be optimized by the compiler. The delay function should not be used for longer delays than 1000 us. Calling the delay function with &gt; 1000 will give unpredictable results. Recalibrate the loop when HFCORECLK is changed.</p>
+<p>The calibration uses the RTC clocked by LFRCO to measure time. Better accuracy can be achieved by adding #define UDELAY_LFXO (i.e. add -DUDELAY_LFXO on the commandline). The LFXO oscillator is then used for delay loop calibration.</p>
+<p>The calibration function will restore RTC upon exit. </p>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ga523f858d15b74728046ceca9796f3046"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga523f858d15b74728046ceca9796f3046">&#9670;&nbsp;</a></span>UDELAY_Calibrate()</h2>
 
-<p class="definition">Definition in file <a class="el" href="udelay_8h_source.html">udelay.h</a>.</p>
-</div></div><!-- contents -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UDELAY_Calibrate </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Calibrates the microsecond delay loop. </p>
+
+<p class="definition">Definition at line <a class="el" href="udelay_8c_source.html#l00072">72</a> of file <a class="el" href="udelay_8c_source.html">udelay.c</a>.</p>
+
+</div>
+</div>
+<a id="ga7b02c652fea1e8305b266ec0356a5ad5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7b02c652fea1e8305b266ec0356a5ad5">&#9670;&nbsp;</a></span>UDELAY_Delay()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UDELAY_Delay </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>usecs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_c6fe9a14e775b8c75819cd4ae39c6ec2.html">SLSTK3400A_project2</a></li><li class="navelem"><a class="el" href="dir_d64ebc909b3eac0eb9a70a1ea1efb805.html">inc</a></li><li class="navelem"><a class="el" href="udelay_8h.html">udelay.h</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
