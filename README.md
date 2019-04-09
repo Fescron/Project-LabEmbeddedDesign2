@@ -9,7 +9,9 @@
 <br/>
 
 ## Software documentation
-See https://fescron.github.io/Project-LabEmbeddedDesign2/files.html
+The following links go to code documentation with [Doxygen](http://www.doxygen.org).
+- [General important documentation](https://fescron.github.io/Project-LabEmbeddedDesign2/index.html)
+- [Individual files and their methods](https://fescron.github.io/Project-LabEmbeddedDesign2/files.html)
 
 ## Important hardware files
 - [Top Copper layer (1:1)](https://github.com/Fescron/Project-LabEmbeddedDesign2/blob/master/hardware/project-embeddedSystemDesign2/pdf/project-embeddedSystemDesign2-F_Cu.pdf)
