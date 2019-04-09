@@ -18,6 +18,7 @@ var pin__mapping_8h =
     [ "BREAK1_PORT", "pin__mapping_8h.html#a9025093577a98cb941e599d4e45606fb", null ],
     [ "BREAK2_PIN", "pin__mapping_8h.html#aa03bdfbf4a2a4b274be0a09c1d91c946", null ],
     [ "BREAK2_PORT", "pin__mapping_8h.html#aaa342d9130233e5b0cf9dea5071681c0", null ],
+    [ "CUSTOM_BOARD", "pin__mapping_8h.html#abd81070fe30f1dd6d9b1f7b39bd4ad1b", null ],
     [ "DBG_RXD_PIN", "pin__mapping_8h.html#abacaf98e4ac5b4096f1357f9f7a2e79a", null ],
     [ "DBG_RXD_PORT", "pin__mapping_8h.html#a99d0e2135d34d7a164a249f2db34907b", null ],
     [ "DBG_TXD_PIN", "pin__mapping_8h.html#a20ad57f5da66322a91a0449e7cb2efa9", null ],
