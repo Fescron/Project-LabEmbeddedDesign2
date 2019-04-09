@@ -3,9 +3,9 @@
  * @brief Enable or disable printing to UART.
  * @details
  *   This header file is called in every other file where there are UART
- *   debugging statements. Commenting the line in this file can remove all
- *   UART functionality in the whole project.
- * @version 1.0
+ *   debugging statements. Depending on the value of `DEBUGGING`, UART statements
+ *   are enabled or disabled.
+ * @version 1.1
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -15,13 +15,13 @@
 #define _DEBUGGING_H_
 
 
-/* Public definition to enable/disable UART debugging
- *  - Uncomment define to enable the UART debugging statements
- *  - Comment define to remove all UART debugging statements */
-#define DEBUGGING
+/** Public definition to enable/disable UART debugging
+ *    @li `1` - Enable the UART debugging statements.
+ *    @li `0` - Remove all UART debugging statements from the uploaded code. */
+#define DEBUGGING 1
 
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 #include "dbprint.h"
 #endif /* DEBUGGING */
 

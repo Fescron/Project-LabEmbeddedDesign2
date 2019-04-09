@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file other.c
  * @brief Cable checking and battery voltage functionality.
- * @version 1.0
+ * @version 1.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -9,9 +9,20 @@
  * @section Versions
  *
  *   @li v1.0: Move `checkCable` from `main.c` to this file and add battery voltage measurement logic.
+ *   @li v1.1: Updated code with new DEFINE checks.
  *
- *   @todo Fix cable-checking method.
- *         Use VCOMP?
+ *   @todo
+ *     - Fix cable-checking method.
+ *     - Use VCOMP?
+ *
+ * ******************************************************************************
+ *
+ * @section License
+ *
+ *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
+ *   These sections are licensed under the Silabs License Agreement. See the file
+ *   "Silabs_License_Agreement.txt" for details. Before using this software for
+ *   any purpose, you must agree to the terms of that agreement.
  *
  ******************************************************************************/
 
@@ -66,7 +77,7 @@ void initVBAT (void)
 	/* Disable used clock */
 	CMU_ClockEnable(cmuClock_ADC0, false);
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 	dbinfo("ADC0 initialized");
 #endif /* DEBUGGING */
 
@@ -147,7 +158,7 @@ bool checkCable (void)
 	GPIO_PinModeSet(BREAK1_PORT, BREAK1_PIN, gpioModeDisabled, 0);
 	GPIO_PinModeSet(BREAK2_PORT, BREAK2_PIN, gpioModeDisabled, 0);
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 	if (check) dbinfo("Cable still intact");
 	else dbcrit("Cable broken!");
 #endif /* DEBUGGING */

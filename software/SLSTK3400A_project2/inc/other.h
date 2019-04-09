@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file other.h
  * @brief Cable checking and battery voltage functionality.
- * @version 1.0
+ * @version 1.1
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 

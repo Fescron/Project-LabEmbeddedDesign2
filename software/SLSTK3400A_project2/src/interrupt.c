@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file interrupt.c
  * @brief Interrupt functionality.
- * @version 1.7
+ * @version 1.8
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -19,11 +19,21 @@
  *   @li v1.5: Started using getters/setters to indicate an interrupt to `main.c`.
  *   @li v1.6: Moved IRQ handler of RTC to this `delay.c`.
  *   @li v1.7: Updated clear pending interrupt logic.
+ *   @li v1.8: Updated code with new DEFINE checks.
  *
  * ******************************************************************************
  *
  * @note
  *   Other interrupt handlers can be found in `delay.c` and `other.c`.
+ *
+ * ******************************************************************************
+ *
+ * @section License
+ *
+ *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
+ *   These sections are licensed under the Silabs License Agreement. See the file
+ *   "Silabs_License_Agreement.txt" for details. Before using this software for
+ *   any purpose, you must agree to the terms of that agreement.
  *
  ******************************************************************************/
 
@@ -93,7 +103,7 @@ void initGPIOwakeup (void)
 	/* Enable rising-edge interrupts for ADXL_INT1 */
 	GPIO_ExtIntConfig(ADXL_INT1_PORT, ADXL_INT1_PIN, ADXL_INT1_PIN, true, false, true);
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 	dbinfo("GPIO wake-up initialized");
 #endif /* DEBUGGING */
 
@@ -118,7 +128,7 @@ bool BTN_getTriggered (uint8_t number)
 	else
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("Non-existing button selected!");
 #endif /* DEBUGGING */
 
@@ -147,7 +157,7 @@ void BTN_setTriggered (uint8_t number, bool value)
 	else
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("Non-existing button selected!");
 #endif /* DEBUGGING */
 
@@ -176,7 +186,7 @@ void GPIO_EVEN_IRQHandler(void)
 	else
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("Unknown even-numbered IRQ pin triggered!");
 #endif /* DEBUGGING */
 
@@ -209,7 +219,7 @@ void GPIO_ODD_IRQHandler(void)
 	else
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("Unknown odd-numbered IRQ pin triggered!");
 #endif /* DEBUGGING */
 

@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.6
+ * @version 1.7
  * @author
- *   Alec Vanderhaegen & Sarah Goossens
+ *   Alec Vanderhaegen & Sarah Goossens @n
  *   Modified by Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -19,12 +19,23 @@
  *   @li v1.4: Cleaned up includes.
  *   @li v1.5: Made more methods static.
  *   @li v1.6: Updated documentation.
+ *   @li v1.7: Updated code with new DEFINE checks.
  *
- *   @todo RTC sleep functionality is broken when `UDELAY_Calibrate()` is called.
- *           - UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
- *         Use internal pull-up resistor for DATA pin using DOUT argument.
- *           - Not working, why? `GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);`
- *         Enter EM1 when the MCU is waiting in a delay method? (see `readVBAT` method in `other.c`)
+ *   @todo
+ *     - RTC sleep functionality is broken when `UDELAY_Calibrate()` is called.
+ *         - UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
+ *     - Use internal pull-up resistor for DATA pin using DOUT argument.
+ *         - Not working, why? `GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);`
+ *     - Enter EM1 when the MCU is waiting in a delay method? (see `readVBAT` method in `other.c`)
+ *
+ * ******************************************************************************
+ *
+ * @section License
+ *
+ *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
+ *   These sections are licensed under the Silabs License Agreement. See the file
+ *   "Silabs_License_Agreement.txt" for details. Before using this software for
+ *   any purpose, you must agree to the terms of that agreement.
  *
  ******************************************************************************/
 
@@ -97,7 +108,7 @@ float readTempDS18B20 (void)
 	}
 	else
 	{
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("DS18B20 measurement failed");
 #endif /* DEBUGGING */
 
@@ -178,7 +189,7 @@ static bool init_DS18B20 (void)
 	if (counter == MAX_TIME_CTR)
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("DS18B20 initialization failed");
 #endif /* DEBUGGING */
 
@@ -198,7 +209,7 @@ static bool init_DS18B20 (void)
 	if (counter == MAX_TIME_CTR)
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("DS18B20 initialization failed");
 #endif /* DEBUGGING */
 

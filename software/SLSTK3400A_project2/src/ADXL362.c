@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.7
+ * @version 1.8
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -18,12 +18,23 @@
  *   @li v1.5: Added get/set method for the static variable `ADXL_triggered`.
  *   @li v1.6: Changed a lot of things...
  *   @li v1.7: Updated documentation and chanced `USART0` to `ADXL_SPI`.
+ *   @li v1.8: Updated code with new DEFINE checks.
  *
- *   @todo Check if variables need to be volatile.
- *         Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
- *           - Debugging it right now with `triggercounter`, remove this variable later.
- *           - Start using linked-loop mode for ADXL to fix the strange interrupt behavior?
- *         Enable wake-up mode: `writeADXL(ADXL_REG_POWER_CTL, 0b00001000)` // 5th bit
+ *   @todo
+ *     - Check if variables need to be volatile.
+ *     - Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
+ *         - Debugging it right now with `triggercounter`, remove this variable later.
+ *         - Start using linked-loop mode for ADXL to fix the strange interrupt behavior?
+ *     - Enable wake-up mode: `writeADXL(ADXL_REG_POWER_CTL, 0b00001000)` // 5th bit
+ *
+ * ******************************************************************************
+ *
+ * @section License
+ *
+ *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
+ *   These sections are licensed under the Silabs License Agreement. See the file
+ *   "Silabs_License_Agreement.txt" for details. Before using this software for
+ *   any purpose, you must agree to the terms of that agreement.
  *
  ******************************************************************************/
 
@@ -86,7 +97,7 @@ void initADXL (void)
 	else
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("Wrong peripheral selected!");
 #endif /* DEBUGGING */
 
@@ -163,9 +174,9 @@ void ADXL_enableSPI (bool enabled)
 		else
 		{
 
-	#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 			dbcrit("Wrong peripheral selected!");
-	#endif /* DEBUGGING */
+#endif /* DEBUGGING */
 
 			error(13);
 
@@ -186,9 +197,9 @@ void ADXL_enableSPI (bool enabled)
 		else
 		{
 
-	#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 			dbcrit("Wrong peripheral selected!");
-	#endif /* DEBUGGING */
+#endif /* DEBUGGING */
 
 			error(14);
 
@@ -225,7 +236,7 @@ void ADXL_enableMeasure (bool enabled)
 		/* Enable measurements (OR with new setting bits) */
 		writeADXL(ADXL_REG_POWER_CTL, reg | 0b00000010); /* Last 2 bits are measurement mode */
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbinfo("ADXL362: Measurement enabled");
 #endif /* DEBUGGING */
 
@@ -241,7 +252,7 @@ void ADXL_enableMeasure (bool enabled)
 		/* Disable measurements (OR with new setting bits) */
 		writeADXL(ADXL_REG_POWER_CTL, reg | 0b00000000); /* Last 2 bits are measurement mode */
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbinfo("ADXL362: Measurement disabled (standby)");
 #endif /* DEBUGGING */
 
@@ -286,14 +297,14 @@ void ADXL_configRange (uint8_t givenRange)
 	else
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("Non-existing range selected!");
 #endif /* DEBUGGING */
 
 		error(7);
 	}
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 	if (range == 0) dbinfo("ADXL362: Measurement mode +- 2g selected");
 	else if (range == 1) dbinfo("ADXL362: Measurement mode +- 4g selected");
 	else if (range == 2) dbinfo("ADXL362: Measurement mode +- 8g selected");
@@ -332,14 +343,14 @@ void ADXL_configODR (uint8_t givenODR)
 	else
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("Non-existing ODR selected!");
 #endif /* DEBUGGING */
 
 		error(6);
 	}
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 	if (givenODR == 0) dbinfo("ADXL362: ODR set at 12.5 Hz");
 	else if (givenODR == 1) dbinfo("ADXL362: ODR set at 25 Hz");
 	else if (givenODR == 2) dbinfo("ADXL362: ODR set at 50 Hz");
@@ -380,7 +391,7 @@ void ADXL_configActivity (uint8_t gThreshold)
 	else
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("Range wrong, can't set gThreshold!");
 #endif /* DEBUGGING */
 
@@ -395,7 +406,7 @@ void ADXL_configActivity (uint8_t gThreshold)
 	writeADXL(ADXL_REG_THRESH_ACT_L, low);  /* 7:0 bits used */
 	writeADXL(ADXL_REG_THRESH_ACT_H, high); /* 2:0 bits used */
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 	dbinfoInt("ADXL362: Activity configured: ", gThreshold, " g");
 #endif /* DEBUGGING */
 
@@ -425,7 +436,7 @@ void ADXL_readValues (void)
 
 		readADXL_XYZDATA(); /* Read XYZ sensor data */
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		/* Print XYZ sensor data */
 		//dbprint("[");
 		dbprint("\r[");
@@ -577,7 +588,7 @@ static void resetHandlerADXL (void)
 		}
 	}
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 	if (retries < 2) dbinfoInt("ADXL362 initialized (", retries, " soft reset retries)");
 	else dbwarnInt("ADXL362 initialized (had to \"hard reset\", ", retries, " soft reset retries)");
 #endif /* DEBUGGING */
@@ -769,7 +780,7 @@ static int32_t convertGRangeToGValue (int8_t sensorValue)
 	else
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("Range wrong, can't calculate mg value!");
 #endif /* DEBUGGING */
 

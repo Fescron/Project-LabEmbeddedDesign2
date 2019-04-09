@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.h
  * @brief Delay functionality.
- * @version 1.8
+ * @version 1.9
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -22,16 +22,16 @@
 #define LFXOFREQ_MS   32.768
 
 
-/* Public definition to select which delay to use
- *  - Uncomment define to use SysTick delays
- *  - Comment define to use EM2/3 RTC compare delays */
-//#define SYSTICKDELAY
+/** Public definition to select which delay to use
+ *    @li `1` - Use SysTick delays.
+ *    @li `0` - Use EM2/3 RTC compare delays. */
+#define SYSTICKDELAY 0
 
 
-/* Public definition to select the use of the crystal or the oscillator
- *  - Uncomment define to use the ultra low-frequency RC oscillator (ULFRCO) - EM3 sleep is used
- *  - Comment define to use the low-frequency crystal oscillator (LFXO) - EM2 sleep is used */
-//#define ULFRCO
+/** Public definition to select the use of the crystal or the oscillator
+ *    @li `0` - Use the ultra low-frequency RC oscillator (ULFRCO), EM3 sleep is used.
+ *    @li `1` - Use the low-frequency crystal oscillator (LFXO), EM2 sleep is used but delays are less precise timing-wise.  */
+#define ULFRCO 0
 
 
 /* Public prototypes */

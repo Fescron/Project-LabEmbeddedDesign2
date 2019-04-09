@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.c
  * @brief Utility functionality.
- * @version 2.5
+ * @version 2.6
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -20,8 +20,19 @@
  *   @li v2.3: Changed name of static variable, simplified some logic.
  *   @li v2.4: Stopped disabling the GPIO clock.
  *   @li v2.5: Moved documentation.
+ *   @li v2.6: Updated code with new DEFINE checks.
  *
- *   @todo Add disableClocks functionality from `emodes.c` here?
+ *   @todo
+ *     - Add disableClocks functionality from `emodes.c` here?
+ *
+ * ******************************************************************************
+ *
+ * @section License
+ *
+ *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
+ *   These sections are licensed under the Silabs License Agreement. See the file
+ *   "Silabs_License_Agreement.txt" for details. Before using this software for
+ *   any purpose, you must agree to the terms of that agreement.
  *
  ******************************************************************************/
 
@@ -88,7 +99,7 @@ void error (uint8_t number)
 	/* Save the given number in the global variable */
 	errorNumber = number;
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 	dbcritInt(">>> Error (", number, ")! Please reset MCU. <<<");
 #endif /* DEBUGGING */
 
@@ -117,7 +128,7 @@ static void initLED (void)
 	/* In the case of gpioModePushPull, the last argument directly sets the pin state */
 	GPIO_PinModeSet(LED_PORT, LED_PIN, gpioModePushPull, 0);
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 	dbinfo("LED pin initialized");
 #endif /* DEBUGGING */
 
