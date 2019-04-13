@@ -37,15 +37,15 @@
  ******************************************************************************/
 
 
-#include <stdint.h>    /* (u)intXX_t */
-#include <stdbool.h>   /* "bool", "true", "false" */
-#include "em_cmu.h"    /* Clock Management Unit */
-#include "em_gpio.h"   /* General Purpose IO */
+#include <stdint.h>      /* (u)intXX_t */
+#include <stdbool.h>     /* "bool", "true", "false" */
+#include "em_cmu.h"      /* Clock Management Unit */
+#include "em_gpio.h"     /* General Purpose IO */
 
-#include "../inc/util.h"        /* Corresponding header file */
-#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
-#include "../inc/debugging.h" 	/* Enable or disable printing to UART */
-#include "../inc/delay.h"     	/* Delay functionality */
+#include "util.h"        /* Corresponding header file */
+#include "pin_mapping.h" /* PORT and PIN definitions */
+#include "debugging.h" 	 /* Enable or disable printing to UART */
+#include "delay.h"     	 /* Delay functionality */
 
 
 /* Local variables */

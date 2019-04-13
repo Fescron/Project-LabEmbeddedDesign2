@@ -23,21 +23,21 @@
  *   @li v1.8: Moved checkCable method to "other.c" and started using readVBAT method.
  *   @li v1.9: Cleaned up documentation and TODO's.
  *   @li v2.0: Updated code with new DEFINE checks.
+ *   @li v2.1: Updated code with new ADC functionality.
  *
  * ******************************************************************************
  *
- *   @todo
- *     IMPORTANT:
- *       - Fix cable-checking method.
- *       - Start using linked-loop mode for ADXL interrupt things.
- *     EXTRA THINGS:
- *       - Check the section about GPIO clock and cmuClock_HFPER
- *       - Add WDOG functionality. (see "powertest" example)
- *       - Add functionality to read internal temperature
- *           - Detect problems of overheating?
- *       - Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
- *           - Also see *AN0007: 2.8 Optimizing Code*
- *       - Move sections to corresponding source files?
+ * @todo
+ *   IMPORTANT:
+ *     - Fix cable-checking method.
+ *     - Start using linked-loop mode for ADXL interrupt things.
+ * @todo
+ *   EXTRA THINGS:
+ *     - Check the section about GPIO clock and cmuClock_HFPER
+ *     - Add WDOG functionality. (see "powertest" example)
+ *     - Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
+ *         - Also see *AN0007: 2.8 Optimizing Code*
+ *     - Move sections to corresponding source files?
  *
  * ******************************************************************************
  *
@@ -56,21 +56,22 @@
  ******************************************************************************/
 
 
-#include <stdint.h>    /* (u)intXX_t */
-#include <stdbool.h>   /* "bool", "true", "false" */
-#include "em_device.h" /* Include necessary MCU-specific header file */
-#include "em_chip.h"   /* Chip Initialization */
-#include "em_cmu.h"    /* Clock management unit */
-#include "em_gpio.h"   /* General Purpose IO */
+#include <cable.h>       /* Cable checking functionality. */
+#include <stdint.h>      /* (u)intXX_t */
+#include <stdbool.h>     /* "bool", "true", "false" */
+#include "em_device.h"   /* Include necessary MCU-specific header file */
+#include "em_chip.h"     /* Chip Initialization */
+#include "em_cmu.h"      /* Clock management unit */
+#include "em_gpio.h"     /* General Purpose IO */
 
-#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
-#include "../inc/debugging.h"   /* Enable or disable printing to UART for debugging */
-#include "../inc/delay.h"     	/* Delay functionality */
-#include "../inc/util.h"    	/* Utility functionality */
-#include "../inc/interrupt.h"   /* GPIO wake-up initialization and interrupt handlers */
-#include "../inc/ADXL362.h"    	/* Functions related to the accelerometer */
-#include "../inc/DS18B20.h"     /* Functions related to the temperature sensor */
-#include "../inc/other.h"       /* Cable checking and battery voltage functionality. */
+#include "pin_mapping.h" /* PORT and PIN definitions */
+#include "debugging.h"   /* Enable or disable printing to UART for debugging */
+#include "delay.h"       /* Delay functionality */
+#include "util.h"        /* Utility functionality */
+#include "interrupt.h"   /* GPIO wake-up initialization and interrupt handlers */
+#include "ADXL362.h"     /* Functions related to the accelerometer */
+#include "DS18B20.h"     /* Functions related to the temperature sensor */
+#include "adc.h"         /* Internal voltage and temperature reading functionality. */
 
 
 /* Local definition */
@@ -147,6 +148,7 @@ int main (void)
 	float temperature = 0;
 	bool notBroken = false;
 	uint32_t voltage = 0;
+	uint32_t internalTemperature = 0;
 
 	while(1)
 	{
@@ -168,7 +170,7 @@ int main (void)
 
 				initGPIOwakeup(); /* Initialize GPIO wake-up */
 
-				initVBAT(); /* Initialize ADC to read battery voltage */
+				initADC(false); /* Initialize ADC to read battery voltage */
 
 				/* Initialize accelerometer */
 				if (true)
@@ -221,11 +223,21 @@ int main (void)
 
 				notBroken = checkCable(); /* Check the cable */
 
-				voltage = readVBAT(); /* Read battery voltage */
+				voltage = readADC(false); /* Read battery voltage */
 #if DEBUGGING == 1 /* DEBUGGING */
 				dbinfoInt("Battery voltage: ", voltage, "");
 #endif /* DEBUGGING */
 
+				/* Read internal temperature */
+				if (true)
+				{
+					internalTemperature = readADC(true); /* Read internal temperature */
+
+#if DEBUGGING == 1 /* DEBUGGING */
+					dbinfoInt("Internal temperature: ", internalTemperature, "");
+#endif /* DEBUGGING */
+
+				}
 
 				led(false); /* Disable LED */
 
