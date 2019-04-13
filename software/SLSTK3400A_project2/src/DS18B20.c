@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.6
+ * @version 1.7
  * @author
- *   Alec Vanderhaegen & Sarah Goossens
+ *   Alec Vanderhaegen & Sarah Goossens @n
  *   Modified by Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -19,27 +19,38 @@
  *   @li v1.4: Cleaned up includes.
  *   @li v1.5: Made more methods static.
  *   @li v1.6: Updated documentation.
+ *   @li v1.7: Updated code with new DEFINE checks.
  *
- *   @todo RTC sleep functionality is broken when `UDELAY_Calibrate()` is called.
- *           - UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
- *         Use internal pull-up resistor for DATA pin using DOUT argument.
- *           - Not working, why? `GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);`
- *         Enter EM1 when the MCU is waiting in a delay method? (see `readVBAT` method in `other.c`)
+ *   @todo
+ *     - RTC sleep functionality is broken when `UDELAY_Calibrate()` is called.
+ *         - UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
+ *     - Use internal pull-up resistor for DATA pin using DOUT argument.
+ *         - Not working, why? `GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);`
+ *     - Enter EM1 when the MCU is waiting in a delay method? (see `readVBAT` method in `other.c`)
+ *
+ * ******************************************************************************
+ *
+ * @section License
+ *
+ *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
+ *   These sections are licensed under the Silabs License Agreement. See the file
+ *   "Silabs_License_Agreement.txt" for details. Before using this software for
+ *   any purpose, you must agree to the terms of that agreement.
  *
  ******************************************************************************/
 
 
-#include <stdint.h>      /* (u)intXX_t */
-#include <stdbool.h>     /* "bool", "true", "false" */
-#include "em_cmu.h"      /* Clock Management Unit */
-#include "em_gpio.h"     /* General Purpose IO (GPIO) peripheral API */
+#include <stdint.h>             /* (u)intXX_t */
+#include <stdbool.h>            /* "bool", "true", "false" */
+#include "em_cmu.h"             /* Clock Management Unit */
+#include "em_gpio.h"            /* General Purpose IO (GPIO) peripheral API */
 
-//#include "ustimer.h"     /* Microsecond delay routine TODO: Use something else? */
+#include "../inc/udelay.h"      /* Microsecond delay routine TODO: Use something else */
 
-#include "DS18B20.h"     /* Corresponding header file */
-#include "pin_mapping.h" /* PORT and PIN definitions */
-#include "debugging.h"   /* Enable or disable printing to UART */
-#include "util.h"    	 /* Utility functionality */
+#include "../inc/DS18B20.h"     /* Corresponding header file */
+#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
+#include "../inc/debugging.h"   /* Enable or disable printing to UART */
+#include "../inc/util.h"    	/* Utility functionality */
 
 
 /* Local variable */
@@ -97,7 +108,7 @@ float readTempDS18B20 (void)
 	}
 	else
 	{
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("DS18B20 measurement failed");
 #endif /* DEBUGGING */
 
@@ -163,7 +174,7 @@ static bool init_DS18B20 (void)
 
 	/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0);
-	//USTIMER_Delay(480);
+	UDELAY_Delay(480);
 
 	/* Change pin-mode to input */
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0); /* TODO: Try to use internal pullup? */
@@ -178,7 +189,7 @@ static bool init_DS18B20 (void)
 	if (counter == MAX_TIME_CTR)
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("DS18B20 initialization failed");
 #endif /* DEBUGGING */
 
@@ -198,7 +209,7 @@ static bool init_DS18B20 (void)
 	if (counter == MAX_TIME_CTR)
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUGGING == 1 /* DEBUGGING */
 		dbcrit("DS18B20 initialization failed");
 #endif /* DEBUGGING */
 
@@ -206,7 +217,7 @@ static bool init_DS18B20 (void)
 	}
 
 	/* Continue waiting and finally return that the reset was successful */
-	//USTIMER_Delay(480);
+	UDELAY_Delay(480);
 
 	return (true);
 }
@@ -235,22 +246,17 @@ static void writeByteToDS18B20 (uint8_t data)
 		if (data & 0x01)
 		{
 			GPIO_PinOutClear(TEMP_DATA_PORT, TEMP_DATA_PIN);
-			//UDELAY_Delay(5);
-			for (int i=0; i<5; i++){
-
-			}
+			UDELAY_Delay(5);
 			GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
-			//USTIMER_DelayIntSafe(60);
+			UDELAY_Delay(60);
 		}
 		/* If not, write a "0" */
 		else
 		{
 			GPIO_PinOutClear(TEMP_DATA_PORT, TEMP_DATA_PIN);
-			//USTIMER_DelayIntSafe(60);
+			UDELAY_Delay(60);
 			GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
-			//UDELAY_Delay(5);
-			for (int i=0; i<5; i++){
-			}
+			UDELAY_Delay(5);
 		}
 		/* Right shift bits once */
 		data >>= 1;
@@ -295,7 +301,7 @@ static uint8_t readByteFromDS18B20 (void)
 
 
 		/* Wait some time before going into next loop */
-		//USTIMER_DelayIntSafe(70);
+		UDELAY_Delay(70);
 	}
 	return (data);
 }
