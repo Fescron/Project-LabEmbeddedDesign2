@@ -20,7 +20,6 @@ var NAVTREE =
       [ "Bits, bytes, nibbles and unsigned/signed integer value ranges", "index.html#DATA", null ]
     ] ],
     [ "Todo List", "todo.html", null ],
-    [ "Modules", "modules.html", "modules" ],
     [ "Files", null, [
       [ "File List", "files.html", "files" ],
       [ "Globals", "globals.html", [

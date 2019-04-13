@@ -24,7 +24,7 @@
  * ******************************************************************************
  *
  * @note
- *   Other interrupt handlers can be found in `delay.c` and `other.c`.
+ *   Other interrupt handlers can be found in `delay.c` and `adc.c`.
  *
  * ******************************************************************************
  *
@@ -38,18 +38,18 @@
  ******************************************************************************/
 
 
-#include <stdint.h>    /* (u)intXX_t */
-#include <stdbool.h>   /* "bool", "true", "false" */
-#include "em_device.h" /* Include necessary MCU-specific header file */
-#include "em_cmu.h"    /* Clock management unit */
-#include "em_gpio.h"   /* General Purpose IO */
-#include "em_rtc.h"    /* Real Time Counter (RTC) */
+#include <stdint.h>      /* (u)intXX_t */
+#include <stdbool.h>     /* "bool", "true", "false" */
+#include "em_device.h"   /* Include necessary MCU-specific header file */
+#include "em_cmu.h"      /* Clock management unit */
+#include "em_gpio.h"     /* General Purpose IO */
+#include "em_rtc.h"      /* Real Time Counter (RTC) */
 
-#include "../inc/interrupt.h"   /* Corresponding header file */
-#include "../inc/pin_mapping.h" /* PORT and PIN definitions */
-#include "../inc/debugging.h"   /* Enable or disable printing to UART */
-#include "../inc/util.h"     	/* Utility functionality */
-#include "../inc/ADXL362.h"     /* Functions related to the accelerometer */
+#include "interrupt.h"   /* Corresponding header file */
+#include "pin_mapping.h" /* PORT and PIN definitions */
+#include "debugging.h"   /* Enable or disable printing to UART */
+#include "util.h"     	 /* Utility functionality */
+#include "ADXL362.h"     /* Functions related to the accelerometer */
 
 
 /* Local variables */
