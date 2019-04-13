@@ -63,13 +63,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><dl class="reflist">
-<dt><a class="anchor" id="_todo000002"></a>File <a class="el" href="adc_8c.html">adc.c</a>  </dt>
-<dd><ul>
-<li>Check TODO notes.</li>
-<li>Use VCOMP? </li>
-</ul>
-</dd>
-<dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="ADXL362_8c.html">ADXL362.c</a>  </dt>
+<dt><a class="anchor" id="_todo000002"></a>File <a class="el" href="ADXL362_8c.html">ADXL362.c</a>  </dt>
 <dd><ul>
 <li>Check if variables need to be volatile.</li>
 <li>Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?<ul>
@@ -80,21 +74,23 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Enable wake-up mode: <code>writeADXL(ADXL_REG_POWER_CTL, 0b00001000)</code> // 5th bit </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="cable_8c.html">cable.c</a>  </dt>
-<dd><ul>
-<li>Fix cable-checking method. </li>
-</ul>
-</dd>
-<dt><a class="anchor" id="_todo000005"></a>File <a class="el" href="delay_8c.html">delay.c</a>  </dt>
+<dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="delay_8c.html">delay.c</a>  </dt>
 <dd><ul>
 <li>Enable disable/enable clock functionality?</li>
 <li>Check <code>EMU_EnterEM2/3</code> true/false effect. </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000006"></a>File <a class="el" href="DS18B20_8c.html">DS18B20.c</a>  </dt>
-<dd>RTC sleep functionality is broken when <code>UDELAY_Calibrate()</code> is called.<ul>
-<li>UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?) Use internal pull-up resistor for DATA pin using DOUT argument.</li>
-<li>Not working, why? <code>GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);</code> Enter EM1 when the MCU is waiting in a delay method? (see <code>readVBAT</code> method in <code>other.c</code>) </li>
+<dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="DS18B20_8c.html">DS18B20.c</a>  </dt>
+<dd><ul>
+<li>RTC sleep functionality is broken when <code><a class="el" href="group__Udelay.html#ga523f858d15b74728046ceca9796f3046" title="Calibrates the microsecond delay loop. ">UDELAY_Calibrate()</a></code> is called.<ul>
+<li>UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)</li>
+</ul>
+</li>
+<li>Use internal pull-up resistor for DATA pin using DOUT argument.<ul>
+<li>Not working, why? <code>GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);</code></li>
+</ul>
+</li>
+<li>Enter EM1 when the MCU is waiting in a delay method? (see <code>readVBAT</code> method in <code><a class="el" href="other_8c.html" title="Cable checking and battery voltage functionality. ">other.c</a></code>) </li>
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000001"></a>page <a class="el" href="index.html">Important documentation</a>  </dt>
@@ -102,12 +98,16 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Also talk about cmuClock_HFPER? </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000007"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
+<dt><a class="anchor" id="_todo000005"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
 <dd>IMPORTANT:<ul>
 <li>Fix cable-checking method.</li>
 <li>Start using linked-loop mode for ADXL interrupt things. EXTRA THINGS:</li>
 <li>Check the section about GPIO clock and cmuClock_HFPER</li>
 <li>Add WDOG functionality. (see "powertest" example)</li>
+<li>Add functionality to read internal temperature<ul>
+<li>Detect problems of overheating?</li>
+</ul>
+</li>
 <li>Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).<ul>
 <li>Also see <em>AN0007: 2.8 Optimizing Code</em></li>
 </ul>
@@ -115,7 +115,13 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Move sections to corresponding source files? </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000008"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
+<dt><a class="anchor" id="_todo000006"></a>File <a class="el" href="other_8c.html">other.c</a>  </dt>
+<dd><ul>
+<li>Fix cable-checking method.</li>
+<li>Use VCOMP? </li>
+</ul>
+</dd>
+<dt><a class="anchor" id="_todo000007"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
 <dd><ul>
 <li>Add disableClocks functionality from <code>emodes.c</code> here?</li>
 </ul>
@@ -126,7 +132,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sat Apr 13 2019 16:35:31 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Wed Apr 10 2019 00:44:42 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
