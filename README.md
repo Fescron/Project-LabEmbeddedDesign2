@@ -26,3 +26,7 @@ The following links go to code documentation with [Doxygen](http://www.doxygen.o
 
 - [3D-render front](https://raw.githubusercontent.com/Fescron/Project-LabEmbeddedDesign2/master/hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2.png)
 - [3D-render back](https://raw.githubusercontent.com/Fescron/Project-LabEmbeddedDesign2/master/hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-back.png)
+
+<br/>
+
+- [PCB with dimensions](https://raw.githubusercontent.com/Fescron/Project-LabEmbeddedDesign2/master/hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-pcb-dimensions.png)
