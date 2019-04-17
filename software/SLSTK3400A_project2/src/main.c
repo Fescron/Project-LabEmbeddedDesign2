@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 2.0
+ * @version 2.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -24,6 +24,7 @@
  *   @li v1.9: Cleaned up documentation and TODO's.
  *   @li v2.0: Updated code with new DEFINE checks.
  *   @li v2.1: Updated code with new ADC functionality.
+ *   @li v2.2: Started using working temperature sensor code.
  *
  * ******************************************************************************
  *
@@ -56,7 +57,6 @@
  ******************************************************************************/
 
 
-#include <cable.h>       /* Cable checking functionality. */
 #include <stdint.h>      /* (u)intXX_t */
 #include <stdbool.h>     /* "bool", "true", "false" */
 #include "em_device.h"   /* Include necessary MCU-specific header file */
@@ -72,6 +72,7 @@
 #include "ADXL362.h"     /* Functions related to the accelerometer */
 #include "DS18B20.h"     /* Functions related to the temperature sensor */
 #include "adc.h"         /* Internal voltage and temperature reading functionality. */
+#include "cable.h"       /* Cable checking functionality. */
 
 
 /* Local definition */
@@ -123,7 +124,8 @@ void checkInterrupts (void)
 
 	/* Read status register to acknowledge interrupt
 	 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL)
-	 * TODO this can perhaps fix the bug where too much movement breaks interrupt wake-up ... */
+	 * TODO this can perhaps fix the bug where too much movement breaks interrupt wake-up ...
+	 * also change in ADXL_readValues! */
 	if (ADXL_getTriggered())
 	{
 
@@ -157,8 +159,6 @@ int main (void)
 			case INIT:
 			{
 				CHIP_Init(); /* Initialize chip */
-
-				//UDELAY_Calibrate(); /* TODO: maybe remove this later? TIMERS! */
 
 #if DEBUGGING == 1 /* DEBUGGING */
 				dbprint_INIT(USART1, 4, true, false); /* VCOM */
@@ -215,7 +215,6 @@ int main (void)
 
 				checkInterrupts();
 
-				/* TODO: not working atm due to UDelay_calibrate being disabled */
 				temperature = readTempDS18B20(); /* A measurement takes about 550 ms */
 #if DEBUGGING == 1 /* DEBUGGING */
 				dbinfoInt("Temperature: ", temperature, "°C");

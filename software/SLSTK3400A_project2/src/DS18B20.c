@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.6
+ * @version 1.7
  * @author
  *   Alec Vanderhaegen & Sarah Goossens
  *   Modified by Brecht Van Eeckhoudt
@@ -19,12 +19,11 @@
  *   @li v1.4: Cleaned up includes.
  *   @li v1.5: Made more methods static.
  *   @li v1.6: Updated documentation.
+ *   @li v1.7: Started using new delay functionality.
  *
- *   @todo RTC sleep functionality is broken when `UDELAY_Calibrate()` is called.
- *           - UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?)
- *         Use internal pull-up resistor for DATA pin using DOUT argument.
- *           - Not working, why? `GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);`
- *         Enter EM1 when the MCU is waiting in a delay method? (see `readVBAT` method in `other.c`)
+ *   @todo
+ *     - Enable/disable timer clock after measurement?
+ *     - Enter EM1 when the MCU is waiting in a delay method? (see `readVBAT` method in `other.c`)
  *
  ******************************************************************************/
 
@@ -34,12 +33,11 @@
 #include "em_cmu.h"      /* Clock Management Unit */
 #include "em_gpio.h"     /* General Purpose IO (GPIO) peripheral API */
 
-//#include "ustimer.h"     /* Microsecond delay routine TODO: Use something else? */
-
 #include "DS18B20.h"     /* Corresponding header file */
 #include "pin_mapping.h" /* PORT and PIN definitions */
 #include "debugging.h"   /* Enable or disable printing to UART */
 #include "util.h"    	 /* Utility functionality */
+#include "ustimer.h"     /* Timer functionality */
 
 
 /* Local variable */
@@ -68,6 +66,9 @@ float readTempDS18B20 (void)
 {
 	/* Initialize and power VDD pin */
 	powerDS18B20(true);
+
+	/* Initialize timer */
+	USTIMER_Init();
 
 	/* Raw data bytes */
 	uint8_t rawDataFromDS18B20Arr[9] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
@@ -163,7 +164,7 @@ static bool init_DS18B20 (void)
 
 	/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0);
-	//USTIMER_Delay(480);
+	USTIMER_DelayIntSafe(480);
 
 	/* Change pin-mode to input */
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0); /* TODO: Try to use internal pullup? */
@@ -206,7 +207,7 @@ static bool init_DS18B20 (void)
 	}
 
 	/* Continue waiting and finally return that the reset was successful */
-	//USTIMER_Delay(480);
+	USTIMER_DelayIntSafe(480);
 
 	return (true);
 }
@@ -240,13 +241,13 @@ static void writeByteToDS18B20 (uint8_t data)
 
 			}
 			GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
-			//USTIMER_DelayIntSafe(60);
+			USTIMER_DelayIntSafe(60);
 		}
 		/* If not, write a "0" */
 		else
 		{
 			GPIO_PinOutClear(TEMP_DATA_PORT, TEMP_DATA_PIN);
-			//USTIMER_DelayIntSafe(60);
+			USTIMER_DelayIntSafe(60);
 			GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
 			//UDELAY_Delay(5);
 			for (int i=0; i<5; i++){
@@ -295,7 +296,7 @@ static uint8_t readByteFromDS18B20 (void)
 
 
 		/* Wait some time before going into next loop */
-		//USTIMER_DelayIntSafe(70);
+		USTIMER_DelayIntSafe(70);
 	}
 	return (data);
 }

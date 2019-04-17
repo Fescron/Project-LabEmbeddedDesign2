@@ -21,6 +21,9 @@
  *   @li v1.7: Updated clear pending interrupt logic.
  *   @li v1.8: Updated code with new DEFINE checks.
  *
+ * @todo
+ *   - Remove error methods in interrupt routines if unknown interrupt is triggered?
+ *
  * ******************************************************************************
  *
  * @note
@@ -215,7 +218,7 @@ void GPIO_ODD_IRQHandler(void)
 
 	/* Check if PB0 or INT1-PD7 is pushed */
 	if (flags == 0x200) PB0_triggered = true;
-	else if (flags == 0x80) ADXL_setTriggered(true);
+	else if (flags == 0x80) ADXL_setTriggered(true); /* 0x80 = D7, 0x00 = F3 */
 	else
 	{
 
@@ -223,7 +226,7 @@ void GPIO_ODD_IRQHandler(void)
 		dbcrit("Unknown odd-numbered IRQ pin triggered!");
 #endif /* DEBUGGING */
 
-		error(3);
+		/**error(3); @todo re-enable later? (add new flag check with other pins) */
 	}
 
 	/* Clear all odd pin interrupt flags */
