@@ -92,17 +92,24 @@ $(document).ready(function(){initNavTree('todo.html','');});
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000006"></a>File <a class="el" href="DS18B20_8c.html">DS18B20.c</a>  </dt>
-<dd>RTC sleep functionality is broken when <code>UDELAY_Calibrate()</code> is called.<ul>
-<li>UDelay uses RTCC, Use timers instead! (timer + prescaler: every microsecond an interrupt?) Use internal pull-up resistor for DATA pin using DOUT argument.</li>
-<li>Not working, why? <code>GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInputPull, 1);</code> Enter EM1 when the MCU is waiting in a delay method? (see <code>readVBAT</code> method in <code>other.c</code>) </li>
+<dd><ul>
+<li>Enable/disable timer clock after measurement?</li>
+<li>Enter EM1 when the MCU is waiting in a delay method? (see <code>readVBAT</code> method in <code>other.c</code>) </li>
 </ul>
 </dd>
+<dt><a class="anchor" id="_todo000008"></a>Global <a class="el" href="interrupt_8c.html#a8fff5a798ff4721659dc7bdbb3149c8b">GPIO_ODD_IRQHandler</a>  (void)</dt>
+<dd>re-enable later? (add new flag check with other pins)  </dd>
 <dt><a class="anchor" id="_todo000001"></a>page <a class="el" href="index.html">Important documentation</a>  </dt>
 <dd><ul>
 <li>Also talk about cmuClock_HFPER? </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000007"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
+<dt><a class="anchor" id="_todo000007"></a>File <a class="el" href="interrupt_8c.html">interrupt.c</a>  </dt>
+<dd><ul>
+<li>Remove error methods in interrupt routines if unknown interrupt is triggered? </li>
+</ul>
+</dd>
+<dt><a class="anchor" id="_todo000009"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
 <dd><p class="startdd">IMPORTANT:</p><ul>
 <li>Fix cable-checking method.</li>
 <li>Start using linked-loop mode for ADXL interrupt things. </li>
@@ -117,7 +124,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Move sections to corresponding source files? </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000008"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
+<dt><a class="anchor" id="_todo000010"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
 <dd><ul>
 <li>Add disableClocks functionality from <code>emodes.c</code> here?</li>
 </ul>
@@ -128,7 +135,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sat Apr 13 2019 16:47:50 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Wed Apr 17 2019 20:56:13 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
