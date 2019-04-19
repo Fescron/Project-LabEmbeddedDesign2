@@ -24,6 +24,7 @@
  *
  *   @todo
  *     - Add disableClocks functionality from `emodes.c` here?
+ *     - Add disableUnusedPins method for use in the INIT state?
  *
  * ******************************************************************************
  *

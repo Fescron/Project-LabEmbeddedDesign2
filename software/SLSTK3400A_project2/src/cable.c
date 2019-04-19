@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file cable.c
  * @brief Cable checking functionality.
- * @version 1.3
+ * @version 1.4
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -12,9 +12,7 @@
  *   @li v1.1: Updated code with new DEFINE checks.
  *   @li v1.2: Moved ADC functionality to `adc.c`.
  *   @li v1.3: Changed filename to `cable.c`
- *
- *   @todo
- *     - Fix cable-checking method.
+ *   @li v1.4: Fixed cable checking method.
  *
  * ******************************************************************************
  *
@@ -28,7 +26,6 @@
  ******************************************************************************/
 
 
-#include <stdint.h>      /* (u)intXX_t */
 #include <stdbool.h>     /* "bool", "true", "false" */
 #include "em_device.h"   /* Include necessary MCU-specific header file */
 #include "em_cmu.h"      /* Clock management unit */
@@ -36,8 +33,6 @@
 
 #include "cable.h"       /* Corresponding header file */
 #include "pin_mapping.h" /* PORT and PIN definitions */
-#include "debugging.h"   /* Enable or disable printing to UART for debugging */
-#include "delay.h"     	 /* Delay functionality */
 
 
 /**************************************************************************//**
@@ -45,8 +40,8 @@
  *   Method to check if the wire is broken.
  *
  * @details
- *   This method sets the mode of the pins, checks the connection
- *   between them and also disables them at the end.
+ *   This method enables the necessary GPIO clocks, sets the mode of the pins,
+ *   checks the connection between them and also disables them at the end.
  *
  * @return
  *   @li `true` - The connection is still okay.
@@ -54,8 +49,6 @@
  *****************************************************************************/
 bool checkCable (void)
 {
-	/* TODO: Fix this method */
-
 	/* Value to eventually return */
 	bool check = false;
 
@@ -64,12 +57,10 @@ bool checkCable (void)
 	CMU_ClockEnable(cmuClock_GPIO, true);
 
 	/* Change mode of first pin */
-	GPIO_PinModeSet(BREAK1_PORT, BREAK1_PIN, gpioModeInput, 1); /* TODO: "1" = filter enabled? */
+	GPIO_PinModeSet(BREAK1_PORT, BREAK1_PIN, gpioModeInput, 0);
 
-	/* Change mode of second pin and also set it high with the last argument */
-	GPIO_PinModeSet(BREAK2_PORT, BREAK2_PIN, gpioModePushPull, 1);
-
-	delay(50);
+	/* Change mode of second pin and also set it low with the last argument */
+	GPIO_PinModeSet(BREAK2_PORT, BREAK2_PIN, gpioModePushPull, 0);
 
 	/* Check the connection */
 	if (!GPIO_PinInGet(BREAK1_PORT,BREAK1_PIN)) check = true;
@@ -77,11 +68,6 @@ bool checkCable (void)
 	/* Disable the pins */
 	GPIO_PinModeSet(BREAK1_PORT, BREAK1_PIN, gpioModeDisabled, 0);
 	GPIO_PinModeSet(BREAK2_PORT, BREAK2_PIN, gpioModeDisabled, 0);
-
-#if DEBUGGING == 1 /* DEBUGGING */
-	if (check) dbinfo("Cable still intact");
-	else dbcrit("Cable broken!");
-#endif /* DEBUGGING */
 
 	return (check);
 }

@@ -22,6 +22,7 @@
  *   @li v1.8: Updated code with new DEFINE checks.
  *
  * @todo
+ *   - Add other check flags thing when using the custom happy gecko board pinout.
  *   - Remove error methods in interrupt routines if unknown interrupt is triggered?
  *
  * ******************************************************************************

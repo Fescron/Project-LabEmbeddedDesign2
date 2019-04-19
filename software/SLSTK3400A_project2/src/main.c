@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 2.2
+ * @version 2.3
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -25,15 +25,17 @@
  *   @li v2.0: Updated code with new DEFINE checks.
  *   @li v2.1: Updated code with new ADC functionality.
  *   @li v2.2: Started using working temperature sensor code.
+ *   @li v2.3: Started using working cable checking code and added "SEND" `mcu_state`.
  *
  * ******************************************************************************
  *
  * @todo
  *   IMPORTANT:
- *     - Fix cable-checking method.
  *     - Start using linked-loop mode for ADXL interrupt things.
+ *     - Use struct to gather measurement data (6x temperature, battery voltage)
  * @todo
  *   EXTRA THINGS:
+ *     - Use jumper on RX and GND pin to disable dbprint stuff aswell? (check extra used current!)
  *     - Check the section about GPIO clock and cmuClock_HFPER
  *     - Add WDOG functionality. (see "powertest" example)
  *     - Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
@@ -76,8 +78,10 @@
 
 
 /* Local definition */
-/** Time between each wake-up in seconds */
-#define WAKE_UP_PERIOD_S 10
+/** Time between each wake-up in seconds
+ *    @li max 500 seconds when using LFXO delay
+ *    @li 3600 seconds (one hour) works fine when using ULFRCO delay */
+#define WAKE_UP_PERIOD_S 3600
 
 
 /* Local definition of new enum type */
@@ -86,8 +90,8 @@ typedef enum mcu_states
 {
 	INIT,
 	MEASURE,
-	SLEEP,
-	WAKE_UP
+	SEND,
+	SLEEP
 } MCU_State_t;
 
 
@@ -161,9 +165,12 @@ int main (void)
 				CHIP_Init(); /* Initialize chip */
 
 #if DEBUGGING == 1 /* DEBUGGING */
+#if CUSTOM_BOARD == 1 /* Custom Happy Gecko pinout */
+				dbprint_INIT(DBG_UART, DBG_UART_LOC, false, false);
+#else /* Regular Happy Gecko pinout */
 				dbprint_INIT(USART1, 4, true, false); /* VCOM */
 				//dbprint_INIT(USART1, 0, false, false); /* US1_TX = PC0 */
-				//dbprint_INIT(DBG_UART, DBG_UART_LOC, false, false);
+#endif /* Board pinout selection */
 #endif /* DEBUGGING */
 
 				led(true); /* Enable (and initialize) LED */
@@ -222,6 +229,11 @@ int main (void)
 
 				notBroken = checkCable(); /* Check the cable */
 
+#if DEBUGGING == 1 /* DEBUGGING */
+				if (notBroken) dbinfo("Cable still intact");
+				else dbcrit("Cable broken!");
+#endif /* DEBUGGING */
+
 				voltage = readADC(false); /* Read battery voltage */
 #if DEBUGGING == 1 /* DEBUGGING */
 				dbinfoInt("Battery voltage: ", voltage, "");
@@ -243,20 +255,22 @@ int main (void)
 				MCUstate = SLEEP;
 			} break;
 
+			case SEND:
+			{
+				/* Unused */
+
+				MCUstate = SLEEP;
+			} break;
+
 			case SLEEP:
 			{
 				sleep(WAKE_UP_PERIOD_S); /* Go to sleep for xx seconds */
 
-				MCUstate = WAKE_UP;
-			} break;
-
-
-			case WAKE_UP:
-			{
-				/* Unused */
-
 				MCUstate = MEASURE;
 			} break;
+
+
+
 
 			default:
 			{

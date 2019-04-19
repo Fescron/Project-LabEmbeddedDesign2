@@ -54,8 +54,8 @@
 	#define ADXL_VDD_PIN        1
 
 	/* LED */
-	#define LED_PORT            gpioPortA
-	#define LED_PIN             2
+	#define LED_PORT            gpioPortC // Before: gpioPortA TODO: change these again to the LED pins
+	#define LED_PIN             1         // Before: 2
 
 	/* Buttons */
 	#define PB0_PORT            gpioPortC
