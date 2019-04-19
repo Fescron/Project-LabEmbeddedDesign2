@@ -80,41 +80,38 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Enable wake-up mode: <code>writeADXL(ADXL_REG_POWER_CTL, 0b00001000)</code> // 5th bit </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="cable_8c.html">cable.c</a>  </dt>
-<dd><ul>
-<li>Fix cable-checking method. </li>
-</ul>
-</dd>
-<dt><a class="anchor" id="_todo000005"></a>File <a class="el" href="delay_8c.html">delay.c</a>  </dt>
+<dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="delay_8c.html">delay.c</a>  </dt>
 <dd><ul>
 <li>Enable disable/enable clock functionality?</li>
 <li>Check <code>EMU_EnterEM2/3</code> true/false effect. </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000006"></a>File <a class="el" href="DS18B20_8c.html">DS18B20.c</a>  </dt>
+<dt><a class="anchor" id="_todo000005"></a>File <a class="el" href="DS18B20_8c.html">DS18B20.c</a>  </dt>
 <dd><ul>
 <li>Enable/disable timer clock after measurement?</li>
 <li>Enter EM1 when the MCU is waiting in a delay method? (see <code>readVBAT</code> method in <code>other.c</code>) </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000008"></a>Global <a class="el" href="interrupt_8c.html#a8fff5a798ff4721659dc7bdbb3149c8b">GPIO_ODD_IRQHandler</a>  (void)</dt>
+<dt><a class="anchor" id="_todo000007"></a>Global <a class="el" href="interrupt_8c.html#a8fff5a798ff4721659dc7bdbb3149c8b">GPIO_ODD_IRQHandler</a>  (void)</dt>
 <dd>re-enable later? (add new flag check with other pins)  </dd>
 <dt><a class="anchor" id="_todo000001"></a>page <a class="el" href="index.html">Important documentation</a>  </dt>
 <dd><ul>
 <li>Also talk about cmuClock_HFPER? </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000007"></a>File <a class="el" href="interrupt_8c.html">interrupt.c</a>  </dt>
+<dt><a class="anchor" id="_todo000006"></a>File <a class="el" href="interrupt_8c.html">interrupt.c</a>  </dt>
 <dd><ul>
+<li>Add other check flags thing when using the custom happy gecko board pinout.</li>
 <li>Remove error methods in interrupt routines if unknown interrupt is triggered? </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000009"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
+<dt><a class="anchor" id="_todo000008"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
 <dd><p class="startdd">IMPORTANT:</p><ul>
-<li>Fix cable-checking method.</li>
-<li>Start using linked-loop mode for ADXL interrupt things. </li>
+<li>Start using linked-loop mode for ADXL interrupt things.</li>
+<li>Use struct to gather measurement data (6x temperature, battery voltage) </li>
 </ul>
 <p class="enddd">EXTRA THINGS:</p><ul>
+<li>Use jumper on RX and GND pin to disable dbprint stuff aswell? (check extra used current!)</li>
 <li>Check the section about GPIO clock and cmuClock_HFPER</li>
 <li>Add WDOG functionality. (see "powertest" example)</li>
 <li>Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).<ul>
@@ -124,9 +121,10 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Move sections to corresponding source files? </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000010"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
+<dt><a class="anchor" id="_todo000009"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
 <dd><ul>
 <li>Add disableClocks functionality from <code>emodes.c</code> here?</li>
+<li>Add disableUnusedPins method for use in the INIT state?</li>
 </ul>
 </dd>
 </dl>
@@ -135,7 +133,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed Apr 17 2019 20:56:13 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Fri Apr 19 2019 21:49:00 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
