@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 2.3
+ * @version 2.4
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -26,13 +26,17 @@
  *   @li v2.1: Updated code with new ADC functionality.
  *   @li v2.2: Started using working temperature sensor code.
  *   @li v2.3: Started using working cable checking code and added "SEND" `mcu_state`.
+ *   @li v2.4: Stared using a struct to keep the measurements in, added line to disable the RN2483.
+ *   @li v2.5: Started using custom enum types for the accelerometer settings.
  *
  * ******************************************************************************
  *
  * @todo
  *   IMPORTANT:
  *     - Start using linked-loop mode for ADXL interrupt things.
- *     - Use struct to gather measurement data (6x temperature, battery voltage)
+ *     - Send a "ADXL triggered" amount with the data?
+ *     - When a cable break is detected, immediately send a LoRa message with the already filled measurement data
+ *         - Use another LoRa send method?
  * @todo
  *   EXTRA THINGS:
  *     - Use jumper on RX and GND pin to disable dbprint stuff aswell? (check extra used current!)
@@ -75,29 +79,23 @@
 #include "DS18B20.h"     /* Functions related to the temperature sensor */
 #include "adc.h"         /* Internal voltage and temperature reading functionality. */
 #include "cable.h"       /* Cable checking functionality. */
+#include "ustimer.h"     /* Timer functionality */
+#include "datatypes.h"   /* Definitions of the custom data-types. */
 
 
 /* Local definition */
 /** Time between each wake-up in seconds
  *    @li max 500 seconds when using LFXO delay
  *    @li 3600 seconds (one hour) works fine when using ULFRCO delay */
-#define WAKE_UP_PERIOD_S 3600
+#define WAKE_UP_PERIOD_S 10
 
 
-/* Local definition of new enum type */
-/** Enum type for the state machine */
-typedef enum mcu_states
-{
-	INIT,
-	MEASURE,
-	SEND,
-	SLEEP
-} MCU_State_t;
-
-
-/* Local variable */
+/* Local variables TODO: perhaps these shouldn't be volatile? */
 /** Keep the state of the state machine */
 static volatile MCU_State_t MCUstate;
+
+/** Keep the measurement date */
+static volatile MeasurementData_t data;
 
 
 /**************************************************************************//**
@@ -150,11 +148,11 @@ void checkInterrupts (void)
  *****************************************************************************/
 int main (void)
 {
-	/* TODO: Remove these variables later? */
-	float temperature = 0;
+	/* Set the index to put the measurements in */
+	data.index = 0;
+
+	/* TODO: Remove this variable later? */
 	bool notBroken = false;
-	uint32_t voltage = 0;
-	uint32_t internalTemperature = 0;
 
 	while(1)
 	{
@@ -173,22 +171,28 @@ int main (void)
 #endif /* Board pinout selection */
 #endif /* DEBUGGING */
 
+				USTIMER_Init(); /* Initialize timer (necessary for DS18B20 logic) */
+
 				led(true); /* Enable (and initialize) LED */
 
 				initGPIOwakeup(); /* Initialize GPIO wake-up */
 
-				initADC(false); /* Initialize ADC to read battery voltage */
+				initADC(BATTERY_VOLTAGE); /* Initialize ADC to read battery voltage */
+
+				/* Disable RN2483 */
+				GPIO_PinModeSet(PM_RN2483_PORT, PM_RN2483_PIN, gpioModePushPull, 0);
 
 				/* Initialize accelerometer */
 				if (true)
 				{
+					/* Initialize the accelerometer */
 					initADXL();
 
-					/* Set the measurement range (0 - 1 - 2) */
-					ADXL_configRange(1); /* 0 = +-2g -- 1 = +-4g -- 3 = +-8g */
+					/* Set the measurement range */
+					ADXL_configRange(ADXL_RANGE_4G);
 
-					/* Configure ODR (0 - 1 - 2 - 3 - 4 - 5) */
-					ADXL_configODR(0); /* 0 = 12.5 Hz -- 3 = 100 Hz (reset default) */
+					/* Configure ODR */
+					ADXL_configODR(ADXL_ODR_12_5);
 
 					/* Read and display values forever */
 					//ADXL_readValues();
@@ -216,15 +220,27 @@ int main (void)
 
 			case MEASURE:
 			{
+				// TODO: add check if max data is filled here?
+
 				led(true); /* Enable LED */
 
 				delay(500);
 
 				checkInterrupts();
 
-				temperature = readTempDS18B20(); /* A measurement takes about 550 ms */
+				/* Measure and store the external temperature (a measurement takes about 550 ms) */
+				data.extTemp[data.index] = readTempDS18B20();
+
+				/* Measure and store the battery voltage */
+				data.voltage[data.index] = readADC(BATTERY_VOLTAGE);
+
+				/* Measure and store the internal temperature */
+				data.intTemp[data.index] = readADC(INTERNAL_TEMPERATURE);
+
 #if DEBUGGING == 1 /* DEBUGGING */
-				dbinfoInt("Temperature: ", temperature, "°C");
+				dbinfoInt("Temperature: ", data.extTemp[data.index]*1000, "");
+				dbinfoInt("Battery voltage: ", data.voltage[data.index], "");
+				dbinfoInt("Internal temperature: ", data.intTemp[data.index], "");
 #endif /* DEBUGGING */
 
 				notBroken = checkCable(); /* Check the cable */
@@ -234,21 +250,8 @@ int main (void)
 				else dbcrit("Cable broken!");
 #endif /* DEBUGGING */
 
-				voltage = readADC(false); /* Read battery voltage */
-#if DEBUGGING == 1 /* DEBUGGING */
-				dbinfoInt("Battery voltage: ", voltage, "");
-#endif /* DEBUGGING */
-
-				/* Read internal temperature */
-				if (true)
-				{
-					internalTemperature = readADC(true); /* Read internal temperature */
-
-#if DEBUGGING == 1 /* DEBUGGING */
-					dbinfoInt("Internal temperature: ", internalTemperature, "");
-#endif /* DEBUGGING */
-
-				}
+				/* Increase the index to put the next measurements in */
+				data.index++;
 
 				led(false); /* Disable LED */
 
@@ -257,20 +260,36 @@ int main (void)
 
 			case SEND:
 			{
-				/* Unused */
 
-				MCUstate = SLEEP;
-			} break;
+#if DEBUGGING == 1 /* DEBUGGING */
+				dbwarn("Normally we send the data now.");
+#endif /* DEBUGGING */
 
-			case SLEEP:
-			{
-				sleep(WAKE_UP_PERIOD_S); /* Go to sleep for xx seconds */
+				// TODO: Call data sending method here
+
+				/* Reset the index to put the measurements in */
+				data.index = 0;
 
 				MCUstate = MEASURE;
 			} break;
 
+			case SLEEP:
+			{
+				GPIO_PinModeSet(DBG_RXD_PORT, DBG_RXD_PIN, gpioModeDisabled, 0);
 
+				sleep(WAKE_UP_PERIOD_S); /* Go to sleep for xx seconds */
 
+				GPIO_PinModeSet(DBG_RXD_PORT, DBG_RXD_PIN, gpioModeInput, 0);
+
+				MCUstate = WAKEUP;
+			} break;
+
+			case WAKEUP:
+			{
+				/* Decide if 6 measurements are taken or not and react accordingly */
+				if (data.index == 6) MCUstate = SEND;
+				else MCUstate = MEASURE;
+			} break;
 
 			default:
 			{

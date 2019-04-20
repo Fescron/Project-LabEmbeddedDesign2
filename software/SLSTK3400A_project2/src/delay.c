@@ -23,6 +23,7 @@
  *   @todo
  *     - Enable disable/enable clock functionality?
  *     - Check `EMU_EnterEM2/3` true/false effect.
+ *     - Disable all clocks (just in case) when using sleep method?
  *
  * ******************************************************************************
  *

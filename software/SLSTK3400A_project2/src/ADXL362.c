@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.8
+ * @version 1.9
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -19,12 +19,14 @@
  *   @li v1.6: Changed a lot of things...
  *   @li v1.7: Updated documentation and chanced `USART0` to `ADXL_SPI`.
  *   @li v1.8: Updated code with new DEFINE checks.
+ *   @li v1.9: Started using custom enum for range & ODR configuration methods.
  *
  *   @todo
  *     - Check if variables need to be volatile.
  *     - Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
  *         - Debugging it right now with `triggercounter`, remove this variable later.
  *         - Start using linked-loop mode for ADXL to fix the strange interrupt behavior?
+ *     - Add test/profile method again and use delay method and disable SPI pins to get correct current.
  *     - Enable wake-up mode: `writeADXL(ADXL_REG_POWER_CTL, 0b00001000)` // 5th bit
  *
  * ******************************************************************************
@@ -56,7 +58,7 @@
 /* TODO: Perhaps these shouldn't be volatile */
 static volatile bool ADXL_triggered = false; /* Volatile because it's modified by an interrupt service routine */
 static volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
-static uint8_t range = 0;
+static ADXL_Range_t range;
 static bool ADXL_VDD_initialized = false;
 static uint16_t triggercounter = 0; /* TODO: remove this later */
 
@@ -265,12 +267,13 @@ void ADXL_enableMeasure (bool enabled)
  *   Configure the measurement range and store the selected one in
  *   a global variable for later (internal) use.
  *
+ * @details
+ *   When a range of, for example "2g" is selected, the real range is "+-2g".
+ *
  * @param[in] givenRange
- *   @li `0` - +- 2g
- *   @li `1` - +- 4g
- *   @li `2` - +- 8g
+ *   The selected range.
  *****************************************************************************/
-void ADXL_configRange (uint8_t givenRange)
+void ADXL_configRange (ADXL_Range_t givenRange)
 {
 	/* Get value in register */
 	uint8_t reg = readADXL(ADXL_REG_FILTER_CTL);
@@ -279,20 +282,20 @@ void ADXL_configRange (uint8_t givenRange)
 	reg = reg & 0b00111111;
 
 	/* Set measurement range (OR with new setting bits, first two bits) */
-	if (givenRange == 0)
+	if (givenRange == ADXL_RANGE_2G)
 	{
 		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000000));
-		range = 0;
+		range = ADXL_RANGE_2G;
 	}
-	else if (givenRange == 1)
+	else if (givenRange == ADXL_RANGE_4G)
 	{
 		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b01000000));
-		range = 1;
+		range = ADXL_RANGE_4G;
 	}
-	else if (givenRange == 2)
+	else if (givenRange == ADXL_RANGE_8G)
 	{
 		writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b10000000));
-		range = 2;
+		range = ADXL_RANGE_8G;
 	}
 	else
 	{
@@ -305,9 +308,9 @@ void ADXL_configRange (uint8_t givenRange)
 	}
 
 #if DEBUGGING == 1 /* DEBUGGING */
-	if (range == 0) dbinfo("ADXL362: Measurement mode +- 2g selected");
-	else if (range == 1) dbinfo("ADXL362: Measurement mode +- 4g selected");
-	else if (range == 2) dbinfo("ADXL362: Measurement mode +- 8g selected");
+	if (range == ADXL_RANGE_2G) dbinfo("ADXL362: Measurement mode +- 2g selected");
+	else if (range == ADXL_RANGE_4G) dbinfo("ADXL362: Measurement mode +- 4g selected");
+	else if (range == ADXL_RANGE_8G) dbinfo("ADXL362: Measurement mode +- 8g selected");
 #endif /* DEBUGGING */
 
 }
@@ -318,14 +321,9 @@ void ADXL_configRange (uint8_t givenRange)
  *   Configure the Output Data Rate (ODR).
  *
  * @param[in] givenODR
- *   @li `0` - 12.5 Hz
- *   @li `1` - 25 Hz
- *   @li `2` - 50 Hz
- *   @li `3` - 100 Hz (reset default)
- *   @li `4` - 200 Hz
- *   @li `5` - 400 Hz
+ *   The selected ODR.
  *****************************************************************************/
-void ADXL_configODR (uint8_t givenODR)
+void ADXL_configODR (ADXL_ODR_t givenODR)
 {
 	/* Get value in register */
 	uint8_t reg = readADXL(ADXL_REG_FILTER_CTL);
@@ -334,12 +332,12 @@ void ADXL_configODR (uint8_t givenODR)
 	reg = reg & 0b11111000;
 
 	/* Set ODR (OR with new setting bits, last three bits) */
-	if (givenODR == 0) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000000));
-	else if (givenODR == 1) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000001));
-	else if (givenODR == 2) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000010));
-	else if (givenODR == 3) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000011));
-	else if (givenODR == 4) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000100));
-	else if (givenODR == 5) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000101));
+	if (givenODR == ADXL_ODR_12_5) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000000));
+	else if (givenODR == ADXL_ODR_25) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000001));
+	else if (givenODR == ADXL_ODR_50) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000010));
+	else if (givenODR == ADXL_ODR_100) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000011));
+	else if (givenODR == ADXL_ODR_200) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000100));
+	else if (givenODR == ADXL_ODR_400) writeADXL(ADXL_REG_FILTER_CTL, (reg | 0b00000101));
 	else
 	{
 
@@ -351,12 +349,12 @@ void ADXL_configODR (uint8_t givenODR)
 	}
 
 #if DEBUGGING == 1 /* DEBUGGING */
-	if (givenODR == 0) dbinfo("ADXL362: ODR set at 12.5 Hz");
-	else if (givenODR == 1) dbinfo("ADXL362: ODR set at 25 Hz");
-	else if (givenODR == 2) dbinfo("ADXL362: ODR set at 50 Hz");
-	else if (givenODR == 3) dbinfo("ADXL362: ODR set at 100 Hz");
-	else if (givenODR == 4) dbinfo("ADXL362: ODR set at 200 Hz");
-	else if (givenODR == 5) dbinfo("ADXL362: ODR set at 400 Hz");
+	if (givenODR == ADXL_ODR_12_5) dbinfo("ADXL362: ODR set at 12.5 Hz");
+	else if (givenODR == ADXL_ODR_25) dbinfo("ADXL362: ODR set at 25 Hz");
+	else if (givenODR == ADXL_ODR_50) dbinfo("ADXL362: ODR set at 50 Hz");
+	else if (givenODR == ADXL_ODR_100) dbinfo("ADXL362: ODR set at 100 Hz");
+	else if (givenODR == ADXL_ODR_200) dbinfo("ADXL362: ODR set at 200 Hz");
+	else if (givenODR == ADXL_ODR_400) dbinfo("ADXL362: ODR set at 400 Hz");
 #endif /* DEBUGGING */
 
 }
@@ -385,9 +383,9 @@ void ADXL_configActivity (uint8_t gThreshold)
 	 * THRESH_ACT [codes] = Threshold Value [g] × Scale Factor [LSB per g] */
 	uint16_t threshold;
 
-	if (range == 0) threshold = gThreshold * 1000;
-	else if (range == 1) threshold = gThreshold * 500;
-	else if (range == 2) threshold = gThreshold * 250;
+	if (range == ADXL_RANGE_2G) threshold = gThreshold * 1000;
+	else if (range == ADXL_RANGE_4G) threshold = gThreshold * 500;
+	else if (range == ADXL_RANGE_8G) threshold = gThreshold * 250;
 	else
 	{
 
@@ -405,6 +403,9 @@ void ADXL_configActivity (uint8_t gThreshold)
 	/* Set threshold register values (total: 11bit unsigned) */
 	writeADXL(ADXL_REG_THRESH_ACT_L, low);  /* 7:0 bits used */
 	writeADXL(ADXL_REG_THRESH_ACT_H, high); /* 2:0 bits used */
+
+	/* Enable loop mode (interrupts don't need to be acknowledged by host) */
+	// writeADXL(ADXL_REG_ACT_INACT_CTL, 0b00110000); TODO: not working...
 
 #if DEBUGGING == 1 /* DEBUGGING */
 	dbinfoInt("ADXL362: Activity configured: ", gThreshold, " g");
@@ -774,9 +775,9 @@ static int32_t convertGRangeToGValue (int8_t sensorValue)
 	/* 2 = + & -
 	 * 1000 = "m"g */
 
-	if (range == 0) return ((2*2*1000 / 255) * sensorValue);
-	else if (range == 1) return ((2*4*1000 / 255) * sensorValue);
-	else if (range == 2) return ((2*8*1000 / 255) * sensorValue);
+	if (range == ADXL_RANGE_2G) return ((2*2*1000 / 255) * sensorValue);
+	else if (range == ADXL_RANGE_4G) return ((2*4*1000 / 255) * sensorValue);
+	else if (range == ADXL_RANGE_8G) return ((2*8*1000 / 255) * sensorValue);
 	else
 	{
 

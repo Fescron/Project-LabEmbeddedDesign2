@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.h
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.8
+ * @version 1.9
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -14,6 +14,26 @@
 /* Includes necessary for this header file */
 #include <stdint.h>  /* (u)intXX_t */
 #include <stdbool.h> /* "bool", "true", "false" */
+
+
+/** Enum type for the measurement range */
+typedef enum adxl_range
+{
+	ADXL_RANGE_2G,
+	ADXL_RANGE_4G,
+	ADXL_RANGE_8G
+} ADXL_Range_t;
+
+/** Enum type for the ODR */
+typedef enum adxl_odr
+{
+	ADXL_ODR_12_5,
+	ADXL_ODR_25,
+	ADXL_ODR_50,
+	ADXL_ODR_100, /* Reset default */
+	ADXL_ODR_200,
+	ADXL_ODR_400
+} ADXL_ODR_t;
 
 
 /* ADXL362 register definitions */
@@ -47,8 +67,8 @@ void ADXL_ackInterrupt (void);
 void ADXL_enableSPI (bool enabled);
 void ADXL_enableMeasure (bool enabled);
 
-void ADXL_configRange (uint8_t givenRange);
-void ADXL_configODR (uint8_t givenODR);
+void ADXL_configRange (ADXL_Range_t givenRange);
+void ADXL_configODR (ADXL_ODR_t givenODR);
 void ADXL_configActivity (uint8_t gThreshold);
 
 void ADXL_readValues (void);
