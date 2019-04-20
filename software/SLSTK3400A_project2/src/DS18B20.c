@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.7
+ * @version 1.8
  * @author
- *   Alec Vanderhaegen & Sarah Goossens
+ *   Alec Vanderhaegen & Sarah Goossens@n
  *   Modified by Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -20,8 +20,10 @@
  *   @li v1.5: Made more methods static.
  *   @li v1.6: Updated documentation.
  *   @li v1.7: Started using new delay functionality.
+ *   @li v1.8: Added line to disable DATA pin after a measurement, this breaks the code but fixes the sleep current.
  *
  *   @todo
+ *     - FIX THE TEMPERATURE READING
  *     - Enable/disable timer clock after measurement?
  *     - Enter EM1 when the MCU is waiting in a delay method? (see `readVBAT` method in `other.c`)
  *
@@ -67,9 +69,6 @@ float readTempDS18B20 (void)
 	/* Initialize and power VDD pin */
 	powerDS18B20(true);
 
-	/* Initialize timer */
-	USTIMER_Init();
-
 	/* Raw data bytes */
 	uint8_t rawDataFromDS18B20Arr[9] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
 
@@ -92,6 +91,9 @@ float readTempDS18B20 (void)
 
 		/* Disable the VDD pin */
 		powerDS18B20(false);
+
+		/* Disable data pin (otherwise we got a "sleep" current of about 330 µA due to the on-board 10k pull-up) */
+		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeDisabled, 0);
 
 		/* Return the converted byte */
 		return (convertTempData(rawDataFromDS18B20Arr[0], rawDataFromDS18B20Arr[1]));
@@ -293,7 +295,6 @@ static uint8_t readByteFromDS18B20 (void)
 
 		/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 1);
-
 
 		/* Wait some time before going into next loop */
 		USTIMER_DelayIntSafe(70);
