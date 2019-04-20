@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file adc.h
  * @brief ADC functionality for reading the (battery) voltage and internal temperature.
- * @version 1.0
+ * @version 1.2
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -12,13 +12,20 @@
 
 
 /* Includes necessary for this header file */
-#include <stdint.h>  /* (u)intXX_t */
-#include <stdbool.h> /* "bool", "true", "false" */
+#include <stdint.h>    /* (u)intXX_t */
+
+
+/** Enum type for the ADC */
+typedef enum adc_measurements
+{
+	BATTERY_VOLTAGE,
+	INTERNAL_TEMPERATURE
+} ADC_Measurement_t;
 
 
 /* Public prototypes */
-void initADC (bool temperature);
-uint32_t readADC (bool temperature);
+void initADC (ADC_Measurement_t peripheral);
+uint32_t readADC (ADC_Measurement_t peripheral);
 
 
 #endif /* _ADC_H_ */

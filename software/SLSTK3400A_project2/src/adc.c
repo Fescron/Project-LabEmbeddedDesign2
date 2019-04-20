@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file adc.c
  * @brief ADC functionality for reading the (battery) voltage and internal temperature.
- * @version 1.0
+ * @version 1.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -9,10 +9,11 @@
  * @section Versions
  *
  *   @li v1.0: Moved ADC functionality from `other.c` to this file.
+ *   @li v1.1: Removed re-initialization dbprint messages.
+ *   @li v1.2: Started using custom enum type and cleaned up some unnecessary statements after testing.
  *
- *   @todo
- *     - Check TODO notes.
- *     - Use VCOMP?
+ * @todo
+ *   - What if we read a negative internal temperature? `int32_t` instead of `uint32_t`?
  *
  * ******************************************************************************
  *
@@ -35,6 +36,7 @@
 
 #include "adc.h"       /* Corresponding header file */
 #include "debugging.h" /* Enable or disable printing to UART for debugging */
+#include "util.h"      /* Utility functionality */
 
 
 /* Local variables */
@@ -43,7 +45,7 @@ static ADC_Init_TypeDef       init       = ADC_INIT_DEFAULT;
 static ADC_InitSingle_TypeDef initSingle = ADC_INITSINGLE_DEFAULT;
 
 
-/* Local prototypes */
+/* Local prototype */
 static float32_t convertToCelsius (int32_t adcSample);
 
 
@@ -51,32 +53,50 @@ static float32_t convertToCelsius (int32_t adcSample);
  * @brief
  *   Method to initialize the ADC to later check the battery voltage or internal temperature.
  *
- * @param[in] temperature
- *   @li `false` - Initialize the ADC to read the VDD voltage.
- *   @li `true` - Initialize the ADC to read the internal temperature.
+ * @param[in] peripheral
+ *   Select the ADC peripheral to initialize.
  *****************************************************************************/
-void initADC (bool temperature)
+void initADC (ADC_Measurement_t peripheral)
 {
 	/* Enable necessary clocks (just in case) */
 	CMU_ClockEnable(cmuClock_HFPER, true); /* ADC0 is a High Frequency Peripheral */
 	CMU_ClockEnable(cmuClock_ADC0, true);
 
-	// TODO: Dramco used these settings also
-	// init.timebase = ADC_TimebaseCalc(0);
-	// init.prescale = ADC_PrescaleCalc(400000, 0);
+	/* Set a timebase providing at least 1 us.
+	 * If the argument is "0" the currently defined HFPER clock setting is used. */
+	init.timebase = ADC_TimebaseCalc(0);
+
+	/* Set a prescale value according to the ADC frequency (400 000 Hz) wanted.
+	 * If the last argument is "0" the currently defined HFPER clock setting is for the calculation used. */
+	init.prescale = ADC_PrescaleCalc(400000, 0);
 
 	/* Initialize ADC peripheral */
 	ADC_Init(ADC0, &init);
 
 	/* Setup single conversions */
-	initSingle.acqTime = adcAcqTime16; // TODO: Dramco disabled this?
-	if (temperature) initSingle.input = adcSingleInpTemp; /* Internal temperature */
-	else initSingle.input = adcSingleInpVDDDiv3; /* Internal VDD/3 */
+
+	/* initSingle.acqTime = adcAcqTime16;
+	 * The statement above was found in a SiLabs example but DRAMCO disabled it.
+	 * After testing this seemed to have no real effect so it was disabled.
+	 * This is probably not necessary since a prescale value other than 0 (default) has been defined. */
+	if (peripheral == INTERNAL_TEMPERATURE) initSingle.input = adcSingleInpTemp; /* Internal temperature */
+	else if (peripheral == BATTERY_VOLTAGE) initSingle.input = adcSingleInpVDDDiv3; /* Internal VDD/3 */
+	else
+	{
+
+#if DEBUGGING == 1 /* DEBUGGING */
+		dbcrit("Unknown ADC peripheral selected!");
+#endif /* DEBUGGING */
+
+		error(2);
+	}
+
 	ADC_InitSingle(ADC0, &initSingle);
 
-	/* Manually set some calibration values */
-	// TODO: Dramco disabled this?
-	ADC0->CAL = (0x7C << _ADC_CAL_SINGLEOFFSET_SHIFT) | (0x1F << _ADC_CAL_SINGLEGAIN_SHIFT);
+	/* Manually set some calibration values
+	 * ADC0->CAL = (0x7C << _ADC_CAL_SINGLEOFFSET_SHIFT) | (0x1F << _ADC_CAL_SINGLEGAIN_SHIFT);
+	 * The statement above was found in a SiLabs example but DRAMCO disabled it.
+	 * After testing this seemed to throw off the first measurement so it was disabled. */
 
 	/* Enable interrupt on completed conversion */
 	ADC_IntEnable(ADC0, ADC_IEN_SINGLE);
@@ -87,8 +107,8 @@ void initADC (bool temperature)
 	CMU_ClockEnable(cmuClock_ADC0, false);
 
 #if DEBUGGING == 1 /* DEBUGGING */
-	if (temperature) dbinfo("ADC0 initialized for internal temperature");
-	else dbinfo("ADC0 initialized for VBAT");
+	if (peripheral == INTERNAL_TEMPERATURE) dbinfo("ADC0 initialized for internal temperature");
+	else if (peripheral == BATTERY_VOLTAGE) dbinfo("ADC0 initialized for VBAT");
 #endif /* DEBUGGING */
 
 }
@@ -98,14 +118,16 @@ void initADC (bool temperature)
  * @brief
  *   Method to read the battery voltage or internal temperature.
  *
- * @param[in] temperature
- *   @li `false` - Read the VDD voltage.
- *   @li `true` - Read the internal temperature.
+ * @details
+ *   This method re-initializes the ADC settings if necessary.
+ *
+ * @param[in] peripheral
+ *   Select the ADC peripheral to read from.
  *
  * @return
  *   The measured battery voltage or internal temperature.
  *****************************************************************************/
-uint32_t readADC (bool temperature)
+uint32_t readADC (ADC_Measurement_t peripheral)
 {
 	uint32_t value = 0;
 
@@ -113,31 +135,30 @@ uint32_t readADC (bool temperature)
 	CMU_ClockEnable(cmuClock_ADC0, true);
 
 	/* Change ADC settings if necessary */
-	if (temperature)
+	if (peripheral == INTERNAL_TEMPERATURE)
 	{
 		if (initSingle.input != adcSingleInpTemp)
 		{
 			initSingle.input = adcSingleInpTemp; /* Internal temperature */
 			ADC_InitSingle(ADC0, &initSingle);
-
-#if DEBUGGING == 1 /* DEBUGGING */
-			dbinfo("ADC0 re-initialized for internal temperature");
-#endif /* DEBUGGING */
-
 		}
 	}
-	else
+	else if (peripheral == BATTERY_VOLTAGE)
 	{
 		if (initSingle.input != adcSingleInpVDDDiv3)
 		{
 			initSingle.input = adcSingleInpVDDDiv3; /* Internal VDD/3 */
 			ADC_InitSingle(ADC0, &initSingle);
+		}
+	}
+	else
+	{
 
 #if DEBUGGING == 1 /* DEBUGGING */
-			dbinfo("ADC0 re-initialized for VBAT");
+		dbcrit("Unknown ADC peripheral selected!");
 #endif /* DEBUGGING */
 
-		}
+		error(3);
 	}
 
 	/* Set variable false just in case */
@@ -156,12 +177,12 @@ uint32_t readADC (bool temperature)
 	CMU_ClockEnable(cmuClock_ADC0, false);
 
 	/* Calculate final value according to parameter */
-	if (temperature)
+	if (peripheral == INTERNAL_TEMPERATURE)
 	{
 		float32_t ft = convertToCelsius(value)*1000;
 		value = (uint32_t) ft;
 	}
-	else
+	else if (peripheral == BATTERY_VOLTAGE)
 	{
 		float32_t fv = value * 3.75 / 4.096;
 		value = (uint32_t) fv;

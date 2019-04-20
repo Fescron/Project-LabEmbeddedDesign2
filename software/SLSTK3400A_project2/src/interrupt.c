@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file interrupt.c
  * @brief Interrupt functionality.
- * @version 1.8
+ * @version 1.9
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -20,10 +20,7 @@
  *   @li v1.6: Moved IRQ handler of RTC to this `delay.c`.
  *   @li v1.7: Updated clear pending interrupt logic.
  *   @li v1.8: Updated code with new DEFINE checks.
- *
- * @todo
- *   - Add other check flags thing when using the custom happy gecko board pinout.
- *   - Remove error methods in interrupt routines if unknown interrupt is triggered?
+ *   @li v1.9: Removed error calls for "unknown" pins and added flag check for custom Happy Gecko board pinout.
  *
  * ******************************************************************************
  *
@@ -187,15 +184,6 @@ void GPIO_EVEN_IRQHandler(void)
 
 	/* Check if PB1 is pushed */
 	if (flags == 0x400) PB1_triggered = true;
-	else
-	{
-
-#if DEBUGGING == 1 /* DEBUGGING */
-		dbcrit("Unknown even-numbered IRQ pin triggered!");
-#endif /* DEBUGGING */
-
-		error(2);
-	}
 
 	/* Clear all even pin interrupt flags */
 	GPIO_IntClear(0x5555);
@@ -217,18 +205,15 @@ void GPIO_ODD_IRQHandler(void)
 	/* Read interrupt flags */
 	uint32_t flags = GPIO_IntGet();
 
-	/* Check if PB0 or INT1-PD7 is pushed */
+	/* Check if PB0 is pushed */
 	if (flags == 0x200) PB0_triggered = true;
-	else if (flags == 0x80) ADXL_setTriggered(true); /* 0x80 = D7, 0x00 = F3 */
-	else
-	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
-		dbcrit("Unknown odd-numbered IRQ pin triggered!");
-#endif /* DEBUGGING */
-
-		/**error(3); @todo re-enable later? (add new flag check with other pins) */
-	}
+	/* Check if INT1 is triggered */
+#if CUSTOM_BOARD == 1 /* Custom Happy Gecko pinout */
+	if (flags == 0x8) ADXL_setTriggered(true);
+#else /* Regular Happy Gecko pinout */
+	if (flags == 0x80) ADXL_setTriggered(true);
+#endif /* Board pinout selection */
 
 	/* Clear all odd pin interrupt flags */
 	GPIO_IntClear(0xAAAA);
