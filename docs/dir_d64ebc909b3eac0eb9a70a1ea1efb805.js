@@ -3,6 +3,7 @@ var dir_d64ebc909b3eac0eb9a70a1ea1efb805 =
     [ "adc.h", "adc_8h.html", "adc_8h" ],
     [ "ADXL362.h", "ADXL362_8h.html", "ADXL362_8h" ],
     [ "cable.h", "cable_8h.html", "cable_8h" ],
+    [ "datatypes.h", "datatypes_8h.html", "datatypes_8h" ],
     [ "debugging.h", "debugging_8h.html", "debugging_8h" ],
     [ "delay.h", "delay_8h.html", "delay_8h" ],
     [ "documentation.h", "documentation_8h.html", null ],

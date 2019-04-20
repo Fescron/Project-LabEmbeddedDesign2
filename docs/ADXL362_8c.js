@@ -2,8 +2,8 @@ var ADXL362_8c =
 [
     [ "ADXL_ackInterrupt", "ADXL362_8c.html#a40573570150c448c0504097f13b96cea", null ],
     [ "ADXL_configActivity", "ADXL362_8c.html#a94fe350d1a382c347c5aec424d573af8", null ],
-    [ "ADXL_configODR", "ADXL362_8c.html#a11979b369ae160fe0f1b703766ad30de", null ],
-    [ "ADXL_configRange", "ADXL362_8c.html#a845daa80087540676884efe073972ed0", null ],
+    [ "ADXL_configODR", "ADXL362_8c.html#a5471fd7a8d4fd02ecdcafd54b9132e73", null ],
+    [ "ADXL_configRange", "ADXL362_8c.html#aff08c54a3f0c4ad752a9f85e761762f5", null ],
     [ "ADXL_enableMeasure", "ADXL362_8c.html#a3a32a4cf4d2f84835d7bd4a640fa66d6", null ],
     [ "ADXL_enableSPI", "ADXL362_8c.html#a76886733862257ff800cd5924e0c3e76", null ],
     [ "ADXL_getTriggered", "ADXL362_8c.html#a0a502d06bb2873e643ce69873622ed04", null ],
@@ -21,7 +21,7 @@ var ADXL362_8c =
     [ "writeADXL", "ADXL362_8c.html#a2abb8426713cdcd9ea9e7410f50cf635", null ],
     [ "ADXL_triggered", "ADXL362_8c.html#aa6796c127952a6190b6c2197bc99d89a", null ],
     [ "ADXL_VDD_initialized", "ADXL362_8c.html#a9e14e51406d759d505002e1cc928ba84", null ],
-    [ "range", "ADXL362_8c.html#a9edcde0584b2ab6c4a7b49eaec49d237", null ],
+    [ "range", "ADXL362_8c.html#ac15127e4a68c57506d50185e28c86b13", null ],
     [ "triggercounter", "ADXL362_8c.html#af0c19c3000868c136b611a604f974054", null ],
     [ "XYZDATA", "ADXL362_8c.html#a9e0d531566d32fef8a59b972f9bdc808", null ]
 ];

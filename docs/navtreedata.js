@@ -20,6 +20,13 @@ var NAVTREE =
       [ "Bits, bytes, nibbles and unsigned/signed integer value ranges", "index.html#DATA", null ]
     ] ],
     [ "Todo List", "todo.html", null ],
+    [ "Data Structures", "annotated.html", [
+      [ "Data Structures", "annotated.html", "annotated_dup" ],
+      [ "Data Fields", "functions.html", [
+        [ "All", "functions.html", null ],
+        [ "Variables", "functions_vars.html", null ]
+      ] ]
+    ] ],
     [ "Files", null, [
       [ "File List", "files.html", "files" ],
       [ "Globals", "globals.html", [
@@ -37,7 +44,8 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"ADXL362_8c.html"
+"ADXL362_8c.html",
+"structMeasurementData__t.html#acc2fb91d22c79045d67ad997074b2f10"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

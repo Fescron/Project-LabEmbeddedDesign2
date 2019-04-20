@@ -65,8 +65,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <div class="textblock"><dl class="reflist">
 <dt><a class="anchor" id="_todo000002"></a>File <a class="el" href="adc_8c.html">adc.c</a>  </dt>
 <dd><ul>
-<li>Check TODO notes.</li>
-<li>Use VCOMP? </li>
+<li>What if we read a negative internal temperature? <code>int32_t</code> instead of <code>uint32_t</code>? </li>
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="ADXL362_8c.html">ADXL362.c</a>  </dt>
@@ -77,40 +76,38 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Start using linked-loop mode for ADXL to fix the strange interrupt behavior?</li>
 </ul>
 </li>
+<li>Add test/profile method again and use delay method and disable SPI pins to get correct current.</li>
 <li>Enable wake-up mode: <code>writeADXL(ADXL_REG_POWER_CTL, 0b00001000)</code> // 5th bit </li>
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="delay_8c.html">delay.c</a>  </dt>
 <dd><ul>
 <li>Enable disable/enable clock functionality?</li>
-<li>Check <code>EMU_EnterEM2/3</code> true/false effect. </li>
+<li>Check <code>EMU_EnterEM2/3</code> true/false effect.</li>
+<li>Disable all clocks (just in case) when using sleep method? </li>
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000005"></a>File <a class="el" href="DS18B20_8c.html">DS18B20.c</a>  </dt>
 <dd><ul>
+<li>FIX THE TEMPERATURE READING</li>
 <li>Enable/disable timer clock after measurement?</li>
 <li>Enter EM1 when the MCU is waiting in a delay method? (see <code>readVBAT</code> method in <code>other.c</code>) </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000007"></a>Global <a class="el" href="interrupt_8c.html#a8fff5a798ff4721659dc7bdbb3149c8b">GPIO_ODD_IRQHandler</a>  (void)</dt>
-<dd>re-enable later? (add new flag check with other pins)  </dd>
 <dt><a class="anchor" id="_todo000001"></a>page <a class="el" href="index.html">Important documentation</a>  </dt>
 <dd><ul>
 <li>Also talk about cmuClock_HFPER? </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000006"></a>File <a class="el" href="interrupt_8c.html">interrupt.c</a>  </dt>
-<dd><ul>
-<li>Add other check flags thing when using the custom happy gecko board pinout.</li>
-<li>Remove error methods in interrupt routines if unknown interrupt is triggered? </li>
-</ul>
-</dd>
-<dt><a class="anchor" id="_todo000008"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
-<dd><p class="startdd">IMPORTANT:</p><ul>
+<dt><a class="anchor" id="_todo000006"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
+<dd>IMPORTANT:<ul>
 <li>Start using linked-loop mode for ADXL interrupt things.</li>
-<li>Use struct to gather measurement data (6x temperature, battery voltage) </li>
+<li>Send a "ADXL triggered" amount with the data?</li>
+<li><p class="startli">When a cable break is detected, immediately send a LoRa message with the already filled measurement data</p><ul>
+<li>Use another LoRa send method? </li>
 </ul>
-<p class="enddd">EXTRA THINGS:</p><ul>
+<p class="startli">EXTRA THINGS:</p>
+</li>
 <li>Use jumper on RX and GND pin to disable dbprint stuff aswell? (check extra used current!)</li>
 <li>Check the section about GPIO clock and cmuClock_HFPER</li>
 <li>Add WDOG functionality. (see "powertest" example)</li>
@@ -121,7 +118,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Move sections to corresponding source files? </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000009"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
+<dt><a class="anchor" id="_todo000007"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
 <dd><ul>
 <li>Add disableClocks functionality from <code>emodes.c</code> here?</li>
 <li>Add disableUnusedPins method for use in the INIT state?</li>
@@ -133,7 +130,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Apr 19 2019 21:49:00 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Sat Apr 20 2019 23:25:16 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
