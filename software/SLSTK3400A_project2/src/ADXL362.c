@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.9
+ * @version 2.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -20,13 +20,12 @@
  *   @li v1.7: Updated documentation and chanced `USART0` to `ADXL_SPI`.
  *   @li v1.8: Updated code with new DEFINE checks.
  *   @li v1.9: Started using custom enum for range & ODR configuration methods.
+ *   @li v2.0: Added testing method to go through all the settings, moved the register definitions.
  *
  *   @todo
- *     - Check if variables need to be volatile.
  *     - Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
  *         - Debugging it right now with `triggercounter`, remove this variable later.
  *         - Start using linked-loop mode for ADXL to fix the strange interrupt behavior?
- *     - Add test/profile method again and use delay method and disable SPI pins to get correct current.
  *     - Enable wake-up mode: `writeADXL(ADXL_REG_POWER_CTL, 0b00001000)` // 5th bit
  *
  * ******************************************************************************
@@ -55,12 +54,32 @@
 
 
 /* Local variables */
-/* TODO: Perhaps these shouldn't be volatile */
 static volatile bool ADXL_triggered = false; /* Volatile because it's modified by an interrupt service routine */
-static volatile int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
+static int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
 static ADXL_Range_t range;
 static bool ADXL_VDD_initialized = false;
 static uint16_t triggercounter = 0; /* TODO: remove this later */
+
+
+/* Local definitions - ADXL362 register definitions */
+#define ADXL_REG_DEVID_AD 		0x00 /* Reset: 0xAD */
+#define ADXL_REG_DEVID_MST 		0x01 /* Reset: 0x1D */
+#define ADXL_REG_PARTID 		0x02 /* Reset: 0xF2 */
+#define ADXL_REG_REVID 			0x03 /* Reset: 0x01 (can be incremented) */
+#define ADXL_REG_XDATA 			0x08
+#define ADXL_REG_YDATA 			0x09
+#define ADXL_REG_ZDATA 			0x0A
+#define ADXL_REG_STATUS 		0x0B
+#define ADXL_REG_TEMP_L 		0x14
+#define ADXL_REG_TEMP_H 		0x15
+#define ADXL_REG_SOFT_RESET 	0x1F /* Needs to be 0x52 ("R") written to for a soft reset */
+#define ADXL_REG_THRESH_ACT_L	0x20 /* 7:0 bits used */
+#define ADXL_REG_THRESH_ACT_H	0x21 /* 2:0 bits used */
+#define ADXL_REG_ACT_INACT_CTL  0x27 /* Activity/Inactivity control register: XX - XX - LINKLOOP - LINKLOOP - INACT_REF - INACT_EN - ACT_REF - ACT_EN */
+#define ADXL_REG_INTMAP1 		0x2A /* INT_LOW -- AWAKE -- INACT -- ACT -- FIFO_OVERRUN -- FIFO_WATERMARK -- FIFO_READY -- DATA_READY */
+#define ADXL_REG_INTMAP2 		0x2B /* INT_LOW -- AWAKE -- INACT -- ACT -- FIFO_OVERRUN -- FIFO_WATERMARK -- FIFO_READY -- DATA_READY */
+#define ADXL_REG_FILTER_CTL 	0x2C /* Write FFxx xxxx (FF = 00 for +-2g, 01 for =-4g, 1x for +- 8g) for measurement range selection */
+#define ADXL_REG_POWER_CTL 		0x2D /* Write xxxx xxMM (MM = 10) to: measurement mode */
 
 
 /* Local prototypes */
@@ -460,7 +479,7 @@ void ADXL_readValues (void)
 
 		/* Read status register to acknowledge interrupt
 		 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL)
-		 * TODO this can perhaps fix the bug where too much movenent breaks interrupt wake-up ... */
+		 * TODO this can perhaps fix the bug where too much movement breaks interrupt wake-up ... */
 		if (ADXL_getTriggered())
 		{
 			delay(1000);
@@ -469,6 +488,88 @@ void ADXL_readValues (void)
 			ADXL_setTriggered(false);
 		}
 	}
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   This method goes through all of the ODR settings to see the influence
+ *   they have on power usage. The measurement range is the default one (+-2g).
+ *
+ * @details
+ *   To get the "correct" currents the delay method puts the MCU to EM2/3 sleep
+ *   and the SPI lines are disabled. The order of the test is:
+ *     - Wait 5 seconds
+ *     - Soft reset the accelerometer
+ *     - One second in "standby" mode
+ *     - Enable "measurement" mode
+ *     - One second in ODR 12.5 Hz
+ *     - One second in ODR 25 Hz
+ *     - One second in ODR 50 Hz
+ *     - One second in ODR 100 Hz
+ *     - One second in ODR 200 Hz
+ *     - One second in ODR 400 Hz
+ *     - Soft reset the accelerometer
+ *****************************************************************************/
+void testADXL (void)
+{
+	delay(5000);
+
+	/* Soft reset ADXL */
+	softResetADXL();
+
+	/* Standby */
+	ADXL_enableSPI(false); /* Disable SPI functionality */
+	delay(1000);
+	ADXL_enableSPI(true);  /* Enable SPI functionality */
+
+	/* ODR 12,5Hz */
+	writeADXL(ADXL_REG_FILTER_CTL, 0b00010000); /* last 3 bits are ODR */
+
+	/* Enable measurements */
+	writeADXL(ADXL_REG_POWER_CTL, 0b00000010); /* last 2 bits are measurement mode */
+
+	ADXL_enableSPI(false); /* Disable SPI functionality */
+	delay(1000);
+	ADXL_enableSPI(true);  /* Enable SPI functionality */
+
+	/* ODR 25Hz */
+	writeADXL(ADXL_REG_FILTER_CTL, 0b00010001); /* last 3 bits are ODR */
+
+	ADXL_enableSPI(false); /* Disable SPI functionality */
+	delay(1000);
+	ADXL_enableSPI(true);  /* Enable SPI functionality */
+
+	/* ODR 50Hz */
+	writeADXL(ADXL_REG_FILTER_CTL, 0b00010010); /* last 3 bits are ODR */
+
+	ADXL_enableSPI(false); /* Disable SPI functionality */
+	delay(1000);
+	ADXL_enableSPI(true);  /* Enable SPI functionality */
+
+	/* ODR 100Hz (default) */
+	writeADXL(ADXL_REG_FILTER_CTL, 0b00010011); /* last 3 bits are ODR */
+
+	ADXL_enableSPI(false); /* Disable SPI functionality */
+	delay(1000);
+	ADXL_enableSPI(true);  /* Enable SPI functionality */
+
+	/* ODR 200Hz */
+	writeADXL(ADXL_REG_FILTER_CTL, 0b00010100); /* last 3 bits are ODR */
+
+	ADXL_enableSPI(false); /* Disable SPI functionality */
+	delay(1000);
+	ADXL_enableSPI(true);  /* Enable SPI functionality */
+
+	/* ODR 400Hz */
+	writeADXL(ADXL_REG_FILTER_CTL, 0b00010101); /* last 3 bits are ODR */
+
+	ADXL_enableSPI(false); /* Disable SPI functionality */
+	delay(1000);
+	ADXL_enableSPI(true);  /* Enable SPI functionality */
+
+	/* Soft reset ADXL */
+	softResetADXL();
 }
 
 

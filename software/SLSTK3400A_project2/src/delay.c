@@ -22,7 +22,6 @@
  *
  *   @todo
  *     - Enable disable/enable clock functionality?
- *     - Check `EMU_EnterEM2/3` true/false effect.
  *     - Disable all clocks (just in case) when using sleep method?
  *
  * ******************************************************************************
@@ -66,7 +65,7 @@ static void initRTC (void);
 
 /**************************************************************************//**
  * @brief
- *   Wait for a certain amount of milliseconds.
+ *   Wait for a certain amount of milliseconds in EM2/3.
  *
  * @details
  *   This method also initializes SysTick/RTC if necessary.
@@ -155,9 +154,9 @@ void delay (uint32_t msDelay)
 	/* In EM3, high and low frequency clocks are disabled. No oscillator (except the ULFRCO) is running.
 	 * Furthermore, all unwanted oscillators are disabled in EM3. This means that nothing needs to be
 	 * manually disabled before the statement EMU_EnterEM3(true); */
-	EMU_EnterEM3(true); /* TODO: "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+	EMU_EnterEM3(true); /* "true" - Save and restore oscillators, clocks and voltage scaling */
 #else /* LFXO selected */
-	EMU_EnterEM2(true); /* TODO: "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+	EMU_EnterEM2(true); /* "true" - Save and restore oscillators, clocks and voltage scaling */
 #endif /* ULFRCO/LFXO selection */
 
 	/* TODO: Disable used oscillator and clocks after wake-up */
@@ -188,9 +187,9 @@ void sleep (uint32_t sSleep)
 
 #if DEBUGGING == 1 /* DEBUGGING */
 #if ULFRCO == 1 /* ULFRCO selected */
-	dbwarnInt("Sleeping in EM3 for ", sSleep, " s");
+	dbwarnInt("Sleeping in EM3 for ", sSleep, " s\n\r");
 #else /* LFXO selected */
-	dbwarnInt("Sleeping in EM2 for ", sSleep, " s");
+	dbwarnInt("Sleeping in EM2 for ", sSleep, " s\n\r");
 #endif /* ULFRCO/LFXO selection */
 #endif /* DEBUGGING */
 
@@ -234,9 +233,9 @@ void sleep (uint32_t sSleep)
 	/* In EM3, high and low frequency clocks are disabled. No oscillator (except the ULFRCO) is running.
 	 * Furthermore, all unwanted oscillators are disabled in EM3. This means that nothing needs to be
 	 * manually disabled before the statement EMU_EnterEM3(true); */
-	EMU_EnterEM3(true); /* TODO: "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+	EMU_EnterEM3(true); /* "true" - Save and restore oscillators, clocks and voltage scaling */
 #else /* LFXO selected */
-	EMU_EnterEM2(true); /* TODO: "true" doesn't seem to have any effect (save and restore oscillators, clocks and voltage scaling) */
+	EMU_EnterEM2(true); /* "true" - Save and restore oscillators, clocks and voltage scaling */
 #endif /* ULFRCO/LFXO selection */
 
 	/* TODO: Disable used oscillator and clocks after wake-up */
@@ -286,7 +285,7 @@ static void initRTC (void)
 
 	/* Allow channel 0 to cause an interrupt */
 	RTC_IntEnable(RTC_IEN_COMP0);
-	RTC_IntClear(RTC_IFC_COMP0); /* TODO: this was in ULFRCO but not in LFXO example? */
+	RTC_IntClear(RTC_IFC_COMP0); /* This statement was in the ULFRCO but not in the LFXO example. It's kept here just in case. */
 	NVIC_ClearPendingIRQ(RTC_IRQn);
 	NVIC_EnableIRQ(RTC_IRQn);
 

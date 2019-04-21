@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 2.4
+ * @version 2.6
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -26,8 +26,9 @@
  *   @li v2.1: Updated code with new ADC functionality.
  *   @li v2.2: Started using working temperature sensor code.
  *   @li v2.3: Started using working cable checking code and added "SEND" `mcu_state`.
- *   @li v2.4: Stared using a struct to keep the measurements in, added line to disable the RN2483.
+ *   @li v2.4: Started using a struct to keep the measurements in, added line to disable the RN2483.
  *   @li v2.5: Started using custom enum types for the accelerometer settings.
+ *   @li v2.6: Added ADXL testing functionality.
  *
  * ******************************************************************************
  *
@@ -37,14 +38,16 @@
  *     - Send a "ADXL triggered" amount with the data?
  *     - When a cable break is detected, immediately send a LoRa message with the already filled measurement data
  *         - Use another LoRa send method?
+ *     - Disable unused pins? (Sensor enable, RN2483RX-TX-RST, INT2, ...)
+ *     - Check DS18B20 measurement timing
+ *     - Add section in `documentation.h` about disabling SPI/DATA pins on sleep (10k pullup ~ 320 µA?)
+ *
  * @todo
  *   EXTRA THINGS:
- *     - Use jumper on RX and GND pin to disable dbprint stuff aswell? (check extra used current!)
  *     - Check the section about GPIO clock and cmuClock_HFPER
  *     - Add WDOG functionality. (see "powertest" example)
  *     - Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
  *         - Also see *AN0007: 2.8 Optimizing Code*
- *     - Move sections to corresponding source files?
  *
  * ******************************************************************************
  *
@@ -90,12 +93,12 @@
 #define WAKE_UP_PERIOD_S 10
 
 
-/* Local variables TODO: perhaps these shouldn't be volatile? */
+/* Local variables */
 /** Keep the state of the state machine */
-static volatile MCU_State_t MCUstate;
+static MCU_State_t MCUstate;
 
 /** Keep the measurement date */
-static volatile MeasurementData_t data;
+static MeasurementData_t data;
 
 
 /**************************************************************************//**
@@ -188,6 +191,14 @@ int main (void)
 					/* Initialize the accelerometer */
 					initADXL();
 
+					/* Go through all of the accelerometer ODR settings to see the influence they have on power usage. */
+					if (false)
+					{
+						led(false);
+						testADXL();
+						led(true);
+					}
+
 					/* Set the measurement range */
 					ADXL_configRange(ADXL_RANGE_4G);
 
@@ -215,6 +226,8 @@ int main (void)
 					ADXL_setTriggered(false); /* Reset variable again */
 				}
 
+				led(false); /* Disable LED */
+
 				MCUstate = MEASURE;
 			} break;
 
@@ -228,7 +241,7 @@ int main (void)
 
 				checkInterrupts();
 
-				/* Measure and store the external temperature (a measurement takes about 550 ms) */
+				/* Measure and store the external temperature (a measurement takes about 550 ms) TODO measurement is not 550 ms? */
 				data.extTemp[data.index] = readTempDS18B20();
 
 				/* Measure and store the battery voltage */
@@ -275,11 +288,12 @@ int main (void)
 
 			case SLEEP:
 			{
-				GPIO_PinModeSet(DBG_RXD_PORT, DBG_RXD_PIN, gpioModeDisabled, 0);
+				// These statements don't seem to have any effect on current consumption ...
+				//GPIO_PinModeSet(DBG_RXD_PORT, DBG_RXD_PIN, gpioModeDisabled, 0); /* Disable RXD pin (has 10k pullup resistor) */
 
 				sleep(WAKE_UP_PERIOD_S); /* Go to sleep for xx seconds */
 
-				GPIO_PinModeSet(DBG_RXD_PORT, DBG_RXD_PIN, gpioModeInput, 0);
+				//GPIO_PinModeSet(DBG_RXD_PORT, DBG_RXD_PIN, gpioModeInput, 0); /* Enable RXD pin */
 
 				MCUstate = WAKEUP;
 			} break;

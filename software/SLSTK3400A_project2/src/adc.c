@@ -12,8 +12,8 @@
  *   @li v1.1: Removed re-initialization dbprint messages.
  *   @li v1.2: Started using custom enum type and cleaned up some unnecessary statements after testing.
  *
- * @todo
- *   - What if we read a negative internal temperature? `int32_t` instead of `uint32_t`?
+ *   @todo
+ *     - What if we read a negative internal temperature? `int32_t` instead of `uint32_t`?
  *
  * ******************************************************************************
  *
@@ -231,7 +231,7 @@ static float32_t convertToCelsius (int32_t adcSample)
  * @brief
  *   Interrupt Service Routine for ADC0.
  *****************************************************************************/
-void ADC0_IRQHandler(void)
+void ADC0_IRQHandler (void)
 {
 	/* Read interrupt flags */
 	 uint32_t flags = ADC_IntGet(ADC0);

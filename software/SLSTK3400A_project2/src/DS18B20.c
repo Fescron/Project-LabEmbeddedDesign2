@@ -24,8 +24,9 @@
  *
  *   @todo
  *     - FIX THE TEMPERATURE READING
+ *     - Use USTIMER_INIT and DEINIT to enable/disable timer clocks? Do these statements require a lot of extra time?
  *     - Enable/disable timer clock after measurement?
- *     - Enter EM1 when the MCU is waiting in a delay method? (see `readVBAT` method in `other.c`)
+ *     - Enter EM1 when the MCU is waiting in a delay method? -> this was tried out but failed to work...
  *
  ******************************************************************************/
 
@@ -94,6 +95,7 @@ float readTempDS18B20 (void)
 
 		/* Disable data pin (otherwise we got a "sleep" current of about 330 µA due to the on-board 10k pull-up) */
 		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeDisabled, 0);
+		//GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0); // TODO: This doesn't work either...
 
 		/* Return the converted byte */
 		return (convertTempData(rawDataFromDS18B20Arr[0], rawDataFromDS18B20Arr[1]));
@@ -169,12 +171,12 @@ static bool init_DS18B20 (void)
 	USTIMER_DelayIntSafe(480);
 
 	/* Change pin-mode to input */
-	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0); /* TODO: Try to use internal pullup? */
+	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0);
 
 	/* Check if the line becomes HIGH during the maximum waiting time */
 	while (counter++ <= MAX_TIME_CTR && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 1)
 	{
-		/* TODO: Maybe EMU_EnterEM1() */
+		/* EMU_EnterEM1() was tried to put here but it failed to work... */
 	}
 
 	/* Exit the function if the maximum waiting time was reached (reset failed) */
@@ -194,7 +196,7 @@ static bool init_DS18B20 (void)
 	/* Check if the line becomes LOW during the maximum waiting time */
 	while (counter++ <= MAX_TIME_CTR && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 0)
 	{
-		/* TODO: Maybe EMU_EnterEM1() */
+		/* EMU_EnterEM1() was tried to put here but it failed to work... */
 	}
 
 	/* Exit the function if the maximum waiting time was reached (reset failed) */
@@ -284,7 +286,7 @@ static uint8_t readByteFromDS18B20 (void)
 	for (uint8_t i = 0; i < 8; i++)
 	{
 		/* Change pin-mode to input */
-		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0); /* TODO: Try to use internal pullup? */
+		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0);
 
 		/* Right shift bits once */
 		data >>= 1;

@@ -171,10 +171,13 @@ void BTN_setTriggered (uint8_t number, bool value)
  * @brief
  *   GPIO Even IRQ for pushbuttons on even-numbered pins.
  *
+ * @details
+ *   The RTC is also disabled on a pin interrupt.
+ *
  * @note
  *   The *weak* definition for this method is located in `system_efm32hg.h`.
  *****************************************************************************/
-void GPIO_EVEN_IRQHandler(void)
+void GPIO_EVEN_IRQHandler (void)
 {
 	/* Disable the counter */
 	RTC_Enable(false);
@@ -194,10 +197,13 @@ void GPIO_EVEN_IRQHandler(void)
  * @brief
  *   GPIO Odd IRQ for pushbuttons on odd-numbered pins.
  *
+ * @details
+ *   The RTC is also disabled on a pin interrupt.
+ *
  * @note
  *   The *weak* definition for this method is located in `system_efm32hg.h`.
  *****************************************************************************/
-void GPIO_ODD_IRQHandler(void)
+void GPIO_ODD_IRQHandler (void)
 {
 	/* Disable the counter */
 	RTC_Enable(false);

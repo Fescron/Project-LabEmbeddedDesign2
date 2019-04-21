@@ -29,7 +29,7 @@
 /** Public definition to select the Happy Gecko board *version*
  *    @li `1` - Use the custom Happy Gecko board pinout.
  *    @li `0` - Use the regular Happy Gecko board pinout. */
-#define CUSTOM_BOARD 1
+#define CUSTOM_BOARD 0
 
 
 #if CUSTOM_BOARD == 1 /* Custom Happy Gecko pinout */

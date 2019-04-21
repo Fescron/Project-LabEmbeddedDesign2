@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.h
  * @brief All code for the ADXL362 accelerometer.
- * @version 1.9
+ * @version 2.0
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -19,42 +19,21 @@
 /** Enum type for the measurement range */
 typedef enum adxl_range
 {
-	ADXL_RANGE_2G,
-	ADXL_RANGE_4G,
-	ADXL_RANGE_8G
+	ADXL_RANGE_2G, /* +- 2g (reset default) */
+	ADXL_RANGE_4G, /* +- 4g */
+	ADXL_RANGE_8G  /* +- 8g */
 } ADXL_Range_t;
 
 /** Enum type for the ODR */
 typedef enum adxl_odr
 {
-	ADXL_ODR_12_5,
-	ADXL_ODR_25,
-	ADXL_ODR_50,
-	ADXL_ODR_100, /* Reset default */
-	ADXL_ODR_200,
-	ADXL_ODR_400
+	ADXL_ODR_12_5, /* 12.5 Hz */
+	ADXL_ODR_25,   /* 25 Hz */
+	ADXL_ODR_50,   /* 50 Hz */
+	ADXL_ODR_100,  /* 100 Hz (reset default) */
+	ADXL_ODR_200,  /* 200 Hz */
+	ADXL_ODR_400   /* 400 Hz */
 } ADXL_ODR_t;
-
-
-/* ADXL362 register definitions */
-#define ADXL_REG_DEVID_AD 		0x00 /* Reset: 0xAD */
-#define ADXL_REG_DEVID_MST 		0x01 /* Reset: 0x1D */
-#define ADXL_REG_PARTID 		0x02 /* Reset: 0xF2 */
-#define ADXL_REG_REVID 			0x03 /* Reset: 0x01 (can be incremented) */
-#define ADXL_REG_XDATA 			0x08
-#define ADXL_REG_YDATA 			0x09
-#define ADXL_REG_ZDATA 			0x0A
-#define ADXL_REG_STATUS 		0x0B
-#define ADXL_REG_TEMP_L 		0x14
-#define ADXL_REG_TEMP_H 		0x15
-#define ADXL_REG_SOFT_RESET 	0x1F /* Needs to be 0x52 ("R") written to for a soft reset */
-#define ADXL_REG_THRESH_ACT_L	0x20 /* 7:0 bits used */
-#define ADXL_REG_THRESH_ACT_H	0x21 /* 2:0 bits used */
-#define ADXL_REG_ACT_INACT_CTL  0x27 /* Activity/Inactivity control register: XX - XX - LINKLOOP - LINKLOOP - INACT_REF - INACT_EN - ACT_REF - ACT_EN */
-#define ADXL_REG_INTMAP1 		0x2A /* INT_LOW -- AWAKE -- INACT -- ACT -- FIFO_OVERRUN -- FIFO_WATERMARK -- FIFO_READY -- DATA_READY */
-#define ADXL_REG_INTMAP2 		0x2B /* INT_LOW -- AWAKE -- INACT -- ACT -- FIFO_OVERRUN -- FIFO_WATERMARK -- FIFO_READY -- DATA_READY */
-#define ADXL_REG_FILTER_CTL 	0x2C /* Write FFxx xxxx (FF = 00 for +-2g, 01 for =-4g, 1x for +- 8g) for measurement range selection */
-#define ADXL_REG_POWER_CTL 		0x2D /* Write xxxx xxMM (MM = 10) to: measurement mode */
 
 
 /* Public prototypes */
@@ -72,6 +51,8 @@ void ADXL_configODR (ADXL_ODR_t givenODR);
 void ADXL_configActivity (uint8_t gThreshold);
 
 void ADXL_readValues (void);
+
+void testADXL (void);
 
 
 #endif /* _ADXL362_H_ */
