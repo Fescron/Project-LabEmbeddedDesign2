@@ -1,5 +1,23 @@
 var ADXL362_8c =
 [
+    [ "ADXL_REG_ACT_INACT_CTL", "ADXL362_8c.html#ad6bd9f8848baae93c5f4178995478585", null ],
+    [ "ADXL_REG_DEVID_AD", "ADXL362_8c.html#a28bec98f28e78aa53fd4590d028e4871", null ],
+    [ "ADXL_REG_DEVID_MST", "ADXL362_8c.html#a95e78f1cab73f4284515bb1e97236fc9", null ],
+    [ "ADXL_REG_FILTER_CTL", "ADXL362_8c.html#a5b17526ccdc926afb76807c3825e047f", null ],
+    [ "ADXL_REG_INTMAP1", "ADXL362_8c.html#afa0f72d0921e474730c2b9c5718d2e3d", null ],
+    [ "ADXL_REG_INTMAP2", "ADXL362_8c.html#a4b9e52f16729fbc57bd1425d9ca5e3c6", null ],
+    [ "ADXL_REG_PARTID", "ADXL362_8c.html#aed12675f4bb6da116473d2862a5b8ad6", null ],
+    [ "ADXL_REG_POWER_CTL", "ADXL362_8c.html#a2b94a1593b4855fc65964c5299c96f21", null ],
+    [ "ADXL_REG_REVID", "ADXL362_8c.html#ad6aafe6d1ff03e1aaa2d7042111e5f7a", null ],
+    [ "ADXL_REG_SOFT_RESET", "ADXL362_8c.html#a5bda23dbc8ecd6f04f0625f421c41b02", null ],
+    [ "ADXL_REG_STATUS", "ADXL362_8c.html#ae37b5c300ecf1f284881f43ee573bc1d", null ],
+    [ "ADXL_REG_TEMP_H", "ADXL362_8c.html#a75cc20945670b55c9fae93c82d34c32f", null ],
+    [ "ADXL_REG_TEMP_L", "ADXL362_8c.html#a9ce15740a3740da3ab9d6173a9643e85", null ],
+    [ "ADXL_REG_THRESH_ACT_H", "ADXL362_8c.html#a8c7bb6b3a32c2921f262f96a0f0bb981", null ],
+    [ "ADXL_REG_THRESH_ACT_L", "ADXL362_8c.html#a878c3ec0841a2f7023d1fc8eaa4ca132", null ],
+    [ "ADXL_REG_XDATA", "ADXL362_8c.html#afbd47c20c1029913e6b0fb89b3dc0a27", null ],
+    [ "ADXL_REG_YDATA", "ADXL362_8c.html#a802d2b32374b3a35394780742faf6599", null ],
+    [ "ADXL_REG_ZDATA", "ADXL362_8c.html#a73d6dc0dc70299bbf178c061a027f95c", null ],
     [ "ADXL_ackInterrupt", "ADXL362_8c.html#a40573570150c448c0504097f13b96cea", null ],
     [ "ADXL_configActivity", "ADXL362_8c.html#a94fe350d1a382c347c5aec424d573af8", null ],
     [ "ADXL_configODR", "ADXL362_8c.html#a5471fd7a8d4fd02ecdcafd54b9132e73", null ],
@@ -18,10 +36,11 @@ var ADXL362_8c =
     [ "readADXL_XYZDATA", "ADXL362_8c.html#adb08386b910fac1df4b052332e6dc038", null ],
     [ "resetHandlerADXL", "ADXL362_8c.html#a99c5f8fb7a89a7a3223593186280418d", null ],
     [ "softResetADXL", "ADXL362_8c.html#aa565c28fcb2cfade8a275c6f22410ab9", null ],
+    [ "testADXL", "ADXL362_8c.html#a50a7f7f1ee9b1ae3a1a60c4f2c9e4649", null ],
     [ "writeADXL", "ADXL362_8c.html#a2abb8426713cdcd9ea9e7410f50cf635", null ],
     [ "ADXL_triggered", "ADXL362_8c.html#aa6796c127952a6190b6c2197bc99d89a", null ],
     [ "ADXL_VDD_initialized", "ADXL362_8c.html#a9e14e51406d759d505002e1cc928ba84", null ],
     [ "range", "ADXL362_8c.html#ac15127e4a68c57506d50185e28c86b13", null ],
     [ "triggercounter", "ADXL362_8c.html#af0c19c3000868c136b611a604f974054", null ],
-    [ "XYZDATA", "ADXL362_8c.html#a9e0d531566d32fef8a59b972f9bdc808", null ]
+    [ "XYZDATA", "ADXL362_8c.html#a03991cf5f8640149a6253a1ca9a2b0cb", null ]
 ];
