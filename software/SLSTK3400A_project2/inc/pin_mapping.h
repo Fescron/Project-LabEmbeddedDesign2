@@ -29,7 +29,7 @@
 /** Public definition to select the Happy Gecko board *version*
  *    @li `1` - Use the custom Happy Gecko board pinout.
  *    @li `0` - Use the regular Happy Gecko board pinout. */
-#define CUSTOM_BOARD 0
+#define CUSTOM_BOARD 1
 
 
 #if CUSTOM_BOARD == 1 /* Custom Happy Gecko pinout */
@@ -54,8 +54,8 @@
 	#define ADXL_VDD_PIN        1
 
 	/* LED */
-	#define LED_PORT            gpioPortA
-	#define LED_PIN             2
+	#define LED_PORT            gpioPortA // Before: A
+	#define LED_PIN             2         // Before: 2
 
 	/* Buttons */
 	#define PB0_PORT            gpioPortC
