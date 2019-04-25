@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.c
  * @brief Delay functionality.
- * @version 1.9
+ * @version 2.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -19,10 +19,8 @@
  *   @li v1.7: Moved IRQ handler of RTC to this file.
  *   @li v1.8: Added ULFRCO logic.
  *   @li v1.9: Updated code with new DEFINE checks.
- *
- *   @todo
- *     - Enable disable/enable clock functionality?
- *     - Disable all clocks (just in case) when using sleep method?
+ *   @li v2.0: Added functionality to enable/disable the clocks only when necessary.
+ *   @li v2.1: Added functionality to check if a wakeup was caused by the RTC.
  *
  * ******************************************************************************
  *
@@ -52,6 +50,8 @@
 
 /* Local variables */
 static volatile uint32_t msTicks; /* Volatile because it's modified by an interrupt service routine */
+static volatile bool RTC_sleep_wakeup = false; /* Volatile because it's modified by an interrupt service routine */
+static volatile bool sleeping = false; /* Volatile because it's modified by an interrupt service routine */
 static bool RTC_initialized = false;
 
 #if SYSTICKDELAY == 1 /* SysTick delay selected */
@@ -111,7 +111,25 @@ void delay (uint32_t msDelay)
 	if (!RTC_initialized) initRTC();
 	else
 	{
-		/* TODO: Enable necessary oscillator and clocks */
+		/* Enable necessary oscillator and clocks */
+
+#if ULFRCO == 1 /* ULFRCO selected */
+
+		/* No specific code here */
+
+#else /* LFXO selected */
+
+		/* Enable the low-frequency crystal oscillator for the RTC */
+		CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
+
+#endif /* ULFRCO/LFXO selection */
+
+		/* Enable the clock to the interface of the low energy modules
+		 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
+		CMU_ClockEnable(cmuClock_HFLE, true);
+
+		/* Turn on the RTC clock */
+		CMU_ClockEnable(cmuClock_RTC, true);
 	}
 
 	/* Set RTC compare value for RTC compare register 0 depending on ULFRCO/LFXO selection */
@@ -159,7 +177,26 @@ void delay (uint32_t msDelay)
 	EMU_EnterEM2(true); /* "true" - Save and restore oscillators, clocks and voltage scaling */
 #endif /* ULFRCO/LFXO selection */
 
-	/* TODO: Disable used oscillator and clocks after wake-up */
+
+	/* Disable used oscillator and clocks after wake-up */
+
+#if ULFRCO == 1 /* ULFRCO selected */
+
+	/* No specific code here */
+
+#else /* LFXO selected */
+
+	/* Disable the low-frequency crystal oscillator for the RTC */
+	CMU_OscillatorEnable(cmuOsc_LFXO, false, true);
+
+#endif /* ULFRCO/LFXO selection */
+
+	/* Disable the clock to the interface of the low energy modules
+	 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
+	CMU_ClockEnable(cmuClock_HFLE, false);
+
+	/* Turn off the RTC clock */
+	CMU_ClockEnable(cmuClock_RTC, false);
 
 #endif /* SysTick/RTC selection */
 
@@ -182,7 +219,25 @@ void sleep (uint32_t sSleep)
 	if (!RTC_initialized) initRTC();
 	else
 	{
-		/* TODO: Enable necessary oscillator and clocks */
+		/* Enable necessary oscillator and clocks */
+
+#if ULFRCO == 1 /* ULFRCO selected */
+
+		/* No specific code here */
+
+#else /* LFXO selected */
+
+		/* Enable the low-frequency crystal oscillator for the RTC */
+		CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
+
+#endif /* ULFRCO/LFXO selection */
+
+		/* Enable the clock to the interface of the low energy modules
+		 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
+		CMU_ClockEnable(cmuClock_HFLE, true);
+
+		/* Turn on the RTC clock */
+		CMU_ClockEnable(cmuClock_RTC, true);
 	}
 
 #if DEBUGGING == 1 /* DEBUGGING */
@@ -223,6 +278,9 @@ void sleep (uint32_t sSleep)
 
 #endif /* ULFRCO/LFXO selection */
 
+	/* Indicate that we're using the sleep method */
+	sleeping = true;
+
 
 	/* Start the RTC */
 	RTC_Enable(true);
@@ -238,7 +296,52 @@ void sleep (uint32_t sSleep)
 	EMU_EnterEM2(true); /* "true" - Save and restore oscillators, clocks and voltage scaling */
 #endif /* ULFRCO/LFXO selection */
 
-	/* TODO: Disable used oscillator and clocks after wake-up */
+
+	/* Indicate that we're no longer sleeping */
+	sleeping = false;
+
+	/* Disable used oscillator and clocks after wake-up */
+
+#if ULFRCO == 1 /* ULFRCO selected */
+
+	/* No specific code here */
+
+#else /* LFXO selected */
+
+	/* Disable the low-frequency crystal oscillator for the RTC */
+	CMU_OscillatorEnable(cmuOsc_LFXO, false, true);
+
+#endif /* ULFRCO/LFXO selection */
+
+	/* Disable the clock to the interface of the low energy modules
+	 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
+	CMU_ClockEnable(cmuClock_HFLE, false);
+
+	/* Turn off the RTC clock */
+	CMU_ClockEnable(cmuClock_RTC, false);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Method to check if the wakeup was caused by the RTC.
+ *
+ * @return
+ *   The value of `RTC_sleep_wakeup`.
+ *****************************************************************************/
+bool RTC_checkWakeup (void)
+{
+	return (RTC_sleep_wakeup);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Method to clear `RTC_sleep_wakeup`.
+ *****************************************************************************/
+void RTC_clearWakeup (void)
+{
+	RTC_sleep_wakeup = false;
 }
 
 
@@ -332,4 +435,7 @@ void RTC_IRQHandler (void)
 
 	/* Clear the interrupt source */
 	RTC_IntClear(RTC_IFC_COMP0);
+
+	/* If the wakeup was caused by "sleeping" (not a delay), act accordingly */
+	if (sleeping) RTC_sleep_wakeup = true;
 }
