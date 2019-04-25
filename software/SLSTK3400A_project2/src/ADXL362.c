@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 2.0
+ * @version 2.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -21,11 +21,16 @@
  *   @li v1.8: Updated code with new DEFINE checks.
  *   @li v1.9: Started using custom enum for range & ODR configuration methods.
  *   @li v2.0: Added testing method to go through all the settings, moved the register definitions.
+ *   @li v2.1: Disabled SPI pins on *hard* reset, cleaned up some code.
+ *   @li v2.2: Added functionality to check the number of interrupts.
  *
  *   @todo
  *     - Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
- *         - Debugging it right now with `triggercounter`, remove this variable later.
  *         - Start using linked-loop mode for ADXL to fix the strange interrupt behavior?
+ *         - Check absolute/relative mode?
+ *         - Check `lis3dh.c` in Dramco example (init shake detection)
+ *         - This seems fixed when the `delay` statement is removed in `MEASURE`, the code can react fast enough between interrupts...
+ *     - Make `ADXL_configActivity` method use **float** as the argument type?
  *     - Enable wake-up mode: `writeADXL(ADXL_REG_POWER_CTL, 0b00001000)` // 5th bit
  *
  * ******************************************************************************
@@ -55,10 +60,10 @@
 
 /* Local variables */
 static volatile bool ADXL_triggered = false; /* Volatile because it's modified by an interrupt service routine */
+static volatile uint16_t ADXL_triggercounter = 0; /* Volatile because it's modified by an interrupt service routine */
 static int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
 static ADXL_Range_t range;
 static bool ADXL_VDD_initialized = false;
-static uint16_t triggercounter = 0; /* TODO: remove this later */
 
 
 /* Local definitions - ADXL362 register definitions */
@@ -136,6 +141,29 @@ void initADXL (void)
 
 /**************************************************************************//**
  * @brief
+ *   Getter for the `ADXL_triggercounter` static variable.
+ *
+ * @return
+ *   The value of `ADXL_triggercounter`.
+ *****************************************************************************/
+uint16_t ADXL_getCounter (void)
+{
+	return (ADXL_triggercounter);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Method to set the `ADXL_triggercounter` static variable back to zero.
+ *****************************************************************************/
+void ADXL_clearCounter (void)
+{
+	ADXL_triggercounter = 0;
+}
+
+
+/**************************************************************************//**
+ * @brief
  *   Setter for the `ADXL_triggered` static variable.
  *
  * @param[in] triggered
@@ -145,7 +173,7 @@ void initADXL (void)
 void ADXL_setTriggered (bool triggered)
 {
 	ADXL_triggered = triggered;
-	triggercounter++; /* TODO: Remove this later */
+	ADXL_triggercounter++;
 }
 
 
@@ -400,7 +428,7 @@ void ADXL_configActivity (uint8_t gThreshold)
 
 	/* Convert g value to "codes":
 	 * THRESH_ACT [codes] = Threshold Value [g] × Scale Factor [LSB per g] */
-	uint16_t threshold;
+	uint8_t threshold;
 
 	if (range == ADXL_RANGE_2G) threshold = gThreshold * 1000;
 	else if (range == ADXL_RANGE_4G) threshold = gThreshold * 500;
@@ -427,7 +455,7 @@ void ADXL_configActivity (uint8_t gThreshold)
 	// writeADXL(ADXL_REG_ACT_INACT_CTL, 0b00110000); TODO: not working...
 
 #if DEBUGGING == 1 /* DEBUGGING */
-	dbinfoInt("ADXL362: Activity configured: ", gThreshold, " g");
+	dbinfoInt("ADXL362: Activity configured: ", gThreshold, "g");
 #endif /* DEBUGGING */
 
 }
@@ -436,11 +464,6 @@ void ADXL_configActivity (uint8_t gThreshold)
 /**************************************************************************//**
  * @brief
  *   Read and display "g" values forever with a 100ms interval.
- *
- * @details
- *   The accelerometer is put in measurement mode at 12.5Hz ODR, new
- *   values are displayed every 100ms, if an interrupt was generated
- *   a delay of one second is called.
  *****************************************************************************/
 void ADXL_readValues (void)
 {
@@ -458,7 +481,6 @@ void ADXL_readValues (void)
 
 #if DEBUGGING == 1 /* DEBUGGING */
 		/* Print XYZ sensor data */
-		//dbprint("[");
 		dbprint("\r[");
 		dbprintInt(counter);
 		dbprint("] X: ");
@@ -467,8 +489,7 @@ void ADXL_readValues (void)
 		dbprintInt(convertGRangeToGValue(XYZDATA[1]));
 		dbprint(" mg | Z: ");
 		dbprintInt(convertGRangeToGValue(XYZDATA[2]));
-		dbprint(" mg   "); /* Extra spacing is to overwrite other data if it's remaining (see \r) */
-		//dbprintln("");
+		dbprint(" mg       "); /* Extra spacing is to overwrite other data if it's remaining (see \r) */
 #endif /* DEBUGGING */
 
 		led(false); /* Disable LED */
@@ -476,17 +497,6 @@ void ADXL_readValues (void)
 		counter++;
 
 		delay(100);
-
-		/* Read status register to acknowledge interrupt
-		 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL)
-		 * TODO this can perhaps fix the bug where too much movement breaks interrupt wake-up ... */
-		if (ADXL_getTriggered())
-		{
-			delay(1000);
-
-			readADXL(ADXL_REG_STATUS);
-			ADXL_setTriggered(false);
-		}
 	}
 }
 
@@ -671,10 +681,12 @@ static void resetHandlerADXL (void)
 				retries++;
 
 				powerADXL(false);
+				ADXL_enableSPI(false); /* Make sure the accelerometer doesn't get power through the SPI pins */
 
 				delay(1000);
 
 				powerADXL(true);
+				ADXL_enableSPI(true);
 
 				delay(1000);
 
@@ -684,6 +696,11 @@ static void resetHandlerADXL (void)
 				/* Last try to get the correct ID failed */
 				if (!checkID_ADXL())
 				{
+
+#if DEBUGGING == 1 /* DEBUGGING */
+					dbcrit("ADXL362 initialization failed");
+#endif /* DEBUGGING */
+
 					error(1);
 				}
 			}

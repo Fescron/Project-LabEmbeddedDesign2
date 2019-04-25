@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file datatypes.h
  * @brief Definitions of the custom data-types used.
- * @version 1.0
+ * @version 1.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -9,6 +9,7 @@
  * @section Versions
  *
  *   @li v1.0: Moved `mcu_states` enum definition from `main.c` to this file and added `MeasurementData_t` struct data type.
+ *   @li v1.1: Added another `MCU_State_t` option.
  *
  ******************************************************************************/
 
@@ -28,6 +29,7 @@ typedef enum mcu_states
 	INIT,
 	MEASURE,
 	SEND,
+	SEND_STORM,
 	SLEEP,
 	WAKEUP
 } MCU_State_t;

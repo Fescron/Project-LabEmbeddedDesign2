@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 2.6
+ * @version 2.8
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -29,25 +29,40 @@
  *   @li v2.4: Started using a struct to keep the measurements in, added line to disable the RN2483.
  *   @li v2.5: Started using custom enum types for the accelerometer settings.
  *   @li v2.6: Added ADXL testing functionality.
+ *   @li v2.7: Removed USTIMER logic from this file.
+ *   @li v2.8: Added functionality to detect a *storm*.
  *
  * ******************************************************************************
  *
  * @todo
  *   IMPORTANT:
- *     - Start using linked-loop mode for ADXL interrupt things.
- *     - Send a "ADXL triggered" amount with the data?
  *     - When a cable break is detected, immediately send a LoRa message with the already filled measurement data
- *         - Use another LoRa send method?
- *     - Disable unused pins? (Sensor enable, RN2483RX-TX-RST, INT2, ...)
- *     - Check DS18B20 measurement timing
- *     - Add section in `documentation.h` about disabling SPI/DATA pins on sleep (10k pullup ~ 320 µA?)
+ *         - Use another LoRa send method to signal the breakage (`true`) and then use the other method to send the measurements.
+ *     - Use a *status* LoRa method to signal errors/system resets (int value, 0 = reset, 1 - ... = error call)
+ *     - Use a LoRa method to signal that a storm has been detected (`true`?)
+ *     - Sleep less when a storm is detected, increase sleep time after one/more cycles?
+ *     - Don't take a measurement each INT1-PD7 interrupt?
  *
  * @todo
  *   EXTRA THINGS:
- *     - Check the section about GPIO clock and cmuClock_HFPER
  *     - Add WDOG functionality. (see "powertest" example)
+ *         - Also see `getResetCause`(`system.c` in Dramco example)
+ *         - Send LoRa message on reset/error method triggered?
+ *         - One **status** LoRa method? `int` value and corresponding events?
+ *     - Give the sensors time to power up (40 ms? - Dramco)
+ *     - Check DS18B20 measurement timing (22,80 ms?)
+ *     - Check if DS18B20 and ADC logic can read negative temperatures (`int32_t` instead of `uint32_t`?)
+ *     - Disable unused pins? (Sensor enable, RN2483RX-TX-RST, INT2, ...)
+ *         - See `system.c` in Dramco example
+ *
+ * @todo
+ *   OPTIMALISATIONS:
  *     - Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
  *         - Also see *AN0007: 2.8 Optimizing Code*
+ *     - Add `disableClocks` (see `emodes.c` example) and `disableUnusedPins` functionality.
+ *         - EM3: All unwanted oscillators are disabled, don't need to manually disable them before `EMU_EnterEM3`.
+ *     - Set the accelerometer in *movement detection* to spare battery life when the buoy isn't installed yet?
+ *         - EM4 wakeup? See `deepsleep` (`system.c` in Dramco example)
  *
  * ******************************************************************************
  *
@@ -82,15 +97,17 @@
 #include "DS18B20.h"     /* Functions related to the temperature sensor */
 #include "adc.h"         /* Internal voltage and temperature reading functionality. */
 #include "cable.h"       /* Cable checking functionality. */
-#include "ustimer.h"     /* Timer functionality */
 #include "datatypes.h"   /* Definitions of the custom data-types. */
 
 
-/* Local definition */
+/* Local definitions */
 /** Time between each wake-up in seconds
  *    @li max 500 seconds when using LFXO delay
  *    @li 3600 seconds (one hour) works fine when using ULFRCO delay */
-#define WAKE_UP_PERIOD_S 10
+#define WAKE_UP_PERIOD_S 30
+
+/** Amount of PIN interrupt wakeups (before a RTC wakeup) to be considered as a *storm* */
+#define STORM_INTERRUPTS 5
 
 
 /* Local variables */
@@ -107,6 +124,14 @@ static MeasurementData_t data;
  *****************************************************************************/
 void checkInterrupts (void)
 {
+	/* Check if we woke up using the RTC sleep functionality and act accordingly */
+	if (RTC_checkWakeup())
+	{
+		RTC_clearWakeup(); /* Clear static variable */
+
+		ADXL_clearCounter(); /* Clear the trigger counter because we woke up "normally" */
+	}
+
 	if (BTN_getTriggered(0))
 	{
 
@@ -116,6 +141,7 @@ void checkInterrupts (void)
 
 		BTN_setTriggered(0, false); /* Clear static variable */
 	}
+
 
 	if (BTN_getTriggered(1))
 	{
@@ -127,11 +153,9 @@ void checkInterrupts (void)
 		BTN_setTriggered(1, false); /* Clear static variable */
 	}
 
-	/* Read status register to acknowledge interrupt
-	 * (can be disabled by changing LINK/LOOP mode in ADXL_REG_ACT_INACT_CTL)
-	 * TODO this can perhaps fix the bug where too much movement breaks interrupt wake-up ...
-	 * also change in ADXL_readValues! */
-	if (ADXL_getTriggered())
+
+	/* Read status register to acknowledge interrupt */
+	if (ADXL_getTriggered() & (ADXL_getCounter() <= STORM_INTERRUPTS))
 	{
 
 #if DEBUGGING == 1 /* DEBUGGING */
@@ -168,13 +192,13 @@ int main (void)
 #if DEBUGGING == 1 /* DEBUGGING */
 #if CUSTOM_BOARD == 1 /* Custom Happy Gecko pinout */
 				dbprint_INIT(DBG_UART, DBG_UART_LOC, false, false);
+				dbwarn("REGULAR board pinout selected");
 #else /* Regular Happy Gecko pinout */
 				dbprint_INIT(USART1, 4, true, false); /* VCOM */
+				dbwarn("CUSTOM board pinout selected");
 				//dbprint_INIT(USART1, 0, false, false); /* US1_TX = PC0 */
 #endif /* Board pinout selection */
 #endif /* DEBUGGING */
-
-				USTIMER_Init(); /* Initialize timer (necessary for DS18B20 logic) */
 
 				led(true); /* Enable (and initialize) LED */
 
@@ -184,6 +208,9 @@ int main (void)
 
 				/* Disable RN2483 */
 				GPIO_PinModeSet(PM_RN2483_PORT, PM_RN2483_PIN, gpioModePushPull, 0);
+				//GPIO_PinModeSet(RN2483_RESET_PORT, RN2483_RESET_PIN, gpioModePushPull, 0);
+				//GPIO_PinModeSet(RN2483_RX_PORT, RN2483_RX_PIN, gpioModePushPull, 0);
+				//GPIO_PinModeSet(RN2483_TX_PORT, RN2483_TX_PIN, gpioModePushPull, 0);
 
 				/* Initialize accelerometer */
 				if (true)
@@ -214,17 +241,19 @@ int main (void)
 					/* Enable measurements */
 					ADXL_enableMeasure(true);
 
-					delay(100); /* TODO: Weird INT behavour, try to fix this with link-looped mode! */
+					delay(100);
 
-					/* ADXL gives interrupt, capture this */
-					ADXL_ackInterrupt(); /* Acknowledge ADXL interrupt */
+					/* ADXL gives interrupt, capture this and acknowledge it by reading from it's status register */
+					ADXL_ackInterrupt();
 
 					/* Disable SPI after the initializations */
 					ADXL_enableSPI(false);
 
-					/* ADXL give interrupt, capture this */
-					ADXL_setTriggered(false); /* Reset variable again */
+					/* Clear the trigger counter */
+					ADXL_clearCounter();
 				}
+
+				//GPIO_PinModeSet(gpioPortC, 0, gpioModePushPull, 0); /* Debug pin */
 
 				led(false); /* Disable LED */
 
@@ -233,13 +262,8 @@ int main (void)
 
 			case MEASURE:
 			{
-				// TODO: add check if max data is filled here?
-
 				led(true); /* Enable LED */
-
-				delay(500);
-
-				checkInterrupts();
+				//delay(500);
 
 				/* Measure and store the external temperature (a measurement takes about 550 ms) TODO measurement is not 550 ms? */
 				data.extTemp[data.index] = readTempDS18B20();
@@ -286,6 +310,21 @@ int main (void)
 				MCUstate = MEASURE;
 			} break;
 
+			case SEND_STORM:
+			{
+
+#if DEBUGGING == 1 /* DEBUGGING */
+				dbwarn("STORM DETECTED! Normally we send the data now.");
+#endif /* DEBUGGING */
+
+				// TODO: Call data sending methods here
+
+				/* Reset the index to put the measurements in */
+				data.index = 0;
+
+				MCUstate = MEASURE;
+			} break;
+
 			case SLEEP:
 			{
 				// These statements don't seem to have any effect on current consumption ...
@@ -300,9 +339,19 @@ int main (void)
 
 			case WAKEUP:
 			{
-				/* Decide if 6 measurements are taken or not and react accordingly */
-				if (data.index == 6) MCUstate = SEND;
-				else MCUstate = MEASURE;
+				checkInterrupts(); /* Check if we woke up using interrupts and act accordingly */
+
+				/* Check if there isn't a storm detected */
+				if (ADXL_getCounter() > STORM_INTERRUPTS)
+				{
+					MCUstate = SEND_STORM;
+				}
+				else
+				{
+					/* Decide if 6 measurements are taken or not and react accordingly */
+					if (data.index == 6) MCUstate = SEND;
+					else MCUstate = MEASURE;
+				}
 			} break;
 
 			default:
