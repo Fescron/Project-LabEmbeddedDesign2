@@ -6,8 +6,9 @@ var NAVTREE =
       [ "Settings using definitions in dbprint and delay functionality", "index.html#SETTINGS", null ],
       [ "Initializations", "index.html#Initializations", null ],
       [ "Debug mode, Energy monitor and VCOM", "index.html#DEBUG", null ],
+      [ "GPIO/DATA/BUS pins and sleep mode", "index.html#GPIO", null ],
       [ "Crystals and RC oscillators (delay.c)", "index.html#CLOCKS1", null ],
-      [ "cmuClock_GPIO", "index.html#cmuClock_GPIO", null ],
+      [ "GPIO clock (cmuClock_GPIO)", "index.html#CLOCKS2", null ],
       [ "RTCC (RTC calendar)", "index.html#RTCC", null ],
       [ "Energy modes (EM1 and EM3)", "index.html#EM", null ],
       [ "Alternate UART Functionality Pinout", "index.html#UART", null ],
@@ -30,7 +31,7 @@ var NAVTREE =
     [ "Files", null, [
       [ "File List", "files.html", "files" ],
       [ "Globals", "globals.html", [
-        [ "All", "globals.html", null ],
+        [ "All", "globals.html", "globals_dup" ],
         [ "Functions", "globals_func.html", null ],
         [ "Variables", "globals_vars.html", null ],
         [ "Typedefs", "globals_type.html", null ],
@@ -45,7 +46,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "ADXL362_8c.html",
-"structMeasurementData__t.html#acc2fb91d22c79045d67ad997074b2f10"
+"pin__mapping_8h.html#a9b49e9431941e967d2961f662fafd24d"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

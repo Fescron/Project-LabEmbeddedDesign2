@@ -77,6 +77,10 @@ $(document).ready(function(){initNavTree('globals.html','');});
 : <a class="el" href="ADXL362_8h.html#a40573570150c448c0504097f13b96cea">ADXL362.h</a>
 , <a class="el" href="ADXL362_8c.html#a40573570150c448c0504097f13b96cea">ADXL362.c</a>
 </li>
+<li>ADXL_clearCounter()
+: <a class="el" href="ADXL362_8c.html#a082ac236e02b38591a21e89de3609dc5">ADXL362.c</a>
+, <a class="el" href="ADXL362_8h.html#a082ac236e02b38591a21e89de3609dc5">ADXL362.h</a>
+</li>
 <li>ADXL_CLK_PIN
 : <a class="el" href="pin__mapping_8h.html#aacac8ee1b757d389d7c15ed2efcaccaa">pin_mapping.h</a>
 </li>
@@ -92,8 +96,8 @@ $(document).ready(function(){initNavTree('globals.html','');});
 , <a class="el" href="ADXL362_8c.html#a5471fd7a8d4fd02ecdcafd54b9132e73">ADXL362.c</a>
 </li>
 <li>ADXL_configRange()
-: <a class="el" href="ADXL362_8h.html#aff08c54a3f0c4ad752a9f85e761762f5">ADXL362.h</a>
-, <a class="el" href="ADXL362_8c.html#aff08c54a3f0c4ad752a9f85e761762f5">ADXL362.c</a>
+: <a class="el" href="ADXL362_8c.html#aff08c54a3f0c4ad752a9f85e761762f5">ADXL362.c</a>
+, <a class="el" href="ADXL362_8h.html#aff08c54a3f0c4ad752a9f85e761762f5">ADXL362.h</a>
 </li>
 <li>ADXL_enableMeasure()
 : <a class="el" href="ADXL362_8h.html#a3a32a4cf4d2f84835d7bd4a640fa66d6">ADXL362.h</a>
@@ -102,6 +106,10 @@ $(document).ready(function(){initNavTree('globals.html','');});
 <li>ADXL_enableSPI()
 : <a class="el" href="ADXL362_8h.html#a76886733862257ff800cd5924e0c3e76">ADXL362.h</a>
 , <a class="el" href="ADXL362_8c.html#a76886733862257ff800cd5924e0c3e76">ADXL362.c</a>
+</li>
+<li>ADXL_getCounter()
+: <a class="el" href="ADXL362_8h.html#aa74db830447eeb4e0a95091e585c36e4">ADXL362.h</a>
+, <a class="el" href="ADXL362_8c.html#aa74db830447eeb4e0a95091e585c36e4">ADXL362.c</a>
 </li>
 <li>ADXL_getTriggered()
 : <a class="el" href="ADXL362_8h.html#a0a502d06bb2873e643ce69873622ed04">ADXL362.h</a>
@@ -112,6 +120,12 @@ $(document).ready(function(){initNavTree('globals.html','');});
 </li>
 <li>ADXL_INT1_PORT
 : <a class="el" href="pin__mapping_8h.html#af29262dedd520950b373f56e12feaf62">pin_mapping.h</a>
+</li>
+<li>ADXL_INT2_PIN
+: <a class="el" href="pin__mapping_8h.html#a000c679363130d58099daf51ab01459c">pin_mapping.h</a>
+</li>
+<li>ADXL_INT2_PORT
+: <a class="el" href="pin__mapping_8h.html#a57e38e24665ea1ab8049c1357df0e2cd">pin_mapping.h</a>
 </li>
 <li>ADXL_MISO_PIN
 : <a class="el" href="pin__mapping_8h.html#ae7f126d05a416689c36153e5f440e285">pin_mapping.h</a>
@@ -229,14 +243,17 @@ $(document).ready(function(){initNavTree('globals.html','');});
 : <a class="el" href="ADXL362_8c.html#a73d6dc0dc70299bbf178c061a027f95c">ADXL362.c</a>
 </li>
 <li>ADXL_setTriggered()
-: <a class="el" href="ADXL362_8h.html#a4ec684aa4bd58a9a39b8a9187a41fd6a">ADXL362.h</a>
-, <a class="el" href="ADXL362_8c.html#a4ec684aa4bd58a9a39b8a9187a41fd6a">ADXL362.c</a>
+: <a class="el" href="ADXL362_8c.html#a4ec684aa4bd58a9a39b8a9187a41fd6a">ADXL362.c</a>
+, <a class="el" href="ADXL362_8h.html#a4ec684aa4bd58a9a39b8a9187a41fd6a">ADXL362.h</a>
 </li>
 <li>ADXL_SPI
 : <a class="el" href="pin__mapping_8h.html#a509acbec1c6554007b9597482992b965">pin_mapping.h</a>
 </li>
 <li>ADXL_SPI_LOC
 : <a class="el" href="pin__mapping_8h.html#aeec8c0efb2948413b1b4374adea788fa">pin_mapping.h</a>
+</li>
+<li>ADXL_triggercounter
+: <a class="el" href="ADXL362_8c.html#a0e4210a158bf3693af16f295ab222688">ADXL362.c</a>
 </li>
 <li>ADXL_triggered
 : <a class="el" href="ADXL362_8c.html#aa6796c127952a6190b6c2197bc99d89a">ADXL362.c</a>
@@ -251,400 +268,12 @@ $(document).ready(function(){initNavTree('globals.html','');});
 : <a class="el" href="pin__mapping_8h.html#ae0f7d8b581df90fe0bb912c962b30cb1">pin_mapping.h</a>
 </li>
 </ul>
-
-
-<h3><a id="index_b"></a>- b -</h3><ul>
-<li>BATTERY_VOLTAGE
-: <a class="el" href="adc_8h.html#a8d24200decb8cc61e4c749c435e80926a33dfae05581973af118a10481e139aba">adc.h</a>
-</li>
-<li>BREAK1_PIN
-: <a class="el" href="pin__mapping_8h.html#a4f943438afb0469fd04a05d4471cc2c2">pin_mapping.h</a>
-</li>
-<li>BREAK1_PORT
-: <a class="el" href="pin__mapping_8h.html#a9025093577a98cb941e599d4e45606fb">pin_mapping.h</a>
-</li>
-<li>BREAK2_PIN
-: <a class="el" href="pin__mapping_8h.html#aa03bdfbf4a2a4b274be0a09c1d91c946">pin_mapping.h</a>
-</li>
-<li>BREAK2_PORT
-: <a class="el" href="pin__mapping_8h.html#aaa342d9130233e5b0cf9dea5071681c0">pin_mapping.h</a>
-</li>
-<li>BTN_getTriggered()
-: <a class="el" href="interrupt_8h.html#ab21b930d7d49ab29917b54408373414a">interrupt.h</a>
-, <a class="el" href="interrupt_8c.html#ab21b930d7d49ab29917b54408373414a">interrupt.c</a>
-</li>
-<li>BTN_setTriggered()
-: <a class="el" href="interrupt_8h.html#abb85f76e16c270396851fad940339a4b">interrupt.h</a>
-, <a class="el" href="interrupt_8c.html#abb85f76e16c270396851fad940339a4b">interrupt.c</a>
-</li>
-</ul>
-
-
-<h3><a id="index_c"></a>- c -</h3><ul>
-<li>checkCable()
-: <a class="el" href="cable_8h.html#af3994387a62811a825f973e1a09a533a">cable.h</a>
-, <a class="el" href="cable_8c.html#af3994387a62811a825f973e1a09a533a">cable.c</a>
-</li>
-<li>checkID_ADXL()
-: <a class="el" href="ADXL362_8c.html#aa90c3ffffda7d277ac7ff51ad0de7e0d">ADXL362.c</a>
-</li>
-<li>checkInterrupts()
-: <a class="el" href="main_8c.html#ad16e16b91af17288b858dbfa6962c056">main.c</a>
-</li>
-<li>convertGRangeToGValue()
-: <a class="el" href="ADXL362_8c.html#a771984ff7d33160250d617c873c0ed77">ADXL362.c</a>
-</li>
-<li>convertTempData()
-: <a class="el" href="DS18B20_8c.html#a0276931f539fb531415b2ac9fa7f4e77">DS18B20.c</a>
-</li>
-<li>convertToCelsius()
-: <a class="el" href="adc_8c.html#a6615c226917d25973e391ded79092b15">adc.c</a>
-</li>
-<li>CUSTOM_BOARD
-: <a class="el" href="pin__mapping_8h.html#abd81070fe30f1dd6d9b1f7b39bd4ad1b">pin_mapping.h</a>
-</li>
-</ul>
-
-
-<h3><a id="index_d"></a>- d -</h3><ul>
-<li>data
-: <a class="el" href="main_8c.html#ad2c9072e6e6a5758dfc647e1a08a9509">main.c</a>
-</li>
-<li>DBG_RXD_PIN
-: <a class="el" href="pin__mapping_8h.html#abacaf98e4ac5b4096f1357f9f7a2e79a">pin_mapping.h</a>
-</li>
-<li>DBG_RXD_PORT
-: <a class="el" href="pin__mapping_8h.html#a99d0e2135d34d7a164a249f2db34907b">pin_mapping.h</a>
-</li>
-<li>DBG_TXD_PIN
-: <a class="el" href="pin__mapping_8h.html#a20ad57f5da66322a91a0449e7cb2efa9">pin_mapping.h</a>
-</li>
-<li>DBG_TXD_PORT
-: <a class="el" href="pin__mapping_8h.html#ac8b51752fd6459f936b33dd5c8ba3d97">pin_mapping.h</a>
-</li>
-<li>DBG_UART
-: <a class="el" href="pin__mapping_8h.html#a4262e551c4909be86ca4e2c37e3085c5">pin_mapping.h</a>
-</li>
-<li>DBG_UART_LOC
-: <a class="el" href="pin__mapping_8h.html#a123ccd79d2ee0a5cd12968e0805e9ce3">pin_mapping.h</a>
-</li>
-<li>DEBUGGING
-: <a class="el" href="debugging_8h.html#a7180786c98af534f76855fef6f1b97ab">debugging.h</a>
-</li>
-<li>delay()
-: <a class="el" href="delay_8h.html#adb46f4276f5ddf111153701858f85df6">delay.h</a>
-, <a class="el" href="delay_8c.html#adb46f4276f5ddf111153701858f85df6">delay.c</a>
-</li>
-<li>DS18B20_VDD_initialized
-: <a class="el" href="DS18B20_8c.html#a762d0c5c4db2a77689f5b7b073d87904">DS18B20.c</a>
-</li>
-</ul>
-
-
-<h3><a id="index_e"></a>- e -</h3><ul>
-<li>error()
-: <a class="el" href="util_8h.html#ab212081592c908bf57b591e3c6e7483d">util.h</a>
-, <a class="el" href="util_8c.html#ab212081592c908bf57b591e3c6e7483d">util.c</a>
-</li>
-<li>errorNumber
-: <a class="el" href="util_8c.html#a23665a34dee037d541a3f7c4de0da810">util.c</a>
-</li>
-</ul>
-
-
-<h3><a id="index_g"></a>- g -</h3><ul>
-<li>GPIO_EVEN_IRQHandler()
-: <a class="el" href="interrupt_8c.html#a87d72653156b83829786f1f856ecbad1">interrupt.c</a>
-</li>
-<li>GPIO_ODD_IRQHandler()
-: <a class="el" href="interrupt_8c.html#a8fff5a798ff4721659dc7bdbb3149c8b">interrupt.c</a>
-</li>
-</ul>
-
-
-<h3><a id="index_i"></a>- i -</h3><ul>
-<li>IIC_SCL_PIN
-: <a class="el" href="pin__mapping_8h.html#a565efdc2653bf8f11f0aedf266cd1aab">pin_mapping.h</a>
-</li>
-<li>IIC_SCL_PORT
-: <a class="el" href="pin__mapping_8h.html#af9d4d211602c59cf4baf79cc713d6a4f">pin_mapping.h</a>
-</li>
-<li>IIC_SDA_PIN
-: <a class="el" href="pin__mapping_8h.html#a458a06f0285a355fbedf1ba6d08ff226">pin_mapping.h</a>
-</li>
-<li>IIC_SDA_PORT
-: <a class="el" href="pin__mapping_8h.html#a78479814901d54ca68800c488a6c0975">pin_mapping.h</a>
-</li>
-<li>INIT
-: <a class="el" href="datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4a0cb1b2c6a7db1f1084886c98909a3f36">datatypes.h</a>
-</li>
-<li>init
-: <a class="el" href="adc_8c.html#a643802e6534a4094866de9f51719ab15">adc.c</a>
-</li>
-<li>init_DS18B20()
-: <a class="el" href="DS18B20_8c.html#afa07203657ccb8eec9f88518640ff70d">DS18B20.c</a>
-</li>
-<li>initADC()
-: <a class="el" href="adc_8h.html#ab8a50016236d402e27a7e1b7f0f4cf52">adc.h</a>
-, <a class="el" href="adc_8c.html#ab8a50016236d402e27a7e1b7f0f4cf52">adc.c</a>
-</li>
-<li>initADXL()
-: <a class="el" href="ADXL362_8h.html#a751aabb29c6d1d22a54443e94873dbe5">ADXL362.h</a>
-, <a class="el" href="ADXL362_8c.html#a751aabb29c6d1d22a54443e94873dbe5">ADXL362.c</a>
-</li>
-<li>initADXL_SPI()
-: <a class="el" href="ADXL362_8c.html#a07f7e61130009572dbb2f6a72e603253">ADXL362.c</a>
-</li>
-<li>initGPIOwakeup()
-: <a class="el" href="interrupt_8h.html#a7e35708d61d26e9fe559a5545cdad810">interrupt.h</a>
-, <a class="el" href="interrupt_8c.html#a7e35708d61d26e9fe559a5545cdad810">interrupt.c</a>
-</li>
-<li>initLED()
-: <a class="el" href="util_8c.html#adf3c8631eb91b6652b542a92790d936a">util.c</a>
-</li>
-<li>initRTC()
-: <a class="el" href="delay_8c.html#aecf4672ef62001664f5ebc953755da1d">delay.c</a>
-</li>
-<li>initSingle
-: <a class="el" href="adc_8c.html#abb29b43e9ebffe8cabd440815ada000e">adc.c</a>
-</li>
-<li>INTERNAL_TEMPERATURE
-: <a class="el" href="adc_8h.html#a8d24200decb8cc61e4c749c435e80926a536d05df6092745fa011adfed26e6312">adc.h</a>
-</li>
-</ul>
-
-
-<h3><a id="index_l"></a>- l -</h3><ul>
-<li>led()
-: <a class="el" href="util_8h.html#ae4f2649524bfb723543f0dc939cd0ddd">util.h</a>
-, <a class="el" href="util_8c.html#ae4f2649524bfb723543f0dc939cd0ddd">util.c</a>
-</li>
-<li>LED_initialized
-: <a class="el" href="util_8c.html#a2af22783f212248cfba486cc8d9b8b40">util.c</a>
-</li>
-<li>LED_PIN
-: <a class="el" href="pin__mapping_8h.html#ab4553be4db9860d940f81d7447173b2f">pin_mapping.h</a>
-</li>
-<li>LED_PORT
-: <a class="el" href="pin__mapping_8h.html#a663daa01e565aee93c6f20c5845b90b4">pin_mapping.h</a>
-</li>
-<li>LFXOFREQ
-: <a class="el" href="delay_8h.html#a608c42d50a4df7f45d31ce5e1fbe1270">delay.h</a>
-</li>
-<li>LFXOFREQ_MS
-: <a class="el" href="delay_8h.html#acde5abcdec802c050f0fdf095fb28343">delay.h</a>
-</li>
-</ul>
-
-
-<h3><a id="index_m"></a>- m -</h3><ul>
-<li>main()
-: <a class="el" href="main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main.c</a>
-</li>
-<li>MAX_TIME_CTR
-: <a class="el" href="DS18B20_8h.html#a64ee5ab6a9e20a95acc7b717b2a3b167">DS18B20.h</a>
-</li>
-<li>MCU_State_t
-: <a class="el" href="datatypes_8h.html#aaaac3cd1355a2985b6f312f60d5919ab">datatypes.h</a>
-</li>
-<li>mcu_states
-: <a class="el" href="datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4">datatypes.h</a>
-</li>
-<li>MCUstate
-: <a class="el" href="main_8c.html#ab6f4105e91cccc9ef2e95660ecf31622">main.c</a>
-</li>
-<li>MEASURE
-: <a class="el" href="datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4a10b4381a926db55ed18619513fb12a28">datatypes.h</a>
-</li>
-<li>msTicks
-: <a class="el" href="delay_8c.html#a0a6e5e17fcb15f3922e278025acabfa2">delay.c</a>
-</li>
-</ul>
-
-
-<h3><a id="index_p"></a>- p -</h3><ul>
-<li>PB0_PIN
-: <a class="el" href="pin__mapping_8h.html#aea39132b18ce668ed815d13c3153323b">pin_mapping.h</a>
-</li>
-<li>PB0_PORT
-: <a class="el" href="pin__mapping_8h.html#ad891cd64538eea14b7d0a5af31dc9d54">pin_mapping.h</a>
-</li>
-<li>PB0_triggered
-: <a class="el" href="interrupt_8c.html#a920e2adfdf9ac0189246152dabbb2929">interrupt.c</a>
-</li>
-<li>PB1_PIN
-: <a class="el" href="pin__mapping_8h.html#aa33c970f051ff2f38a217f39f00599c1">pin_mapping.h</a>
-</li>
-<li>PB1_PORT
-: <a class="el" href="pin__mapping_8h.html#a45dba1bc29795a6d20a5eab51e7932be">pin_mapping.h</a>
-</li>
-<li>PB1_triggered
-: <a class="el" href="interrupt_8c.html#a527d3b0da76a1ab45ccd89950cc891cd">interrupt.c</a>
-</li>
-<li>PM_RN2483_PIN
-: <a class="el" href="pin__mapping_8h.html#a72c2ec1ff29c64c102892ecd0a9d1087">pin_mapping.h</a>
-</li>
-<li>PM_RN2483_PORT
-: <a class="el" href="pin__mapping_8h.html#afa86994dcd9da11c714337b4f201d100">pin_mapping.h</a>
-</li>
-<li>PM_SENS_EXT_PIN
-: <a class="el" href="pin__mapping_8h.html#a73a4329f7f36b5b0cb41a39300e35b7f">pin_mapping.h</a>
-</li>
-<li>PM_SENS_EXT_PORT
-: <a class="el" href="pin__mapping_8h.html#a0223987bdf0e26bd8b25781db5f371d2">pin_mapping.h</a>
-</li>
-<li>powerADXL()
-: <a class="el" href="ADXL362_8c.html#a642b0a175a83d9bdcab62a7dc387915d">ADXL362.c</a>
-</li>
-<li>powerDS18B20()
-: <a class="el" href="DS18B20_8c.html#a84d8cb45da1e9ecfbf71aae818823a12">DS18B20.c</a>
-</li>
-</ul>
-
-
-<h3><a id="index_r"></a>- r -</h3><ul>
-<li>range
-: <a class="el" href="ADXL362_8c.html#ac15127e4a68c57506d50185e28c86b13">ADXL362.c</a>
-</li>
-<li>readADC()
-: <a class="el" href="adc_8h.html#aa4c26dec382cae73bcbf21e406d10442">adc.h</a>
-, <a class="el" href="adc_8c.html#aa4c26dec382cae73bcbf21e406d10442">adc.c</a>
-</li>
-<li>readADXL()
-: <a class="el" href="ADXL362_8c.html#a37895e749ce9f02bea12d42cf2dd8b1d">ADXL362.c</a>
-</li>
-<li>readADXL_XYZDATA()
-: <a class="el" href="ADXL362_8c.html#adb08386b910fac1df4b052332e6dc038">ADXL362.c</a>
-</li>
-<li>readByteFromDS18B20()
-: <a class="el" href="DS18B20_8c.html#ad078b80b8eb65e93150b6e05a1ab2f88">DS18B20.c</a>
-</li>
-<li>readTempDS18B20()
-: <a class="el" href="DS18B20_8h.html#a4067fdb03437426a25af1f210622217b">DS18B20.h</a>
-, <a class="el" href="DS18B20_8c.html#a4067fdb03437426a25af1f210622217b">DS18B20.c</a>
-</li>
-<li>resetHandlerADXL()
-: <a class="el" href="ADXL362_8c.html#a99c5f8fb7a89a7a3223593186280418d">ADXL362.c</a>
-</li>
-<li>RN2483_RESET_PIN
-: <a class="el" href="pin__mapping_8h.html#affef8164edb04f522584d0bb89008a24">pin_mapping.h</a>
-</li>
-<li>RN2483_RESET_PORT
-: <a class="el" href="pin__mapping_8h.html#a370effc9854e492bf08089ef9d87bdd0">pin_mapping.h</a>
-</li>
-<li>RN2483_RX_PIN
-: <a class="el" href="pin__mapping_8h.html#a37bb52e2cedde3344587b821866d67df">pin_mapping.h</a>
-</li>
-<li>RN2483_RX_PORT
-: <a class="el" href="pin__mapping_8h.html#ad02494be4b9f19f33b3721e8dba2d182">pin_mapping.h</a>
-</li>
-<li>RN2483_TX_PIN
-: <a class="el" href="pin__mapping_8h.html#afa1d478d34d1b89d7e5f7963127badef">pin_mapping.h</a>
-</li>
-<li>RN2483_TX_PORT
-: <a class="el" href="pin__mapping_8h.html#a067858594eb5fcfce73ee25d159d3459">pin_mapping.h</a>
-</li>
-<li>RN2483_UART
-: <a class="el" href="pin__mapping_8h.html#aafe5285b93dd59fe5d345b1487927a45">pin_mapping.h</a>
-</li>
-<li>RN2483_UART_LOC
-: <a class="el" href="pin__mapping_8h.html#ac6781798f5792cf47986a925c2d320aa">pin_mapping.h</a>
-</li>
-<li>RTC_initialized
-: <a class="el" href="delay_8c.html#a31a8d0ba2d09ee649bb6d17829f89712">delay.c</a>
-</li>
-<li>RTC_IRQHandler()
-: <a class="el" href="delay_8c.html#ab86b9dd0d7b4eacfe38086e1fa4c2312">delay.c</a>
-</li>
-</ul>
-
-
-<h3><a id="index_s"></a>- s -</h3><ul>
-<li>SEND
-: <a class="el" href="datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4a67be7a5f47004345047b32fff72a2230">datatypes.h</a>
-</li>
-<li>sleep()
-: <a class="el" href="delay_8h.html#aae86f940455b5957441f4331cdc0828d">delay.h</a>
-, <a class="el" href="delay_8c.html#aae86f940455b5957441f4331cdc0828d">delay.c</a>
-</li>
-<li>SLEEP
-: <a class="el" href="datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4ad6137abebe4fdc59e2f0f2c84bdbe3fa">datatypes.h</a>
-</li>
-<li>softResetADXL()
-: <a class="el" href="ADXL362_8c.html#aa565c28fcb2cfade8a275c6f22410ab9">ADXL362.c</a>
-</li>
-<li>SysTick_Handler()
-: <a class="el" href="delay_8c.html#ab5e09814056d617c521549e542639b7e">delay.c</a>
-</li>
-<li>SYSTICKDELAY
-: <a class="el" href="delay_8h.html#ad940ebb5d3d4b3a77abd7c92fe76073c">delay.h</a>
-</li>
-</ul>
-
-
-<h3><a id="index_t"></a>- t -</h3><ul>
-<li>TEMP_DATA_PIN
-: <a class="el" href="pin__mapping_8h.html#ad72e87ac3f7ae2d8aeb5b0219824094f">pin_mapping.h</a>
-</li>
-<li>TEMP_DATA_PORT
-: <a class="el" href="pin__mapping_8h.html#af2b5f0565a2bbde4f40c600b1ce98a8c">pin_mapping.h</a>
-</li>
-<li>TEMP_VDD_PIN
-: <a class="el" href="pin__mapping_8h.html#ac692aef67d9f511152968311fe406dbb">pin_mapping.h</a>
-</li>
-<li>TEMP_VDD_PORT
-: <a class="el" href="pin__mapping_8h.html#a9b49e9431941e967d2961f662fafd24d">pin_mapping.h</a>
-</li>
-<li>testADXL()
-: <a class="el" href="ADXL362_8h.html#a50a7f7f1ee9b1ae3a1a60c4f2c9e4649">ADXL362.h</a>
-, <a class="el" href="ADXL362_8c.html#a50a7f7f1ee9b1ae3a1a60c4f2c9e4649">ADXL362.c</a>
-</li>
-<li>triggercounter
-: <a class="el" href="ADXL362_8c.html#af0c19c3000868c136b611a604f974054">ADXL362.c</a>
-</li>
-</ul>
-
-
-<h3><a id="index_u"></a>- u -</h3><ul>
-<li>ULFRCO
-: <a class="el" href="delay_8h.html#a78cca9c59fcbf3b43d03f7270c4b3a8c">delay.h</a>
-</li>
-<li>ULFRCOFREQ
-: <a class="el" href="delay_8h.html#a32d3f5f00133102c9c845ca65e7d5d77">delay.h</a>
-</li>
-<li>ULFRCOFREQ_MS
-: <a class="el" href="delay_8h.html#a7dfc303d591a9e657e53c979d8e0c664">delay.h</a>
-</li>
-</ul>
-
-
-<h3><a id="index_w"></a>- w -</h3><ul>
-<li>WAKE_UP_PERIOD_S
-: <a class="el" href="main_8c.html#ae1c1201a004beb35d405fd396f53f86c">main.c</a>
-</li>
-<li>WAKEUP
-: <a class="el" href="datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4a9204d962c01740d01d1ea40b219a0472">datatypes.h</a>
-</li>
-<li>writeADXL()
-: <a class="el" href="ADXL362_8c.html#a2abb8426713cdcd9ea9e7410f50cf635">ADXL362.c</a>
-</li>
-<li>writeByteToDS18B20()
-: <a class="el" href="DS18B20_8c.html#a371c1525c598f00d3dd4f1f4b2c66961">DS18B20.c</a>
-</li>
-</ul>
-
-
-<h3><a id="index_x"></a>- x -</h3><ul>
-<li>XYZDATA
-: <a class="el" href="ADXL362_8c.html#a03991cf5f8640149a6253a1ca9a2b0cb">ADXL362.c</a>
-</li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sun Apr 21 2019 15:53:25 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Fri Apr 26 2019 01:11:43 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

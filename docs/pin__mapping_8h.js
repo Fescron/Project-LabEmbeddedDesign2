@@ -4,6 +4,8 @@ var pin__mapping_8h =
     [ "ADXL_CLK_PORT", "pin__mapping_8h.html#acf0c17ea354c32c47e56583f7f5b3ef1", null ],
     [ "ADXL_INT1_PIN", "pin__mapping_8h.html#a70ba0d40c82a05d88a91cfa3fb4caf9a", null ],
     [ "ADXL_INT1_PORT", "pin__mapping_8h.html#af29262dedd520950b373f56e12feaf62", null ],
+    [ "ADXL_INT2_PIN", "pin__mapping_8h.html#a000c679363130d58099daf51ab01459c", null ],
+    [ "ADXL_INT2_PORT", "pin__mapping_8h.html#a57e38e24665ea1ab8049c1357df0e2cd", null ],
     [ "ADXL_MISO_PIN", "pin__mapping_8h.html#ae7f126d05a416689c36153e5f440e285", null ],
     [ "ADXL_MISO_PORT", "pin__mapping_8h.html#a91d38c984028b3369a2e0a8628325981", null ],
     [ "ADXL_MOSI_PIN", "pin__mapping_8h.html#a99316dafe17719dc4f0d0e04731c36db", null ],

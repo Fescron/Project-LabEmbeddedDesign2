@@ -85,6 +85,13 @@ Debug mode, Energy monitor and VCOM</h1>
 <p>The Energy profiler in Simplicity Studio seems to use VCOM (on-board UART to USB converter) somehow, change to using an external UART adapter if both the energy profiler and UART debugging are necessary at the same time!</p>
 <p>If the energy profiler was used and the code functionality was switched, physically re-plug the board to make sure VCOM UART starts working again!</p>
 <hr/>
+<h1><a class="anchor" id="GPIO"></a>
+GPIO/DATA/BUS pins and sleep mode</h1>
+<dl class="section warning"><dt>Warning</dt><dd>It's necessary to disable the GPIO pins of, for example, an SPI bus before going to sleep to get the <em>correct</em> sleep currents.</dd></dl>
+<p>Otherwise, some unwanted currents might flow out of these pins even though the data bus isn't active. This behavior caused confusion multiple times during the development phase. It was observed that for example that a 10k pull-up resistor pulled about 320 µA of unwanted current if the corresponding MCU pins weren't disabled.</p>
+<dl class="section warning"><dt>Warning</dt><dd>It's also necessary to disable the GPIO pins for data pins (like for example in the case of the SPI bus) if an external sensor should be powered down.</dd></dl>
+<p>Because of the low current usage of these energy-efficient sensors, it's possible they can still be parasitically powered through the data bus even though it's supply pins are powered off using GPIO pins of the MCU. This also caused confusion bugs during the development phase.</p>
+<hr/>
 <h1><a class="anchor" id="CLOCKS1"></a>
 Crystals and RC oscillators (delay.c)</h1>
 <p>Normally using an external oscillator/crystal uses less energy than the internal one. This external oscillator/crystal can however be omitted if the design goal is to reduce the BOM count as much as possible.</p>
@@ -93,13 +100,11 @@ Crystals and RC oscillators (delay.c)</h1>
 <p>For the development of the code for the RN2483 shield from DRAMCO, it's possible they chose to use the LFXO instead of the ULFRCO in sleep because the crystal was more stable for high baudrate communication using the LEUART peripheral.</p>
 <dl class="section note"><dt>Note</dt><dd>For low-power development it's advised to consistently enable peripherals and oscillators/clocks when needed and disable them afterwards. For some methods it can be useful to provide a boolean argument so that in the case of sending more bytes the clock can be disabled only after sending the latest one. Perhaps this can be used in combination with static variables in the method so they keep their value between calls and recursion can be used.</dd></dl>
 <hr/>
-<h1><a class="anchor" id="cmuClock_GPIO"></a>
-cmuClock_GPIO</h1>
+<h1><a class="anchor" id="CLOCKS2"></a>
+GPIO clock (cmuClock_GPIO)</h1>
 <p>At one point in the development phase the clock to the GPIO peripheral was always enabled when necessary and disabled afterwards. Because the GPIO clock needs to be enabled for almost everything, even during EM2 so the MCU can react (and not only log) pin interrupts, this behavior was later scrapped.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd><ul>
-<li>Also talk about cmuClock_HFPER?</li>
-</ul>
-</dd></dl>
+<p><code>cmuClock_GPIO</code> is however just in case enabled in INIT methods where GPIO functionality is necessary.</p>
+<dl class="section note"><dt>Note</dt><dd>Alongside this peripheral clock, <code>cmuClock_HFPER</code> is also always enabled since GPIO is a High Frequency Peripheral.</dd></dl>
 <hr/>
 <h1><a class="anchor" id="RTCC"></a>
 RTCC (RTC calendar)</h1>
@@ -194,7 +199,7 @@ Bits, bytes, nibbles and unsigned/signed integer value ranges</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sun Apr 21 2019 15:53:25 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Fri Apr 26 2019 01:11:43 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
