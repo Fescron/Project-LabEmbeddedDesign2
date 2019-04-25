@@ -12,9 +12,6 @@
  *   @li v1.1: Removed re-initialization dbprint messages.
  *   @li v1.2: Started using custom enum type and cleaned up some unnecessary statements after testing.
  *
- *   @todo
- *     - What if we read a negative internal temperature? `int32_t` instead of `uint32_t`?
- *
  * ******************************************************************************
  *
  * @section License

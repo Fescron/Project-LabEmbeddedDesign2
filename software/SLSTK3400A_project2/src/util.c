@@ -23,8 +23,8 @@
  *   @li v2.6: Updated code with new DEFINE checks.
  *
  *   @todo
- *     - Add disableClocks functionality from `emodes.c` here?
- *     - Add disableUnusedPins method for use in the INIT state?
+ *     - Don't go in while(true) loop on error when the mode is in **release**.
+ *         - Call LoRa method but check beforehand if some clocks need to be disabled after the error call!
  *
  * ******************************************************************************
  *
