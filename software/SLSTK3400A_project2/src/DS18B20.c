@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.8
+ * @version 1.9
  * @author
  *   Alec Vanderhaegen & Sarah Goossens@n
  *   Modified by Brecht Van Eeckhoudt
@@ -21,12 +21,10 @@
  *   @li v1.6: Updated documentation.
  *   @li v1.7: Started using new delay functionality.
  *   @li v1.8: Added line to disable DATA pin after a measurement, this breaks the code but fixes the sleep current.
+ *   @li v1.9: Enabled and disabled timer each time a measurement is taken.
  *
  *   @todo
- *     - FIX THE TEMPERATURE READING
- *     - Use USTIMER_INIT and DEINIT to enable/disable timer clocks? Do these statements require a lot of extra time?
- *     - Enable/disable timer clock after measurement?
- *     - Enter EM1 when the MCU is waiting in a delay method? -> this was tried out but failed to work...
+ *     - Fix the temperature reading when the data pin gets disabled.
  *
  ******************************************************************************/
 
@@ -67,6 +65,10 @@ static float convertTempData (uint8_t tempLS, uint8_t tempMS);
  *****************************************************************************/
 float readTempDS18B20 (void)
 {
+	/* Initialize timer
+	 * Initializing and disabling the timer again adds about 40 µs active time but should conserve sleep energy... */
+	USTIMER_Init();
+
 	/* Initialize and power VDD pin */
 	powerDS18B20(true);
 
@@ -90,18 +92,22 @@ float readTempDS18B20 (void)
 			rawDataFromDS18B20Arr[n] = readByteFromDS18B20();
 		}
 
-		/* Disable the VDD pin */
-		powerDS18B20(false);
+		/* Disable interrupts and turn off the clock to the underlying hardware timer. */
+		USTIMER_DeInit();
 
 		/* Disable data pin (otherwise we got a "sleep" current of about 330 µA due to the on-board 10k pull-up) */
 		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeDisabled, 0);
 		//GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0); // TODO: This doesn't work either...
+
+		/* Disable the VDD pin */
+		powerDS18B20(false);
 
 		/* Return the converted byte */
 		return (convertTempData(rawDataFromDS18B20Arr[0], rawDataFromDS18B20Arr[1]));
 	}
 	else
 	{
+
 #ifdef DEBUGGING /* DEBUGGING */
 		dbcrit("DS18B20 measurement failed");
 #endif /* DEBUGGING */
