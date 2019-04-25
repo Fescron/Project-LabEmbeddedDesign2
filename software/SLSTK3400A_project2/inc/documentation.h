@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file documentation.h
  * @brief This file contains useful documentation about the project.
- * @version 1.0
+ * @version 1.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -72,6 +72,27 @@
  *
  * ******************************************************************************
  *
+ * @section GPIO GPIO/DATA/BUS pins and sleep mode
+ *
+ *   @warning It's necessary to disable the GPIO pins of, for example, an SPI bus
+ *   before going to sleep to get the *correct* sleep currents.
+ *
+ *   Otherwise, some unwanted currents might flow out of these pins even though
+ *   the data bus isn't active. This behavior caused confusion multiple times
+ *   during the development phase. It was observed that for example that a 10k
+ *   pull-up resistor pulled about 320 µA of unwanted current if the corresponding
+ *   MCU pins weren't disabled.
+ *
+ *   @warning It's also necessary to disable the GPIO pins for data pins (like for
+ *   example in the case of the SPI bus) if an external sensor should be powered down.
+ *
+ *   Because of the low current usage of these energy-efficient sensors,
+ *   it's possible they can still be parasitically powered through the data bus
+ *   even though it's supply pins are powered off using GPIO pins of the MCU. This
+ *   also caused confusion bugs during the development phase.
+ *
+ * ******************************************************************************
+ *
  * @section CLOCKS1 Crystals and RC oscillators (delay.c)
  *
  *   Normally using an external oscillator/crystal uses less energy than the internal
@@ -100,15 +121,18 @@
  *
  * ******************************************************************************
  *
- * @section cmuClock_GPIO
+ * @section CLOCKS2 GPIO clock (cmuClock_GPIO)
  *
  *   At one point in the development phase the clock to the GPIO peripheral was
  *   always enabled when necessary and disabled afterwards. Because the GPIO
  *   clock needs to be enabled for almost everything, even during EM2 so the MCU
  *   can react (and not only log) pin interrupts, this behavior was later scrapped.
  *
- *   @todo
- *     - Also talk about cmuClock_HFPER?
+ *   `cmuClock_GPIO` is however just in case enabled in INIT methods where GPIO
+ *   functionality is necessary.
+ *
+ *   @note Alongside this peripheral clock, `cmuClock_HFPER` is also always enabled
+ *   since GPIO is a High Frequency Peripheral.
  *
  * ******************************************************************************
  *
