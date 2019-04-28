@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file interrupt.c
  * @brief Interrupt functionality.
- * @version 2.0
+ * @version 2.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -22,6 +22,7 @@
  *   @li v1.8: Updated code with new DEFINE checks.
  *   @li v1.9: Removed error calls for "unknown" pins and added flag check for custom Happy Gecko board pinout.
  *   @li v2.0: Stopped disabling the RTC counter on pin interrupts.
+ *   @li v2.1: Disabled the RTC counter on a button push because it confused delays called in LoRaWAN code.
  *
  * ******************************************************************************
  *
@@ -173,21 +174,24 @@ void BTN_setTriggered (uint8_t number, bool value)
  *   GPIO Even IRQ for pushbuttons on even-numbered pins.
  *
  * @details
- *   The RTC is also disabled on a pin interrupt TODO not anymore, perhaps change the comments if everything works fine.
+ *   The RTC is also disabled on a button press (*manual wakeup*)
  *
  * @note
  *   The *weak* definition for this method is located in `system_efm32hg.h`.
  *****************************************************************************/
 void GPIO_EVEN_IRQHandler (void)
 {
-	/* Disable the counter */
-	//RTC_Enable(false);
-
 	/* Read interrupt flags */
 	uint32_t flags = GPIO_IntGet();
 
 	/* Check if PB1 is pushed */
-	if (flags == 0x400) PB1_triggered = true;
+	if (flags == 0x400)
+	{
+		/* Disable the counter (manual wakeup) */
+		RTC_Enable(false);
+
+		PB1_triggered = true;
+	}
 
 	/* Clear all even pin interrupt flags */
 	GPIO_IntClear(0x5555);
@@ -199,21 +203,24 @@ void GPIO_EVEN_IRQHandler (void)
  *   GPIO Odd IRQ for pushbuttons on odd-numbered pins.
  *
  * @details
- *   The RTC is also disabled on a pin interrupt TODO not anymore, perhaps change the comments if everything works fine.
+ *   The RTC is also disabled on a button press (*manual wakeup*)
  *
  * @note
  *   The *weak* definition for this method is located in `system_efm32hg.h`.
  *****************************************************************************/
 void GPIO_ODD_IRQHandler (void)
 {
-	/* Disable the counter */
-	//RTC_Enable(false);
-
 	/* Read interrupt flags */
 	uint32_t flags = GPIO_IntGet();
 
 	/* Check if PB0 is pushed */
-	if (flags == 0x200) PB0_triggered = true;
+	if (flags == 0x200)
+	{
+		/* Disable the counter (manual wakeup) */
+		RTC_Enable(false);
+
+		PB0_triggered = true;
+	}
 
 	/* Check if INT1 is triggered */
 #if CUSTOM_BOARD == 1 /* Custom Happy Gecko pinout */

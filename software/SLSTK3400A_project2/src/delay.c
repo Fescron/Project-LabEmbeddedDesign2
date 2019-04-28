@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.c
  * @brief Delay functionality.
- * @version 2.1
+ * @version 2.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -21,6 +21,10 @@
  *   @li v1.9: Updated code with new DEFINE checks.
  *   @li v2.0: Added functionality to enable/disable the clocks only when necessary.
  *   @li v2.1: Added functionality to check if a wakeup was caused by the RTC.
+ *   @li v2.2: Removed some clock disabling statements.
+ *
+ *   @todo
+ *     - Split definition to use the ULFRCO for the delay and sleep method? (if so, also update documentation!)
  *
  * ******************************************************************************
  *
@@ -51,7 +55,7 @@
 /* Local variables */
 static volatile uint32_t msTicks; /* Volatile because it's modified by an interrupt service routine */
 static volatile bool RTC_sleep_wakeup = false; /* Volatile because it's modified by an interrupt service routine */
-static volatile bool sleeping = false; /* Volatile because it's modified by an interrupt service routine */
+static bool sleeping = false;
 static bool RTC_initialized = false;
 
 #if SYSTICKDELAY == 1 /* SysTick delay selected */
@@ -120,13 +124,13 @@ void delay (uint32_t msDelay)
 #else /* LFXO selected */
 
 		/* Enable the low-frequency crystal oscillator for the RTC */
-		CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
+		//CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
 
 #endif /* ULFRCO/LFXO selection */
 
 		/* Enable the clock to the interface of the low energy modules
 		 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
-		CMU_ClockEnable(cmuClock_HFLE, true);
+		//CMU_ClockEnable(cmuClock_HFLE, true);
 
 		/* Turn on the RTC clock */
 		CMU_ClockEnable(cmuClock_RTC, true);
@@ -187,13 +191,13 @@ void delay (uint32_t msDelay)
 #else /* LFXO selected */
 
 	/* Disable the low-frequency crystal oscillator for the RTC */
-	CMU_OscillatorEnable(cmuOsc_LFXO, false, true);
+	//CMU_OscillatorEnable(cmuOsc_LFXO, false, true);
 
 #endif /* ULFRCO/LFXO selection */
 
 	/* Disable the clock to the interface of the low energy modules
 	 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
-	CMU_ClockEnable(cmuClock_HFLE, false);
+	//CMU_ClockEnable(cmuClock_HFLE, false);
 
 	/* Turn off the RTC clock */
 	CMU_ClockEnable(cmuClock_RTC, false);
@@ -228,13 +232,13 @@ void sleep (uint32_t sSleep)
 #else /* LFXO selected */
 
 		/* Enable the low-frequency crystal oscillator for the RTC */
-		CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
+		//CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
 
 #endif /* ULFRCO/LFXO selection */
 
 		/* Enable the clock to the interface of the low energy modules
 		 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
-		CMU_ClockEnable(cmuClock_HFLE, true);
+		//CMU_ClockEnable(cmuClock_HFLE, true);
 
 		/* Turn on the RTC clock */
 		CMU_ClockEnable(cmuClock_RTC, true);
@@ -309,13 +313,13 @@ void sleep (uint32_t sSleep)
 #else /* LFXO selected */
 
 	/* Disable the low-frequency crystal oscillator for the RTC */
-	CMU_OscillatorEnable(cmuOsc_LFXO, false, true);
+	//CMU_OscillatorEnable(cmuOsc_LFXO, false, true);
 
 #endif /* ULFRCO/LFXO selection */
 
 	/* Disable the clock to the interface of the low energy modules
 	 * cmuClock_CORELE = cmuClock_HFLE (deprecated) */
-	CMU_ClockEnable(cmuClock_HFLE, false);
+	//CMU_ClockEnable(cmuClock_HFLE, false);
 
 	/* Turn off the RTC clock */
 	CMU_ClockEnable(cmuClock_RTC, false);
