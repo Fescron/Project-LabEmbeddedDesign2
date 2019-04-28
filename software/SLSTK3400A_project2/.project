@@ -36,6 +36,11 @@
 			<locationURI>STUDIO_SDK_LOC/hardware/kit/common/bsp/bsp_stk_leds.c</locationURI>
 		</link>
 		<link>
+			<name>drivers/dmactrl.c</name>
+			<type>1</type>
+			<location>/home/brecht/Programs/SimplicityStudio_v4/developer/sdks/gecko_sdk_suite/v2.4/hardware/kit/common/drivers/dmactrl.c</location>
+		</link>
+		<link>
 			<name>emdrv/ustimer.c</name>
 			<type>1</type>
 			<location>/home/brecht/Programs/SimplicityStudio_v4/developer/sdks/gecko_sdk_suite/v2.4/platform/emdrv/ustimer/src/ustimer.c</location>
@@ -61,6 +66,11 @@
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_core.c</locationURI>
 		</link>
 		<link>
+			<name>emlib/em_dma.c</name>
+			<type>1</type>
+			<location>/home/brecht/Programs/SimplicityStudio_v4/developer/sdks/gecko_sdk_suite/v2.4/platform/emlib/src/em_dma.c</location>
+		</link>
+		<link>
 			<name>emlib/em_emu.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_emu.c</locationURI>
@@ -69,6 +79,11 @@
 			<name>emlib/em_gpio.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_gpio.c</locationURI>
+		</link>
+		<link>
+			<name>emlib/em_leuart.c</name>
+			<type>1</type>
+			<location>/home/brecht/Programs/SimplicityStudio_v4/developer/sdks/gecko_sdk_suite/v2.4/platform/emlib/src/em_leuart.c</location>
 		</link>
 		<link>
 			<name>emlib/em_rtc.c</name>
