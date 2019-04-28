@@ -2,7 +2,13 @@
  * @file cable.c
  * @brief Cable checking functionality.
  * @version 1.4
- * @author Brecht Van Eeckhoudt
+ * @author
+ *   Matthias Alleman@n
+ *   Modified by Brecht Van Eeckhoudt
+ * @details
+ *   Originally this functionality should've detected a cable breaking event using
+ *   an **interrupt**, but due to the low water resistance this unfortunately wasn't
+ *   possible to implement.
  *
  * ******************************************************************************
  *

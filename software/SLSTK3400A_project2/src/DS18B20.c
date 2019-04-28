@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 1.9
+ * @version 2.0
  * @author
  *   Alec Vanderhaegen & Sarah Goossens@n
  *   Modified by Brecht Van Eeckhoudt
@@ -22,9 +22,7 @@
  *   @li v1.7: Started using new delay functionality.
  *   @li v1.8: Added line to disable DATA pin after a measurement, this breaks the code but fixes the sleep current.
  *   @li v1.9: Enabled and disabled timer each time a measurement is taken.
- *
- *   @todo
- *     - Fix the temperature reading when the data pin gets disabled.
+ *   @li v2.0: Updated documentation.
  *
  ******************************************************************************/
 
@@ -58,7 +56,11 @@ static float convertTempData (uint8_t tempLS, uint8_t tempMS);
  *   Get a temperature value from the DS18B20.
  *
  * @details
- *   One measurement takes about 550 ms.
+ *   A measurement takes about 23 ms if successful, about 60 ms if no sensor is attached.
+ *   USTimer gets initialized, the sensor gets powered, the data-transmission
+ *   takes place, the timer gets de-initialized to disable the clocks and interrupts,
+ *   the data and power pin get disabled and finally the read values are converted to a
+ *   float value.
  *
  * @return
  *   The read temperature data (`float`).
@@ -97,7 +99,6 @@ float readTempDS18B20 (void)
 
 		/* Disable data pin (otherwise we got a "sleep" current of about 330 µA due to the on-board 10k pull-up) */
 		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeDisabled, 0);
-		//GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0); // TODO: This doesn't work either...
 
 		/* Disable the VDD pin */
 		powerDS18B20(false);
@@ -246,10 +247,10 @@ static void writeByteToDS18B20 (uint8_t data)
 		if (data & 0x01)
 		{
 			GPIO_PinOutClear(TEMP_DATA_PORT, TEMP_DATA_PIN);
-			//UDELAY_Delay(5);
-			for (int i=0; i<5; i++){
 
-			}
+			/* 5 µs delay should be called here but this loop works fine too... */
+			for (int i=0; i<5; i++);
+
 			GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
 			USTIMER_DelayIntSafe(60);
 		}
@@ -259,9 +260,9 @@ static void writeByteToDS18B20 (uint8_t data)
 			GPIO_PinOutClear(TEMP_DATA_PORT, TEMP_DATA_PIN);
 			USTIMER_DelayIntSafe(60);
 			GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
-			//UDELAY_Delay(5);
-			for (int i=0; i<5; i++){
-			}
+
+			/* 5 µs delay should be called here but this loop works fine too... */
+			for (int i=0; i<5; i++);
 		}
 		/* Right shift bits once */
 		data >>= 1;
@@ -323,7 +324,7 @@ static uint8_t readByteFromDS18B20 (void)
  *   Least significant byte.
  *
  * @param[in] tempMS
- *   Most significant byte
+ *   Most significant byte.
  *
  * @return
  *   The converted temperature data (`float`).

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 2.2
+ * @version 2.3
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -23,13 +23,12 @@
  *   @li v2.0: Added testing method to go through all the settings, moved the register definitions.
  *   @li v2.1: Disabled SPI pins on *hard* reset, cleaned up some code.
  *   @li v2.2: Added functionality to check the number of interrupts.
+ *   @li v2.3: Updated documentation.
  *
  *   @todo
- *     - Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?
- *         - Start using linked-loop mode for ADXL to fix the strange interrupt behavior?
+ *     - Check initialization (settings)
  *         - Check absolute/relative mode?
  *         - Check `lis3dh.c` in Dramco example (init shake detection)
- *         - This seems fixed when the `delay` statement is removed in `MEASURE`, the code can react fast enough between interrupts...
  *     - Make `ADXL_configActivity` method use **float** as the argument type?
  *     - Enable wake-up mode: `writeADXL(ADXL_REG_POWER_CTL, 0b00001000)` // 5th bit
  *
