@@ -65,43 +65,51 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <div class="textblock"><dl class="reflist">
 <dt><a class="anchor" id="_todo000001"></a>File <a class="el" href="ADXL362_8c.html">ADXL362.c</a>  </dt>
 <dd><ul>
-<li>Too much movement breaks interrupt functionality, register not cleared good but new movement already detected?<ul>
-<li>Start using linked-loop mode for ADXL to fix the strange interrupt behavior?</li>
+<li>Check initialization (settings)<ul>
 <li>Check absolute/relative mode?</li>
 <li>Check <code>lis3dh.c</code> in Dramco example (init shake detection)</li>
-<li>This seems fixed when the <code>delay</code> statement is removed in <code>MEASURE</code>, the code can react fast enough between interrupts...</li>
 </ul>
 </li>
 <li>Make <code>ADXL_configActivity</code> method use <b>float</b> as the argument type?</li>
 <li>Enable wake-up mode: <code>writeADXL(ADXL_REG_POWER_CTL, 0b00001000)</code> // 5th bit </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000002"></a>File <a class="el" href="DS18B20_8c.html">DS18B20.c</a>  </dt>
+<dt><a class="anchor" id="_todo000002"></a>File <a class="el" href="delay_8c.html">delay.c</a>  </dt>
 <dd><ul>
-<li>Fix the temperature reading when the data pin gets disabled. </li>
+<li>Split definition to use the ULFRCO for the delay and sleep method? (if so, also update documentation!) </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
-<dd><p class="startdd">IMPORTANT:</p><ul>
-<li>When a cable break is detected, immediately send a LoRa message with the already filled measurement data<ul>
-<li>Use another LoRa send method to signal the breakage (<code>true</code>) and then use the other method to send the measurements.</li>
+<dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="lora__wrappers_8c.html">lora_wrappers.c</a>  </dt>
+<dd><ul>
+<li>Fix <code>sendMeasurements</code> method!</li>
+<li>Save LoRaWAN settings before calling <code>disableLoRaWAN</code>?</li>
+<li>Fix <code>sleepLoRaWAN</code> and <code>wakeLoRaWAN</code> methods.</li>
+<li>Remove unnecessary defines/variables. </li>
 </ul>
-</li>
+</dd>
+<dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
+<dd>IMPORTANT:<ul>
+<li>Add already filled measurement data to a "cable break send" method?</li>
 <li>Use a <em>status</em> LoRa method to signal errors/system resets (int value, 0 = reset, 1 - ... = error call)</li>
-<li>Use a LoRa method to signal that a storm has been detected (<code>true</code>?)</li>
-<li>Sleep less when a storm is detected, increase sleep time after one/more cycles?</li>
-<li>Don't take a measurement each INT1-PD7 interrupt?</li>
+<li>Enable/disable LED using definition.</li>
+<li><p class="startli">On INT1-PD7, go to sleep for somehow the remaining RTC time on wakeup?</p><ul>
+<li>On ADXL interrupt the RTC doesn't get disabled!</li>
 </ul>
-<p class="enddd">EXTRA THINGS:</p><ul>
+<p class="startli">EXTRA THINGS:</p>
+</li>
 <li>Add WDOG functionality. (see "powertest" example)<ul>
 <li>Also see <code>getResetCause</code>(<code>system.c</code> in Dramco example)</li>
 <li>Send LoRa message on reset/error method triggered?</li>
 <li>One <b>status</b> LoRa method? <code>int</code> value and corresponding events?</li>
 </ul>
 </li>
+<li>Clean up BSP folder and other includes.</li>
+<li>Check error call values.</li>
 <li>Give the sensors time to power up (40 ms? - Dramco)</li>
-<li>Check DS18B20 measurement timing (22,80 ms?)</li>
-<li>Check if DS18B20 and ADC logic can read negative temperatures (<code>int32_t</code> instead of <code>uint32_t</code>?)</li>
+<li>Check if DS18B20 and ADC logic can read negative temperatures (<code>int32_t</code> instead of <code>uint32_t</code>?)<ul>
+<li>Can LPP even handle/display these negative temperatures?</li>
+</ul>
+</li>
 <li><p class="startli">Disable unused pins? (Sensor enable, RN2483RX-TX-RST, INT2, ...)</p><ul>
 <li>See <code>system.c</code> in Dramco example</li>
 </ul>
@@ -111,17 +119,19 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Also see <em>AN0007: 2.8 Optimizing Code</em></li>
 </ul>
 </li>
+<li>Change LoRaWAN Spreading Factor</li>
 <li>Add <code>disableClocks</code> (see <code>emodes.c</code> example) and <code>disableUnusedPins</code> functionality.<ul>
 <li>EM3: All unwanted oscillators are disabled, don't need to manually disable them before <code>EMU_EnterEM3</code>.</li>
 </ul>
 </li>
 <li>Set the accelerometer in <em>movement detection</em> to spare battery life when the buoy isn't installed yet?<ul>
-<li>EM4 wakeup? See <code>deepsleep</code> (<code>system.c</code> in Dramco example) </li>
+<li>EM4 wakeup? See <code>deepsleep</code> (<code>system.c</code> in Dramco example)</li>
 </ul>
 </li>
+<li>Surround some delay logic with <code>ATOMIC</code> statements? (see <code>rtcdvr</code>?) </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000006"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
+<dt><a class="anchor" id="_todo000007"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
 <dd><ul>
 <li>Don't go in while(true) loop on error when the mode is in <b>release</b>.<ul>
 <li>Call LoRa method but check beforehand if some clocks need to be disabled after the error call!</li>
@@ -135,7 +145,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Apr 26 2019 01:11:43 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Mon Apr 29 2019 00:03:29 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

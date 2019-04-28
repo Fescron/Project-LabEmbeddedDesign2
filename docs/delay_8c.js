@@ -10,5 +10,5 @@ var delay_8c =
     [ "msTicks", "delay_8c.html#a0a6e5e17fcb15f3922e278025acabfa2", null ],
     [ "RTC_initialized", "delay_8c.html#a31a8d0ba2d09ee649bb6d17829f89712", null ],
     [ "RTC_sleep_wakeup", "delay_8c.html#a5d05d3c03875b363db56e35882b55025", null ],
-    [ "sleeping", "delay_8c.html#a261322f6135dca93b08b3a042f3f1c25", null ]
+    [ "sleeping", "delay_8c.html#afc77d1fb95870b5511dffff362261cb6", null ]
 ];

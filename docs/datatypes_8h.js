@@ -8,6 +8,7 @@ var datatypes_8h =
       [ "SEND", "datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4a67be7a5f47004345047b32fff72a2230", null ],
       [ "SEND_STORM", "datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4ae05e5e5d4033fcc1f6cc3894881d66b3", null ],
       [ "SLEEP", "datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4ad6137abebe4fdc59e2f0f2c84bdbe3fa", null ],
+      [ "SLEEP_HALFTIME", "datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4aa40e10b1b38eea53354adb9aba78506c", null ],
       [ "WAKEUP", "datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4a9204d962c01740d01d1ea40b219a0472", null ]
     ] ]
 ];
