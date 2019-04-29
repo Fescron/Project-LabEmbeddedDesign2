@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lora_wrappers.c
  * @brief LoRa wrapper methods
- * @version 1.1
+ * @version 1.2
  * @author
  *   Benjamin Van der Smissen@n
  *   Heavily modified by Brecht Van Eeckhoudt
@@ -12,9 +12,9 @@
  *
  *   @li v1.0: Started with original code from Benjamin.
  *   @li v1.1: Modified a lot of code, implemented custom LPP data type methods.
+ *   @li v1.2: Updated code to use new functionality to add data to the LPP packet.
  *
  *   @todo
- *     - Fix `sendMeasurements` method!
  *     - Save LoRaWAN settings before calling `disableLoRaWAN`?
  *     - Fix `sleepLoRaWAN` and `wakeLoRaWAN` methods.
  *     - Remove unnecessary defines/variables.
@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 
-#include <stdbool.h>        /* (u)intXX_t */
-#include <stdlib.h>         /* "bool", "true", "false" */
+#include <stdlib.h>         /* "round" and memory functionality */
+#include <stdbool.h>        /* "bool", "true", "false" */
 #include "em_gpio.h"        /* General Purpose IO */
 #include "em_leuart.h"      /* Low Energy Universal Asynchronous Receiver/Transmitter Peripheral API */
 
@@ -113,56 +113,56 @@ void wakeLoRaWAN (void)
  *   to the cloud using LoRaWAN.
  *
  * @details
- *   The code detects if not all six measurement fields are filled in the array
- *   and reacts accordingly using the `index` field.
+ *   The measurements get added to the LPP packet following the *custom message
+ *   convention* to save bytes to send.
  *
  * @param[in] data
  *   The struct which contains the measurements to send using LoRaWAN.
+ *****************************************************************************/
+void sendMeasurements (MeasurementData_t data)
+{
+	/* Initialize LPP-formatted payload
+	 * For 6 measurements we need a max amount of 43 bytes (see `LPP_AddMeasurements` method documentation for the calculation) */
+	if (!LPP_InitBuffer(&appData, 43)) error(21);
+
+	/* Add measurements to the LPP packet using the custom convention to save bytes send */
+	if (!LPP_AddMeasurements(&appData, data)) error(22);
+
+	/* Send custom LPP-like-formatted payload */
+	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(23);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Send a packet to the cloud using LoRaWAN to indicate that a storm has been detected.
+ *
+ * @details
+ *   The value gets added to the LPP packet following the *custom message convention*.
  *
  * @param[in] stormDetected
- *   A value to indicate if a storm is detected using the accelerometer.
+ *   @li `true` - A storm has been detected!
+ *   @li `false` - No storm is detected.
  *****************************************************************************/
-void sendMeasurements (MeasurementData_t data, bool stormDetected)
+void sendStormDetected (bool stormDetected)
 {
-	/* Initialize and fill LPP-formatted payload
-	 * 6*VBAT (4) + 6*intTemp (4) + 6*extTemp (4) + 1*stormDetected (3) = 75 bytes */
-	if (!LPP_InitBuffer(&appData, 75)) error(21);
+	/* Initialize LPP-formatted payload - We need 4 bytes */
+	if (!LPP_InitBuffer(&appData, 4)) error(24);
 
-	/* Add battery voltage measurements to LPP payload */
-	for (uint8_t i = 0; i <= data.index-1; i++)
-	{
-		int16_t batteryLPP = (int16_t)(round((float)data.voltage[i]/10));
-		if (!LPP_AddVBAT(&appData, batteryLPP)) error(22);
-	}
-
-	/* Add internal temperature measurements to LPP payload */
-	for (uint8_t i = 0; i <= data.index-1; i++)
-	{
-		/* Convert temperature sensor value (should represent 0.1 °C Signed MSB) */
-		int16_t intTempLPP = (int16_t)(round((float)data.intTemp[i]/100));
-		if (!LPP_AddIntTemp(&appData, intTempLPP)) error(23);
-	}
-
-	/* Add external temperature measurements to LPP payload */
-	for (uint8_t i = 0; i <= data.index-1; i++)
-	{
-		/* Convert temperature sensor value (should represent 0.1 °C Signed MSB) */
-		int16_t extTempLPP = (int16_t)(round((float)data.extTemp[i]/100));
-		if (!LPP_AddExtTemp(&appData, extTempLPP)) error(24);
-	}
-
-	/* Add "storm" value */
+	/* Add value to the LPP packet using the custom convention */
 	if (!LPP_AddStormDetected(&appData, stormDetected)) error(25);
 
-	/* Send LPP-formatted payload */
-	LoRaStatus_t test = LoRa_SendLppBuffer(appData, LORA_UNCONFIMED); /* TODO: fix this, can't send (buffer too large?) */
+	/* Send custom LPP-like-formatted payload */
 	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(26);
 }
 
 
 /**************************************************************************//**
  * @brief
- *   Send a packet to indicate the cable is broken.
+ *   Send a packet to the cloud using LoRaWAN to indicate that the cable is broken.
+ *
+ * @details
+ *   The value gets added to the LPP packet following the *custom message convention*.
  *
  * @param[in] cableBroken
  *   @li `true` - The cable is intact.
@@ -170,14 +170,13 @@ void sendMeasurements (MeasurementData_t data, bool stormDetected)
  *****************************************************************************/
 void sendCableBroken (bool cableBroken)
 {
-	/* Initialize and fill LPP-formatted payload
-	 * 1*cableBroken (3) = 3 bytes */
-	if (!LPP_InitBuffer(&appData, 3)) error(27);
+	/* Initialize LPP-formatted payload - We need 4 bytes */
+	if (!LPP_InitBuffer(&appData, 4)) error(27);
 
-	/* Add cable break value */
-    if (!LPP_AddCableBroken(&appData, cableBroken)) error(28);
+	/* Add value to the LPP packet using the custom convention */
+	if (!LPP_AddCableBroken(&appData, cableBroken)) error(28);
 
-	/* Send LPP-formatted payload */
+	/* Send custom LPP-like-formatted payload */
 	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(29);
 }
 
@@ -191,13 +190,12 @@ void sendCableBroken (bool cableBroken)
  *****************************************************************************/
 void sendStatus (uint8_t status)
 {
-	/* Initialize and fill LPP-formatted payload
-	 * 1*status (3) = 3 bytes */
-	if (!LPP_InitBuffer(&appData, 3)) error(30);
+	/* Initialize LPP-formatted payload - We need 4 bytes */
+	if (!LPP_InitBuffer(&appData, 4)) error(30);
 
-	/* Add cable break value */
-    if (!LPP_AddStatus(&appData, status)) error(31);
+	/* Add value to the LPP packet using the custom convention */
+	if (!LPP_AddStatus(&appData, status)) error(31);
 
-	/* Send LPP-formatted payload */
+	/* Send custom LPP-like-formatted payload */
 	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(32);
 }

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lora_wrappers.h
  * @brief LoRa wrapper methods
- * @version 1.1
+ * @version 1.2
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -13,7 +13,7 @@
 
 /* Include necessary for this header file */
 #include <stdint.h>    /* (u)intXX_t */
-#include <stdlib.h>    /* "bool", "true", "false" */
+#include <stdbool.h>   /* "bool", "true", "false" */
 #include "datatypes.h" /* Definitions of the custom data-types */
 
 
@@ -23,7 +23,8 @@ void disableLoRaWAN (void);
 void sleepLoRaWAN (uint32_t sSleep);
 void wakeLoRaWAN (void);
 
-void sendMeasurements (MeasurementData_t data, bool stormDetected);
+void sendMeasurements (MeasurementData_t data);
+void sendStormDetected (bool stormDetected);
 void sendCableBroken (bool cableBroken);
 void sendStatus (uint8_t status);
 

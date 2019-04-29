@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lpp.c
  * @brief Basic Low Power Payload (LPP) functionality.
- * @version 1.1
+ * @version 1.2
  * @author
  *   Geoffrey Ottoy@n
  *   Modified by Brecht Van Eeckhoudt
@@ -12,6 +12,7 @@
  *
  *   @li v1.0: DRAMCO GitHub version (https://github.com/DRAMCO/EFM32-RN2483-LoRa-Node).
  *   @li v1.1: Added custom methods to add specific data to the LPP packet.
+ *   @li v1.2: Merged methods to use less bytes when sending the data.
  *
  ******************************************************************************/
 
@@ -34,10 +35,13 @@
  *  Description: Basic Low Power Payload (LPP) functionality.
  */
 
-#include <stdlib.h>
-#include <stdbool.h>
+#include <em_device.h> /* Math functionality */
+#include <stdlib.h>    /* Memory functionality */
+#include <stdint.h>    /* (u)intXX_t */
+#include <stdbool.h>   /* "bool", "true", "false" */
 
-#include "lpp.h"
+#include "lpp.h"       /* Corresponding header file */
+#include "datatypes.h" /* Definitions of the custom data-types */
 
 // lpp types
 #define LPP_DIGITAL_INPUT			0x00
@@ -72,12 +76,14 @@
 #define LPP_STATUS_CHANNEL          0x15
 
 
-bool LPP_InitBuffer(LPP_Buffer_t *b, uint8_t size){
+bool LPP_InitBuffer(LPP_Buffer_t *b, uint8_t size)
+{
 	LPP_ClearBuffer(b);
 
 	b->buffer = (uint8_t *) malloc(sizeof(uint8_t) * size);
 
-	if(b->buffer != NULL){
+	if(b->buffer != NULL)
+	{
 		b->fill = 0;
 		b->length = size;
 		return (true);
@@ -86,10 +92,239 @@ bool LPP_InitBuffer(LPP_Buffer_t *b, uint8_t size){
 	return (false);
 }
 
-void LPP_ClearBuffer(LPP_Buffer_t *b){
-	if(b->buffer != NULL){
-		free(b->buffer);
+void LPP_ClearBuffer(LPP_Buffer_t *b)
+{
+	if(b->buffer != NULL) free(b->buffer);
+}
+
+/**************************************************************************//**
+ * @brief
+ *   Add measurement data to the LPP packet following the *custom message
+ *   convention* to save bytes to send.
+ *
+ * @details
+ *   This is what each added byte represents, **in the case of `2` measurements**:
+ *     - **byte 0:** Amount of measurements
+ *     - **byte 1:** Battery voltage channel (`LPP_VBAT_CHANNEL = 0x10`)
+ *     - **byte 2:** LPP analog input type (`LPP_ANALOG_INPUT = 0x02`)
+ *     - **byte 3-4:** A battery voltage measurement
+ *     - **byte 5-6:** Another battery voltage measurement (in the case of `2` measurements)
+ *     - ...
+ *     - **byte 7:** Internal temperature channel (`LPP_TEMPERATURE_CHANNEL_INT = 0x11`)
+ *     - **byte 8:** LPP temperature type (`LPP_TEMPERATURE = 0x67`)
+ *     - **byte 9-10:** An internal temperature measurement
+ *     - **byte 11-12:** Another internal temperature measurement (in the case of `2` measurements)
+ *     - ...
+ *     - **byte 13:** External temperature channel (`LPP_TEMPERATURE_CHANNEL_EXT = 0x12`)
+ *     - **byte 14:** LPP temperature type (`LPP_TEMPERATURE = 0x67`)
+ *     - **byte 15-16:** An external temperature measurement
+ *     - **byte 17-18:** Another external temperature measurement (in the case of `2` measurements)
+ *     - ...
+ *
+ *   If we have **6 measurements** we need **43 bytes**:
+ *     - `1 byte` to hold the amount of measurements
+ *     - `2 bytes` to hold the battery voltage channel and LPP analog input type
+ *     - `6*2bytes` to hold the battery voltage measurements
+ *     - `2 bytes` to hold the internal temperature channel and LPP temperature type
+ *     - `6*2bytes` to hold the internal temperature measurements
+ *     - `2 bytes` to hold the external temperature channel and LPP temperature type
+ *     - `6*2bytes` to hold the external temperature measurements
+ *
+ * @param[in] b
+ *   The pointer to the LPP pointer.
+ *
+ * @param[in] data
+ *   The struct which contains the measurements to send using LoRaWAN.
+ *
+ * @return
+ *   @li `true` - Successfully added the data to the LoRaWAN packet.
+ *   @li `false` - Couldn't add the data to the LoRaWAN packet.
+ *****************************************************************************/
+bool LPP_AddMeasurements (LPP_Buffer_t *b, MeasurementData_t data)
+{
+	/* Calculate free space in the buffer */
+	uint8_t space = b->length - b->fill;
+
+	/* Calculate necessary space, first byte holds the amount of measurements */
+	uint8_t necessarySpace = 1;
+
+	/* Add space necessary for the battery voltage and internal and external temperature measurements.
+	 * (1 byte for the channel ID, 1 byte for the data type, 2 bytes for each measurement) */
+	necessarySpace += 3*(2+(2*(data.index)));
+
+	/* Return `false` if we don't have the necessary space available */
+	if (space < necessarySpace) return (false);
+
+	/* Fill the first byte with the amount of measurements */
+	b->buffer[b->fill++] = data.index;
+
+	/* Fill the next bytes with battery voltage measurements */
+	b->buffer[b->fill++] = LPP_VBAT_CHANNEL;
+	b->buffer[b->fill++] = LPP_ANALOG_INPUT;
+
+	for (uint8_t i = 0; i < data.index; i++)
+	{
+		int16_t batteryLPP = (int16_t)(round((float)data.voltage[i]/10));
+		b->buffer[b->fill++] = (uint8_t)((0xFF00 & batteryLPP) >> 8);
+		b->buffer[b->fill++] = (uint8_t)(0x00FF & batteryLPP);
 	}
+
+	/* Fill the next bytes with internal temperature measurements */
+	b->buffer[b->fill++] = LPP_TEMPERATURE_CHANNEL_INT;
+	b->buffer[b->fill++] = LPP_TEMPERATURE;
+
+	for (uint8_t i = 0; i < data.index; i++)
+	{
+		/* Convert temperature sensor value (should represent 0.1 °C Signed MSB) */
+		int16_t intTempLPP = (int16_t)(round((float)data.intTemp[i]/100));
+
+		b->buffer[b->fill++] = (uint8_t)((0xFF00 & intTempLPP) >> 8);
+		b->buffer[b->fill++] = (uint8_t)(0x00FF & intTempLPP);
+	}
+
+	/* Fill the next bytes with external temperature measurements */
+	b->buffer[b->fill++] = LPP_TEMPERATURE_CHANNEL_EXT;
+	b->buffer[b->fill++] = LPP_TEMPERATURE;
+
+	for (uint8_t i = 0; i < data.index; i++)
+	{
+		/* Convert temperature sensor value (should represent 0.1 °C Signed MSB) */
+		int16_t extTempLPP = (int16_t)(round((float)data.extTemp[i]/100));
+
+		b->buffer[b->fill++] = (uint8_t)((0xFF00 & extTempLPP) >> 8);
+		b->buffer[b->fill++] = (uint8_t)(0x00FF & extTempLPP);
+	}
+
+	return (true);
+}
+
+/**************************************************************************//**
+ * @brief
+ *   Add a value to indicate that a storm has been detected to the LPP packet
+ *   following the *custom message convention*.
+ *
+ * @details
+ *   This is what each added byte represents:
+ *     - **byte 0:** Amount of measurements (in this case always one)
+ *     - **byte 1:** *Storm detected* channel (`LPP_STORM_CHANNEL = 0x13`)
+ *     - **byte 2:** LPP digital input type (`LPP_DIGITAL_INPUT = 0x00`)
+ *     - **byte 3:** The `stormDetected` value
+ *
+ *   **We always need 4 bytes.**
+ *
+ * @param[in] b
+ *   The pointer to the LPP pointer.
+ *
+ * @param[in] stormDetected
+ *   If a storm is detected using the accelerometer or not.
+ *
+ * @return
+ *   @li `true` - Successfully added the data to the LoRaWAN packet.
+ *   @li `false` - Couldn't add the data to the LoRaWAN packet.
+ *****************************************************************************/
+bool LPP_AddStormDetected (LPP_Buffer_t *b, uint8_t stormDetected)
+{
+	/* Calculate free space in the buffer */
+	uint8_t space = b->length - b->fill;
+
+	/* Return `false` if we don't have the necessary space available */
+	if (space < LPP_DIGITAL_INPUT_SIZE + 1) return (false); /* "+1": One extra byte for the amount of measurements */
+
+	/* Fill the first byte with the amount of measurements (in this case always one) */
+	b->buffer[b->fill++] = 1;
+
+	/* Fill the next bytes following the default LPP packet convention */
+	b->buffer[b->fill++] = LPP_STORM_CHANNEL;
+	b->buffer[b->fill++] = LPP_DIGITAL_INPUT;
+	b->buffer[b->fill++] = stormDetected;
+
+	return (true);
+}
+
+/**************************************************************************//**
+ * @brief
+ *   Add a value to indicate that the cable has been broken to the LPP packet
+ *   following the *custom message convention*.
+ *
+ * @details
+ *   This is what each added byte represents:
+ *     - **byte 0:** Amount of measurements (in this case always one)
+ *     - **byte 1:** *Cable broken* channel (`LPP_CABLE_BROKEN_CHANNEL = 0x14`)
+ *     - **byte 2:** LPP digital input type (`LPP_DIGITAL_INPUT = 0x00`)
+ *     - **byte 3:** The `cableBroken` value
+ *
+ *   **We always need 4 bytes.**
+ *
+ * @param[in] b
+ *   The pointer to the LPP pointer.
+ *
+ * @param[in] cableBroken
+ *   The *cable break* value.
+ *
+ * @return
+ *   @li `true` - Successfully added the data to the LoRaWAN packet.
+ *   @li `false` - Couldn't add the data to the LoRaWAN packet.
+ *****************************************************************************/
+bool LPP_AddCableBroken (LPP_Buffer_t *b, uint8_t cableBroken)
+{
+	/* Calculate free space in the buffer */
+	uint8_t space = b->length - b->fill;
+
+	/* Return `false` if we don't have the necessary space available */
+	if (space < LPP_DIGITAL_INPUT_SIZE + 1) return (false); /* "+1": One extra byte for the amount of measurements */
+
+	/* Fill the first byte with the amount of measurements (in this case always one) */
+	b->buffer[b->fill++] = 1;
+
+	/* Fill the next bytes following the default LPP packet convention */
+	b->buffer[b->fill++] = LPP_CABLE_BROKEN_CHANNEL;
+	b->buffer[b->fill++] = LPP_DIGITAL_INPUT;
+	b->buffer[b->fill++] = cableBroken;
+
+	return (true);
+}
+
+/**************************************************************************//**
+ * @brief
+ *   Add a value to indicate a program status to the LPP packet following the
+ *   *custom message convention*.
+ *
+ * @details
+ *   This is what each added byte represents:
+ *     - **byte 0:** Amount of measurements (in this case always one)
+ *     - **byte 1:** *Status* channel (`LPP_STATUS_CHANNEL = 0x15`)
+ *     - **byte 2:** LPP digital input type (`LPP_DIGITAL_INPUT = 0x00`)
+ *     - **byte 3:** The `status` value
+ *
+ *   **We always need 4 bytes.**
+ *
+ * @param[in] b
+ *   The pointer to the LPP pointer.
+ *
+ * @param[in] status
+ *   The *status* value.
+ *
+ * @return
+ *   @li `true` - Successfully added the data to the LoRaWAN packet.
+ *   @li `false` - Couldn't add the data to the LoRaWAN packet.
+ *****************************************************************************/
+bool LPP_AddStatus (LPP_Buffer_t *b, uint8_t status)
+{
+	/* Calculate free space in the buffer */
+	uint8_t space = b->length - b->fill;
+
+	/* Return `false` if we don't have the necessary space available */
+	if (space < LPP_DIGITAL_INPUT_SIZE + 1) return (false); /* "+1": One extra byte for the amount of measurements */
+
+	/* Fill the first byte with the amount of measurements (in this case always one) */
+	b->buffer[b->fill++] = 1;
+
+	/* Fill the next bytes following the default LPP packet convention */
+	b->buffer[b->fill++] = LPP_STATUS_CHANNEL;
+	b->buffer[b->fill++] = LPP_DIGITAL_INPUT;
+	b->buffer[b->fill++] = status;
+
+	return (true);
 }
 
 /**************************************************************************//**
@@ -97,6 +332,11 @@ void LPP_ClearBuffer(LPP_Buffer_t *b){
  *   Add a battery voltage measurement to the LPP packet, disguised as an
  *   *Analog Input* packet (2 bytes). The channel is defined by `LPP_VBAT_CHANNEL`
  *   and is `0x10`.
+ *
+ * @deprecated
+ *   This is a deprecated method following the standard LPP format to add data
+ *   to the LPP packet. In practice it uses too much bytes to send a lot of
+ *   measurements at once. The method is kept here just in case.
  *
  * @param[in] b
  *   The pointer to the LPP pointer.
@@ -108,7 +348,7 @@ void LPP_ClearBuffer(LPP_Buffer_t *b){
  *   @li `true` - Successfully added the data to the LoRaWAN packet.
  *   @li `false` - Couldn't add the data to the LoRaWAN packet.
  *****************************************************************************/
-bool LPP_AddVBAT (LPP_Buffer_t *b, int16_t vbat)
+bool LPP_deprecated_AddVBAT (LPP_Buffer_t *b, int16_t vbat)
 {
 	uint8_t space = b->length - b->fill;
 	if (space < LPP_ANALOG_INPUT_SIZE) return (false);
@@ -126,6 +366,11 @@ bool LPP_AddVBAT (LPP_Buffer_t *b, int16_t vbat)
  *   Add an internal temperature measurement (2 bytes) to the LPP packet.
  *   The channel is defined by `LPP_TEMPERATURE_CHANNEL_INT` and is `0x11`.
  *
+ * @deprecated
+ *   This is a deprecated method following the standard LPP format to add data
+ *   to the LPP packet. In practice it uses too much bytes to send a lot of
+ *   measurements at once. The method is kept here just in case.
+ *
  * @param[in] b
  *   The pointer to the LPP pointer.
  *
@@ -136,7 +381,7 @@ bool LPP_AddVBAT (LPP_Buffer_t *b, int16_t vbat)
  *   @li `true` - Successfully added the data to the LoRaWAN packet.
  *   @li `false` - Couldn't add the data to the LoRaWAN packet.
  *****************************************************************************/
-bool LPP_AddIntTemp (LPP_Buffer_t *b, int16_t intTemp)
+bool LPP_deprecated_AddIntTemp (LPP_Buffer_t *b, int16_t intTemp)
 {
 	uint8_t space = b->length - b->fill;
 	if (space < LPP_TEMPERATURE_SIZE) return (false);
@@ -154,6 +399,11 @@ bool LPP_AddIntTemp (LPP_Buffer_t *b, int16_t intTemp)
  *   Add an external temperature measurement (2 bytes) to the LPP packet.
  *   The channel is defined by `LPP_TEMPERATURE_CHANNEL_EXT` and is `0x12`.
  *
+ * @deprecated
+ *   This is a deprecated method following the standard LPP format to add data
+ *   to the LPP packet. In practice it uses too much bytes to send a lot of
+ *   measurements at once. The method is kept here just in case.
+ *
  * @param[in] b
  *   The pointer to the LPP pointer.
  *
@@ -164,7 +414,7 @@ bool LPP_AddIntTemp (LPP_Buffer_t *b, int16_t intTemp)
  *   @li `true` - Successfully added the data to the LoRaWAN packet.
  *   @li `false` - Couldn't add the data to the LoRaWAN packet.
  *****************************************************************************/
-bool LPP_AddExtTemp (LPP_Buffer_t *b, int16_t extTemp)
+bool LPP_deprecated_AddExtTemp (LPP_Buffer_t *b, int16_t extTemp)
 {
 	uint8_t space = b->length - b->fill;
 	if (space < LPP_TEMPERATURE_SIZE) return (false);
@@ -182,6 +432,10 @@ bool LPP_AddExtTemp (LPP_Buffer_t *b, int16_t extTemp)
  *   Add a *storm* value to the LPP packet, disguised as a *Digital Input*
  *   packet (1 byte). The channel is defined by `LPP_STORM_CHANNEL` and is `0x13`.
  *
+ * @deprecated
+ *   This is a deprecated method following the standard LPP format to add data
+ *   to the LPP packet. The method is kept here just in case.
+ *
  * @param[in] b
  *   The pointer to the LPP pointer.
  *
@@ -192,7 +446,7 @@ bool LPP_AddExtTemp (LPP_Buffer_t *b, int16_t extTemp)
  *   @li `true` - Successfully added the data to the LoRaWAN packet.
  *   @li `false` - Couldn't add the data to the LoRaWAN packet.
  *****************************************************************************/
-bool LPP_AddStormDetected (LPP_Buffer_t *b, uint8_t stormDetected)
+bool LPP_deprecated_AddStormDetected (LPP_Buffer_t *b, uint8_t stormDetected)
 {
 	uint8_t space = b->length - b->fill;
 	if (space < LPP_DIGITAL_INPUT_SIZE) return (false);
@@ -209,6 +463,10 @@ bool LPP_AddStormDetected (LPP_Buffer_t *b, uint8_t stormDetected)
  *   Add a *cable break* value to the LPP packet, disguised as a *Digital Input*
  *   packet (1 byte). The channel is defined by `LPP_CABLE_BROKEN_CHANNEL` and is `0x14`.
  *
+ * @deprecated
+ *   This is a deprecated method following the standard LPP format to add data
+ *   to the LPP packet. The method is kept here just in case.
+ *
  * @param[in] b
  *   The pointer to the LPP pointer.
  *
@@ -219,7 +477,7 @@ bool LPP_AddStormDetected (LPP_Buffer_t *b, uint8_t stormDetected)
  *   @li `true` - Successfully added the data to the LoRaWAN packet.
  *   @li `false` - Couldn't add the data to the LoRaWAN packet.
  *****************************************************************************/
-bool LPP_AddCableBroken (LPP_Buffer_t *b, uint8_t cableBroken)
+bool LPP_deprecated_AddCableBroken (LPP_Buffer_t *b, uint8_t cableBroken)
 {
 	uint8_t space = b->length - b->fill;
 	if (space < LPP_DIGITAL_INPUT_SIZE) return (false);
@@ -236,6 +494,10 @@ bool LPP_AddCableBroken (LPP_Buffer_t *b, uint8_t cableBroken)
  *   Add a *status* value to the LPP packet, disguised as a *Digital Input*
  *   packet (1 byte). The channel is defined by `LPP_STATUS_CHANNEL` and is `0x15`.
  *
+ * @deprecated
+ *   This is a deprecated method following the standard LPP format to add data
+ *   to the LPP packet. The method is kept here just in case.
+ *
  * @param[in] b
  *   The pointer to the LPP pointer.
  *
@@ -246,7 +508,7 @@ bool LPP_AddCableBroken (LPP_Buffer_t *b, uint8_t cableBroken)
  *   @li `true` - Successfully added the data to the LoRaWAN packet.
  *   @li `false` - Couldn't add the data to the LoRaWAN packet.
  *****************************************************************************/
-bool LPP_AddStatus (LPP_Buffer_t *b, uint8_t status)
+bool LPP_deprecated_AddStatus (LPP_Buffer_t *b, uint8_t status)
 {
 	uint8_t space = b->length - b->fill;
 	if (space < LPP_DIGITAL_INPUT_SIZE) return (false);
@@ -258,7 +520,8 @@ bool LPP_AddStatus (LPP_Buffer_t *b, uint8_t status)
 	return (true);
 }
 
-bool LPP_AddDigital(LPP_Buffer_t *b, uint8_t data){
+bool LPP_AddDigital(LPP_Buffer_t *b, uint8_t data)
+{
 	uint8_t space = b->length - b->fill;
 	if(space < LPP_DIGITAL_INPUT_SIZE){
 		return (false);
@@ -271,7 +534,8 @@ bool LPP_AddDigital(LPP_Buffer_t *b, uint8_t data){
 	return (true);
 }
 
-bool LPP_AddAnalog(LPP_Buffer_t *b, int16_t data){
+bool LPP_AddAnalog(LPP_Buffer_t *b, int16_t data)
+{
 	uint8_t space = b->length - b->fill;
 	if(space < LPP_ANALOG_INPUT_SIZE){
 		return (false);
@@ -285,7 +549,8 @@ bool LPP_AddAnalog(LPP_Buffer_t *b, int16_t data){
 	return (true);
 }
 
-bool LPP_AddTemperature(LPP_Buffer_t *b, int16_t data){
+bool LPP_AddTemperature(LPP_Buffer_t *b, int16_t data)
+{
 	uint8_t space = b->length - b->fill;
 	if(space < LPP_TEMPERATURE_SIZE){
 		return (false);
@@ -299,7 +564,8 @@ bool LPP_AddTemperature(LPP_Buffer_t *b, int16_t data){
 	return (true);
 }
 
-bool LPP_AddHumidity(LPP_Buffer_t *b, uint8_t data){
+bool LPP_AddHumidity(LPP_Buffer_t *b, uint8_t data)
+{
 	uint8_t space = b->length - b->fill;
 	if(space < LPP_HUMIDITY_SIZE){
 		return (false);
@@ -312,7 +578,8 @@ bool LPP_AddHumidity(LPP_Buffer_t *b, uint8_t data){
 	return (true);
 }
 
-bool LPP_AddAccelerometer(LPP_Buffer_t *b, int16_t x, int16_t y, int16_t z){
+bool LPP_AddAccelerometer(LPP_Buffer_t *b, int16_t x, int16_t y, int16_t z)
+{
 	uint8_t space = b->length - b->fill;
 	if(space < LPP_ACCELEROMETER_SIZE){
 		return (false);
@@ -330,7 +597,8 @@ bool LPP_AddAccelerometer(LPP_Buffer_t *b, int16_t x, int16_t y, int16_t z){
 	return (true);
 }
 
-bool LPP_AddPressure(LPP_Buffer_t *b, uint16_t data){
+bool LPP_AddPressure(LPP_Buffer_t *b, uint16_t data)
+{
 	uint8_t space = b->length - b->fill;
 	if(space < LPP_PRESSURE_SIZE){
 		return (false);

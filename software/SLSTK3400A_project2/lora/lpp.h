@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lpp.h
  * @brief Basic Low Power Payload (LPP) functionality.
- * @version 1.1
+ * @version 1.2
  * @author
  *   Geoffrey Ottoy@n
  *   Modified by Brecht Van Eeckhoudt
@@ -30,10 +30,13 @@
 #ifndef _LPP_H_
 #define _LPP_H_
 
-#include <em_device.h>
-#include <stdbool.h>
+#include <stdint.h>    /* (u)intXX_t */
+#include <stdbool.h>   /* "bool", "true", "false" */
 
-typedef struct lpp_buffer{
+#include "datatypes.h" /* Definitions of the custom data-types */
+
+typedef struct lpp_buffer
+{
 	uint8_t * buffer;
 	uint8_t fill;
 	uint8_t length;
@@ -42,12 +45,17 @@ typedef struct lpp_buffer{
 bool LPP_InitBuffer(LPP_Buffer_t * b, uint8_t size);
 void LPP_ClearBuffer(LPP_Buffer_t * b);
 
-bool LPP_AddVBAT (LPP_Buffer_t *b, int16_t vbat);
-bool LPP_AddIntTemp (LPP_Buffer_t *b, int16_t intTemp);
-bool LPP_AddExtTemp (LPP_Buffer_t *b, int16_t extTemp);
+bool LPP_AddMeasurements (LPP_Buffer_t *b, MeasurementData_t data);
 bool LPP_AddStormDetected (LPP_Buffer_t *b, uint8_t stormDetected);
-bool LPP_AddCableBroken (LPP_Buffer_t *b, uint8_t cableValue);
+bool LPP_AddCableBroken (LPP_Buffer_t *b, uint8_t cableBroken);
 bool LPP_AddStatus (LPP_Buffer_t *b, uint8_t status);
+
+bool LPP_deprecated_AddVBAT (LPP_Buffer_t *b, int16_t vbat);
+bool LPP_deprecated_AddIntTemp (LPP_Buffer_t *b, int16_t intTemp);
+bool LPP_deprecated_AddExtTemp (LPP_Buffer_t *b, int16_t extTemp);
+bool LPP_deprecated_AddStormDetected (LPP_Buffer_t *b, uint8_t stormDetected);
+bool LPP_deprecated_AddCableBroken (LPP_Buffer_t *b, uint8_t cableValue);
+bool LPP_deprecated_AddStatus (LPP_Buffer_t *b, uint8_t status);
 
 bool LPP_AddDigital(LPP_Buffer_t *b, uint8_t data);
 bool LPP_AddAnalog(LPP_Buffer_t *b, int16_t data);

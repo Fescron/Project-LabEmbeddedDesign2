@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 2.9
+ * @version 3.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -32,12 +32,12 @@
  *   @li v2.7: Removed USTIMER logic from this file.
  *   @li v2.8: Added functionality to detect a *storm*.
  *   @li v2.9: Started adding LoRaWAN functionality, added more wake-up/sleep functionality.
+ *   @li v3.0: Started using updated LoRaWAN send methods.
  *
  * ******************************************************************************
  *
  * @todo
  *   IMPORTANT:
- *     - Add already filled measurement data to a "cable break send" method?
  *     - Use a *status* LoRa method to signal errors/system resets (int value, 0 = reset, 1 - ... = error call)
  *     - Enable/disable LED using definition.
  *     - On INT1-PD7, go to sleep for somehow the remaining RTC time on wakeup?
@@ -174,6 +174,9 @@ int main (void)
 	/* Keep the amount of times a message has been send to indicate the cable is broken */
 	uint8_t cableBrokenSendTimes = 0;
 
+	/* Keep a value if a storm has been detected */
+	bool stormDetected = false;
+
 	/* Set the index to put the measurements in */
 	data.index = 0;
 
@@ -276,22 +279,33 @@ int main (void)
 				dbinfoInt("Internal temperature: ", data.intTemp[data.index], "");
 #endif /* DEBUGGING */
 
-				/* Check if the cable is broken and we haven't send this message 4 times */
-				if (!checkCable() & (cableBrokenSendTimes < 4))
+				/* Check if the cable is broken */
+				if (!checkCable())
 				{
+					/* Only send a message 4 times */
+					if (cableBrokenSendTimes < 4)
+					{
 
 #if DEBUGGING == 1 /* DEBUGGING */
-					dbcrit("Cable broken! Sending the data ...");
+						dbcrit("Cable broken! Sending the data ...");
 #endif /* DEBUGGING */
 
-					initLoRaWAN(); /* Initialize LoRaWAN functionality */
+						initLoRaWAN(); /* Initialize LoRaWAN functionality */
 
-					sendCableBroken(true); /* Send the LoRaWAN message TODO: also send measurement data here? */
+						sendCableBroken(true); /* Send the LoRaWAN message TODO: also send measurement data here? */
 
-					disableLoRaWAN(); /* Disable RN2483 */
+						disableLoRaWAN(); /* Disable RN2483 */
 
-					cableBrokenSendTimes++; /* Increment the counter */
+						cableBrokenSendTimes++; /* Increment the counter */
+					}
+					else
+					{
 
+#if DEBUGGING == 1 /* DEBUGGING */
+						dbcrit("Cable broken but no longer sending the data");
+#endif /* DEBUGGING */
+
+					}
 				}
 				else
 				{
@@ -320,10 +334,10 @@ int main (void)
 				initLoRaWAN(); /* Initialize LoRaWAN functionality */
 
 #if DEBUGGING == 1 /* DEBUGGING */
-				dbwarn("Sending the data ...");
+				dbwarnInt("Sending ", data.index, " measurements ...");
 #endif /* DEBUGGING */
 
-				sendMeasurements(data, false); /* Send the measurements */
+				sendMeasurements(data); /* Send the measurements */
 
 				disableLoRaWAN(); /* Disable RN2483 */
 
@@ -345,16 +359,21 @@ int main (void)
 				initLoRaWAN(); /* Initialize LoRaWAN functionality */
 
 #if DEBUGGING == 1 /* DEBUGGING */
-				dbwarn("STORM DETECTED! Sending the data ...");
+				dbwarnInt("STORM DETECTED! Sending ", data.index, " measurement(s) ...");
 #endif /* DEBUGGING */
 
-				sendMeasurements(data, true); /* Send the measurements */
+				// TODO: reset this value again?
+				sendStormDetected(true); /* Send a message to indicate that a storm has been detected */
+
+				sendMeasurements(data); /* Send the measurements */
 
 				disableLoRaWAN(); /* Disable RN2483 */
 
 				//sleepLoRaWAN(WAKE_UP_PERIOD_S); /* Put the LoRaWAN module back to sleep */
 
 				data.index = 0; /* Reset the index to put the measurements in */
+
+				stormDetected = true; /* Indicate that a storm has been detected */
 
 				led(false); /* Disable LED */
 
@@ -382,7 +401,7 @@ int main (void)
 
 			case WAKEUP:
 			{
-				/* Check if we woke up using buttons and take a measurement on "case WAKEUP" exit */
+				/* Check if we woke up using buttons and take measurements on "case WAKEUP" exit */
 				if (checkBTNinterrupts()) MCUstate = MEASURE;
 
 				/* Check if we woke up using the RTC sleep functionality and act accordingly */
@@ -392,7 +411,7 @@ int main (void)
 
 					ADXL_clearCounter(); /* Clear the trigger counter because we woke up "normally" */
 
-					MCUstate = MEASURE; /* Take a measurement on "case WAKEUP" exit */
+					MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
 				}
 
 				/* Check if we woke up using the accelerometer */
@@ -416,8 +435,16 @@ int main (void)
 						ADXL_ackInterrupt();   /* Acknowledge ADXL interrupt by reading the status register */
 						ADXL_enableSPI(false); /* Disable SPI functionality */
 
-						/* Go back to sleep, we only take measurements on RTC/button wakeup */
-						MCUstate = SLEEP; /* TODO: go to sleep for somehow the remaining RTC time on wakeup? */
+						/* Check if a storm was detected before going to sleep for WAKE_UP_PERIOD_S/2 */
+						if (stormDetected)
+						{
+							MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
+						}
+						else
+						{
+							/* Go back to sleep, we only take measurements on RTC/button wakeup */
+							MCUstate = SLEEP; /* TODO: go to sleep for somehow the remaining RTC time on wakeup? */
+						}
 					}
 				}
 			} break;
