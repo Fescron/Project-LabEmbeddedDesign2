@@ -21,6 +21,7 @@ var NAVTREE =
       [ "Bits, bytes, nibbles and unsigned/signed integer value ranges", "index.html#DATA", null ]
     ] ],
     [ "Todo List", "todo.html", null ],
+    [ "Deprecated List", "deprecated.html", null ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
       [ "Data Fields", "functions.html", [
@@ -46,8 +47,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "ADXL362_8c.html",
-"leuart_8c.html#a83092fef5d81b8c30eee0b5b60893245",
-"rn2483_8c.html#a6ba9fcbe2574dbdd6af0c6389dbe4046"
+"leuart_8c.html#a728a9d6f37da6fb50062cc1e9372a73b",
+"rn2483_8c.html#a024a57eca44925647135ac26f92fedba"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
