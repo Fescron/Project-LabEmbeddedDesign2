@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file adc.c
  * @brief ADC functionality for reading the (battery) voltage and internal temperature.
- * @version 1.2
+ * @version 1.3
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -11,6 +11,7 @@
  *   @li v1.0: Moved ADC functionality from `other.c` to this file.
  *   @li v1.1: Removed re-initialization dbprint messages.
  *   @li v1.2: Started using custom enum type and cleaned up some unnecessary statements after testing.
+ *   @li v1.3: Changed error numbering.
  *
  * ******************************************************************************
  *
@@ -85,7 +86,7 @@ void initADC (ADC_Measurement_t peripheral)
 		dbcrit("Unknown ADC peripheral selected!");
 #endif /* DEBUGGING */
 
-		error(2);
+		error(11);
 	}
 
 	ADC_InitSingle(ADC0, &initSingle);
@@ -155,7 +156,7 @@ uint32_t readADC (ADC_Measurement_t peripheral)
 		dbcrit("Unknown ADC peripheral selected!");
 #endif /* DEBUGGING */
 
-		error(3);
+		error(12);
 	}
 
 	/* Set variable false just in case */

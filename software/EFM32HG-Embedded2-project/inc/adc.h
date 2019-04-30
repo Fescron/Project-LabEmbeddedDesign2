@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file adc.h
  * @brief ADC functionality for reading the (battery) voltage and internal temperature.
- * @version 1.2
+ * @version 1.3
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 

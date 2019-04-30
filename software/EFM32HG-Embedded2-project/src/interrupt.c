@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file interrupt.c
  * @brief Interrupt functionality.
- * @version 2.1
+ * @version 2.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -23,6 +23,7 @@
  *   @li v1.9: Removed error calls for "unknown" pins and added flag check for custom Happy Gecko board pinout.
  *   @li v2.0: Stopped disabling the RTC counter on pin interrupts.
  *   @li v2.1: Disabled the RTC counter on a button push because it confused delays called in LoRaWAN code.
+ *   @li v2.2: Changed error numbering.
  *
  * ******************************************************************************
  *
@@ -82,7 +83,6 @@ void initGPIOwakeup (void)
 	/* Configure ADXL_INT1 as input, the last argument enables the filter */
 	GPIO_PinModeSet(ADXL_INT1_PORT, ADXL_INT1_PIN, gpioModeInput, 1);
 
-
 	/* Clear all odd pin interrupt flags (just in case)
 	 * NVIC_ClearPendingIRQ(GPIO_ODD_IRQn); would also work but is less "readable" */
 	GPIO_IntClear(0xAAAA);
@@ -135,7 +135,7 @@ bool BTN_getTriggered (uint8_t number)
 		dbcrit("Non-existing button selected!");
 #endif /* DEBUGGING */
 
-		error(9);
+		error(18);
 
 		return (false);
 	}
@@ -164,7 +164,7 @@ void BTN_setTriggered (uint8_t number, bool value)
 		dbcrit("Non-existing button selected!");
 #endif /* DEBUGGING */
 
-		error(8);
+		error(19);
 	}
 }
 

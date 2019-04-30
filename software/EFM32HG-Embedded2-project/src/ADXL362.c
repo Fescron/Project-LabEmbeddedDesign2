@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 2.3
+ * @version 2.4
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -24,6 +24,7 @@
  *   @li v2.1: Disabled SPI pins on *hard* reset, cleaned up some code.
  *   @li v2.2: Added functionality to check the number of interrupts.
  *   @li v2.3: Updated documentation.
+ *   @li v2.4: Changed error numbering.
  *
  *   @todo
  *     - Check initialization (settings)
@@ -57,14 +58,6 @@
 #include "util.h"     	 /* Utility functionality */
 
 
-/* Local variables */
-static volatile bool ADXL_triggered = false; /* Volatile because it's modified by an interrupt service routine */
-static volatile uint16_t ADXL_triggercounter = 0; /* Volatile because it's modified by an interrupt service routine */
-static int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
-static ADXL_Range_t range;
-static bool ADXL_VDD_initialized = false;
-
-
 /* Local definitions - ADXL362 register definitions */
 #define ADXL_REG_DEVID_AD 		0x00 /* Reset: 0xAD */
 #define ADXL_REG_DEVID_MST 		0x01 /* Reset: 0x1D */
@@ -84,6 +77,14 @@ static bool ADXL_VDD_initialized = false;
 #define ADXL_REG_INTMAP2 		0x2B /* INT_LOW -- AWAKE -- INACT -- ACT -- FIFO_OVERRUN -- FIFO_WATERMARK -- FIFO_READY -- DATA_READY */
 #define ADXL_REG_FILTER_CTL 	0x2C /* Write FFxx xxxx (FF = 00 for +-2g, 01 for =-4g, 1x for +- 8g) for measurement range selection */
 #define ADXL_REG_POWER_CTL 		0x2D /* Write xxxx xxMM (MM = 10) to: measurement mode */
+
+
+/* Local variables */
+static volatile bool ADXL_triggered = false; /* Volatile because it's modified by an interrupt service routine */
+static volatile uint16_t ADXL_triggercounter = 0; /* Volatile because it's modified by an interrupt service routine */
+static int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
+static ADXL_Range_t range;
+static bool ADXL_VDD_initialized = false;
 
 
 /* Local prototypes */
@@ -126,7 +127,7 @@ void initADXL (void)
 		dbcrit("Wrong peripheral selected!");
 #endif /* DEBUGGING */
 
-		error(12);
+		error(21);
 
 	}
 
@@ -226,7 +227,7 @@ void ADXL_enableSPI (bool enabled)
 			dbcrit("Wrong peripheral selected!");
 #endif /* DEBUGGING */
 
-			error(13);
+			error(22);
 
 		}
 		USART_Enable(ADXL_SPI, usartEnable);
@@ -249,7 +250,7 @@ void ADXL_enableSPI (bool enabled)
 			dbcrit("Wrong peripheral selected!");
 #endif /* DEBUGGING */
 
-			error(14);
+			error(23);
 
 		}
 		USART_Enable(ADXL_SPI, usartDisable);
@@ -350,7 +351,7 @@ void ADXL_configRange (ADXL_Range_t givenRange)
 		dbcrit("Non-existing range selected!");
 #endif /* DEBUGGING */
 
-		error(7);
+		error(24);
 	}
 
 #if DEBUGGING == 1 /* DEBUGGING */
@@ -391,7 +392,7 @@ void ADXL_configODR (ADXL_ODR_t givenODR)
 		dbcrit("Non-existing ODR selected!");
 #endif /* DEBUGGING */
 
-		error(6);
+		error(25);
 	}
 
 #if DEBUGGING == 1 /* DEBUGGING */
@@ -439,7 +440,7 @@ void ADXL_configActivity (uint8_t gThreshold)
 		dbcrit("Range wrong, can't set gThreshold!");
 #endif /* DEBUGGING */
 
-		error(5);
+		error(26);
 	}
 
 	/* Isolate bits using masks and shifting */
@@ -700,7 +701,7 @@ static void resetHandlerADXL (void)
 					dbcrit("ADXL362 initialization failed");
 #endif /* DEBUGGING */
 
-					error(1);
+					error(20);
 				}
 			}
 		}
@@ -902,7 +903,7 @@ static int32_t convertGRangeToGValue (int8_t sensorValue)
 		dbcrit("Range wrong, can't calculate mg value!");
 #endif /* DEBUGGING */
 
-		error(4);
+		error(27);
 
 		return (0);
 	}
