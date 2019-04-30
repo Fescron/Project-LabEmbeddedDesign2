@@ -13,6 +13,10 @@ The following links go to code documentation with [Doxygen](http://www.doxygen.o
 - [General important documentation](https://fescron.github.io/Project-LabEmbeddedDesign2/index.html)
 - [Individual files and their methods](https://fescron.github.io/Project-LabEmbeddedDesign2/files.html)
 
+## LoRaWAN links
+- [The Things Network - Applications (Register LoRaWAN device)](https://console.thethingsnetwork.org/applications/)
+- [Cayenne Dashboard](https://cayenne.mydevices.com/cayenne/dashboard/start)
+
 ## Important hardware files
 - [Top Copper layer (1:1)](https://github.com/Fescron/Project-LabEmbeddedDesign2/blob/master/hardware/project-embeddedSystemDesign2/pdf/project-embeddedSystemDesign2-F_Cu.pdf)
 - [Bottom Copper layer (1:1, mirrored)](https://github.com/Fescron/Project-LabEmbeddedDesign2/blob/master/hardware/project-embeddedSystemDesign2/pdf/project-embeddedSystemDesign2-B_Cu-mirrored.pdf)
