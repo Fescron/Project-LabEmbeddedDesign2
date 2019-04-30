@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lora_wrappers.c
  * @brief LoRa wrapper methods
- * @version 1.2
+ * @version 1.4
  * @author
  *   Benjamin Van der Smissen@n
  *   Heavily modified by Brecht Van Eeckhoudt
@@ -13,6 +13,8 @@
  *   @li v1.0: Started with original code from Benjamin.
  *   @li v1.1: Modified a lot of code, implemented custom LPP data type methods.
  *   @li v1.2: Updated code to use new functionality to add data to the LPP packet.
+ *   @li v1.3: Added method to use deprecated methods to test if data gets send correctly.
+ *   @li v1.4: Changed error numbering.
  *
  *   @todo
  *     - Save LoRaWAN settings before calling `disableLoRaWAN`?
@@ -22,20 +24,20 @@
  ******************************************************************************/
 
 
-#include <stdlib.h>         /* "round" and memory functionality */
-#include <stdbool.h>        /* "bool", "true", "false" */
-#include "em_gpio.h"        /* General Purpose IO */
-#include "em_leuart.h"      /* Low Energy Universal Asynchronous Receiver/Transmitter Peripheral API */
+#include <stdlib.h>        /* "round" and memory functionality */
+#include <stdbool.h>       /* "bool", "true", "false" */
+#include "em_gpio.h"       /* General Purpose IO */
+#include "em_leuart.h"     /* Low Energy Universal Asynchronous Receiver/Transmitter Peripheral API */
 
-#include "lora.h"           /* LoRaWAN functionality */
-#include "lpp.h"            /* Basic Low Power Payload (LPP) functionality */
-#include "pm.h"             /* Power management functionality */
-#include "my_lora_device.h" /* LoRaWAN settings */
+#include "lora.h"          /* LoRaWAN functionality */
+#include "lpp.h"           /* Basic Low Power Payload (LPP) functionality */
+#include "pm.h"            /* Power management functionality */
+#include "lora_settings.h" /* LoRaWAN settings */
 
-#include "lora_wrappers.h"  /* Corresponding header file */
-#include "pin_mapping.h"    /* PORT and PIN definitions */
-#include "datatypes.h"      /* Definitions of the custom data-types */
-#include "util.h"           /* Utility functionality */
+#include "lora_wrappers.h" /* Corresponding header file */
+#include "pin_mapping.h"   /* PORT and PIN definitions */
+#include "datatypes.h"     /* Definitions of the custom data-types */
+#include "util.h"          /* Utility functionality */
 
 
 /* Local definitions TODO: remove? */
@@ -65,7 +67,7 @@ void initLoRaWAN (void)
 	/* Initialize LoRaWAN communication */
 	loraStatus = LoRa_Init(loraSettings);
 
-	if (loraStatus != JOINED) error(20);
+	if (loraStatus != JOINED) error(30);
 }
 
 
@@ -123,13 +125,13 @@ void sendMeasurements (MeasurementData_t data)
 {
 	/* Initialize LPP-formatted payload
 	 * For 6 measurements we need a max amount of 43 bytes (see `LPP_AddMeasurements` method documentation for the calculation) */
-	if (!LPP_InitBuffer(&appData, 43)) error(21);
+	if (!LPP_InitBuffer(&appData, 43)) error(31);
 
 	/* Add measurements to the LPP packet using the custom convention to save bytes send */
-	if (!LPP_AddMeasurements(&appData, data)) error(22);
+	if (!LPP_AddMeasurements(&appData, data)) error(32);
 
 	/* Send custom LPP-like-formatted payload */
-	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(23);
+	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(33);
 }
 
 
@@ -147,13 +149,13 @@ void sendMeasurements (MeasurementData_t data)
 void sendStormDetected (bool stormDetected)
 {
 	/* Initialize LPP-formatted payload - We need 4 bytes */
-	if (!LPP_InitBuffer(&appData, 4)) error(24);
+	if (!LPP_InitBuffer(&appData, 4)) error(34);
 
 	/* Add value to the LPP packet using the custom convention */
-	if (!LPP_AddStormDetected(&appData, stormDetected)) error(25);
+	if (!LPP_AddStormDetected(&appData, stormDetected)) error(35);
 
 	/* Send custom LPP-like-formatted payload */
-	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(26);
+	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(36);
 }
 
 
@@ -171,13 +173,13 @@ void sendStormDetected (bool stormDetected)
 void sendCableBroken (bool cableBroken)
 {
 	/* Initialize LPP-formatted payload - We need 4 bytes */
-	if (!LPP_InitBuffer(&appData, 4)) error(27);
+	if (!LPP_InitBuffer(&appData, 4)) error(37);
 
 	/* Add value to the LPP packet using the custom convention */
-	if (!LPP_AddCableBroken(&appData, cableBroken)) error(28);
+	if (!LPP_AddCableBroken(&appData, cableBroken)) error(38);
 
 	/* Send custom LPP-like-formatted payload */
-	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(29);
+	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(39);
 }
 
 
@@ -191,11 +193,45 @@ void sendCableBroken (bool cableBroken)
 void sendStatus (uint8_t status)
 {
 	/* Initialize LPP-formatted payload - We need 4 bytes */
-	if (!LPP_InitBuffer(&appData, 4)) error(30);
+	if (!LPP_InitBuffer(&appData, 4)) error(40);
 
 	/* Add value to the LPP packet using the custom convention */
-	if (!LPP_AddStatus(&appData, status)) error(31);
+	if (!LPP_AddStatus(&appData, status)) error(41);
 
 	/* Send custom LPP-like-formatted payload */
-	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(32);
+	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(42);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   Send ONE measured battery voltage, internal and external temperature,
+ *   `stormDetected`, `cableBroken` and `status` value to the cloud using
+ *   LoRaWAN. This method uses the deprecated methods to test if the data
+ *   gets send correctly.
+ *
+ * @param[in] data
+ *   The struct which contains the measurements to send using LoRaWAN.
+ *****************************************************************************/
+void sendTest (MeasurementData_t data)
+{
+	/* Initialize LPP-formatted payload - We need 21 bytes */
+	if (!LPP_InitBuffer(&appData, 21)) error(43);
+
+	/* Add measurements to the LPP packet */
+	int16_t batteryLPP = (int16_t)(round((float)data.voltage[0]/10));
+	if (!LPP_deprecated_AddVBAT(&appData, batteryLPP)) error(44);
+
+	int16_t intTempLPP = (int16_t)(round((float)data.intTemp[0]/100));
+	if (!LPP_deprecated_AddIntTemp(&appData, intTempLPP)) error(45);
+
+	int16_t extTempLPP = (int16_t)(round((float)data.extTemp[0]/100));
+	if (!LPP_deprecated_AddExtTemp(&appData, extTempLPP)) error(46);
+
+	if (!LPP_deprecated_AddStormDetected(&appData, true)) error(47);
+	if (!LPP_deprecated_AddCableBroken(&appData, true)) error(48);
+	if (!LPP_deprecated_AddStatus(&appData, 11)) error(49);
+
+	/* Send LPP-formatted payload */
+	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(50);
 }

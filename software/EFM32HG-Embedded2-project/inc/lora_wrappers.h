@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lora_wrappers.h
  * @brief LoRa wrapper methods
- * @version 1.2
+ * @version 1.4
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -27,6 +27,8 @@ void sendMeasurements (MeasurementData_t data);
 void sendStormDetected (bool stormDetected);
 void sendCableBroken (bool cableBroken);
 void sendStatus (uint8_t status);
+
+void sendTest (MeasurementData_t data);
 
 
 #endif /* _LORA_WAPPERS_H_ */
