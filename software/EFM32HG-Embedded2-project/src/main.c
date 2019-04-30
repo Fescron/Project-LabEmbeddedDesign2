@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 3.0
+ * @version 3.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -33,13 +33,12 @@
  *   @li v2.8: Added functionality to detect a *storm*.
  *   @li v2.9: Started adding LoRaWAN functionality, added more wake-up/sleep functionality.
  *   @li v3.0: Started using updated LoRaWAN send methods.
+ *   @li v3.1: Added functionality to enable/disable the LED blinking when measuring/sending data.
  *
  * ******************************************************************************
  *
  * @todo
  *   IMPORTANT:
- *     - Use a *status* LoRa method to signal errors/system resets (int value, 0 = reset, 1 - ... = error call)
- *     - Enable/disable LED using definition.
  *     - On INT1-PD7, go to sleep for somehow the remaining RTC time on wakeup?
  *         - On ADXL interrupt the RTC doesn't get disabled!
  *
@@ -47,15 +46,9 @@
  *   EXTRA THINGS:
  *     - Add WDOG functionality. (see "powertest" example)
  *         - Also see `getResetCause`(`system.c` in Dramco example)
- *         - Send LoRa message on reset/error method triggered?
- *         - One **status** LoRa method? `int` value and corresponding events?
- *     - Clean up BSP folder and other includes.
- *     - Check error call values.
  *     - Give the sensors time to power up (40 ms? - Dramco)
  *     - Check if DS18B20 and ADC logic can read negative temperatures (`int32_t` instead of `uint32_t`?)
  *         - Can LPP even handle/display these negative temperatures?
- *     - Disable unused pins? (Sensor enable, RN2483RX-TX-RST, INT2, ...)
- *         - See `system.c` in Dramco example
  *
  * @todo
  *   OPTIMALISATIONS:
@@ -110,10 +103,15 @@
 /** Time between each wake-up in seconds
  *    @li max 500 seconds when using LFXO delay
  *    @li 3600 seconds (one hour) works fine when using ULFRCO delay */
-#define WAKE_UP_PERIOD_S 10
+#define WAKE_UP_PERIOD_S 3600
 
 /** Amount of PIN interrupt wakeups (before a RTC wakeup) to be considered as a *storm* */
 #define STORM_INTERRUPTS 5
+
+/** Public definition to select if the LED is turned on while measuring or sending data
+ *    @li `1` - Enable the LED when while measuring or sending data.
+ *    @li `0` - Don't enable the LED while measuring or sending data. */
+#define LED_ENABLED 1
 
 
 /* Local variables */
@@ -177,6 +175,9 @@ int main (void)
 	/* Keep a value if a storm has been detected */
 	bool stormDetected = false;
 
+	/* Keep a value to send one test LoRaWAN message */
+	bool tested = false; // TODO: remove later
+
 	/* Set the index to put the measurements in */
 	data.index = 0;
 
@@ -211,6 +212,9 @@ int main (void)
 				//GPIO_PinModeSet(RN2483_RX_PORT, RN2483_RX_PIN, gpioModePushPull, 0);
 				//GPIO_PinModeSet(RN2483_TX_PORT, RN2483_TX_PIN, gpioModePushPull, 0);
 
+				/* Initialize pin and disable external sensor power on DRAMCO shield */
+				GPIO_PinModeSet(PM_SENS_EXT_PORT, PM_SENS_EXT_PIN, gpioModePushPull, 0); // TODO: check power usage effect?
+
 				//initLoRaWAN(); /* Initialize LoRaWAN functionality */
 				//sleepLoRaWAN(WAKE_UP_PERIOD_S); /* Put the LoRaWAN module to sleep */
 
@@ -227,17 +231,17 @@ int main (void)
 						led(true);
 					}
 
-					ADXL_configRange(ADXL_RANGE_4G); /* Set the measurement range */
+					ADXL_configRange(ADXL_RANGE_8G); /* Set the measurement range */
 
 					ADXL_configODR(ADXL_ODR_12_5); /* Configure ODR */
 
 					//ADXL_readValues(); /* Read and display values forever */
 
-					ADXL_configActivity(3); /* Configure activity detection on INT1 [g] */
+					ADXL_configActivity(7); /* Configure activity detection on INT1 [g] */
 
 					ADXL_enableMeasure(true); /* Enable measurements */
 
-					delay(100);
+					delay(300);
 
 					ADXL_ackInterrupt(); /* ADXL gives interrupt, capture this and acknowledge it by reading from it's status register */
 
@@ -261,7 +265,10 @@ int main (void)
 
 			case MEASURE:
 			{
+
+#if LED_ENABLED == 1 /* LED_ENABLED */
 				led(true); /* Enable LED */
+#endif /* LED_ENABLED */
 
 				/* Measure and store the external temperature (a measurement takes about 23 ms if successful, about 60 ms if no sensor is attached)*/
 				data.extTemp[data.index] = readTempDS18B20();
@@ -274,7 +281,7 @@ int main (void)
 
 #if DEBUGGING == 1 /* DEBUGGING */
 				dbinfoInt("Measurement ", data.index + 1, "");
-				dbinfoInt("Temperature: ", data.extTemp[data.index]*1000, "");
+				dbinfoInt("Temperature: ", data.extTemp[data.index], "");
 				dbinfoInt("Battery voltage: ", data.voltage[data.index], "");
 				dbinfoInt("Internal temperature: ", data.intTemp[data.index], "");
 #endif /* DEBUGGING */
@@ -318,7 +325,25 @@ int main (void)
 
 				data.index++; /* Increase the index to put the next measurements in */
 
+				if (!tested)
+				{
+
+#if DEBUGGING == 1 /* DEBUGGING */
+					dbwarn("Sending test LPP data once ...");
+#endif /* DEBUGGING */
+
+					initLoRaWAN(); /* Initialize LoRaWAN functionality */
+
+					sendTest(data); /* Send the LoRaWAN test message */
+
+					disableLoRaWAN(); /* Disable RN2483 */
+
+					tested = true;
+				}
+
+#if LED_ENABLED == 1 /* LED_ENABLED */
 				led(false); /* Disable LED */
+#endif /* LED_ENABLED */
 
 				/* Decide if 6 measurements are taken or not and react accordingly */
 				if (data.index == 6) MCUstate = SEND;
@@ -327,7 +352,10 @@ int main (void)
 
 			case SEND:
 			{
+
+#if LED_ENABLED == 1 /* LED_ENABLED */
 				led(true); /* Enable LED */
+#endif /* LED_ENABLED */
 
 				//wakeLoRaWAN(); /* Wake up the LoRaWAN module */
 
@@ -345,14 +373,19 @@ int main (void)
 
 				data.index = 0; /* Reset the index to put the measurements in */
 
+#if LED_ENABLED == 1 /* LED_ENABLED */
 				led(false); /* Disable LED */
+#endif /* LED_ENABLED */
 
 				MCUstate = SLEEP;
 			} break;
 
 			case SEND_STORM:
 			{
+
+#if LED_ENABLED == 1 /* LED_ENABLED */
 				led(true); /* Enable LED */
+#endif /* LED_ENABLED */
 
 				//wakeLoRaWAN(); /* Wake up the LoRaWAN module */
 
@@ -375,7 +408,9 @@ int main (void)
 
 				stormDetected = true; /* Indicate that a storm has been detected */
 
+#if LED_ENABLED == 1 /* LED_ENABLED */
 				led(false); /* Disable LED */
+#endif /* LED_ENABLED */
 
 				MCUstate = SLEEP_HALFTIME;
 			} break;
@@ -401,6 +436,11 @@ int main (void)
 
 			case WAKEUP:
 			{
+
+#if LED_ENABLED == 1 /* LED_ENABLED */
+				led(true); /* Enable LED */
+#endif /* LED_ENABLED */
+
 				/* Check if we woke up using buttons and take measurements on "case WAKEUP" exit */
 				if (checkBTNinterrupts()) MCUstate = MEASURE;
 
@@ -447,11 +487,16 @@ int main (void)
 						}
 					}
 				}
+
+#if LED_ENABLED == 1 /* LED_ENABLED */
+				led(false); /* Disable LED */
+#endif /* LED_ENABLED */
+
 			} break;
 
 			default:
 			{
-				error(0);
+				error(10);
 			} break;
 		}
 	}
