@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.h
  * @brief All code for the DS18B20 temperature sensor.
- * @version 2.0
+ * @version 2.2
  * @author
  *   Alec Vanderhaegen & Sarah Goossens@n
  *   Modified by Brecht Van Eeckhoudt
@@ -13,13 +13,12 @@
 #define _DS18B20_H_
 
 
-/* Public definition */
-/** Maximum waiting value before a reset becomes *failed* */
-#define MAX_TIME_CTR 2000
+/* Include necessary for this header file */
+#include <stdint.h> /* (u)intXX_t */
 
 
 /* Public prototype */
-float readTempDS18B20 (void);
+uint32_t readTempDS18B20 (void);
 
 
 #endif /* _DS18B20_H_ */

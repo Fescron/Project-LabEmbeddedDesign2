@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 2.0
+ * @version 2.2
  * @author
  *   Alec Vanderhaegen & Sarah Goossens@n
  *   Modified by Brecht Van Eeckhoudt
@@ -23,6 +23,8 @@
  *   @li v1.8: Added line to disable DATA pin after a measurement, this breaks the code but fixes the sleep current.
  *   @li v1.9: Enabled and disabled timer each time a measurement is taken.
  *   @li v2.0: Updated documentation.
+ *   @li v2.1: Changed method to return `uint32_t` instead of float.
+ *   @li v2.2: Changed error numbering, moved definition from header to source file and updated header file include.
  *
  ******************************************************************************/
 
@@ -35,8 +37,14 @@
 #include "DS18B20.h"     /* Corresponding header file */
 #include "pin_mapping.h" /* PORT and PIN definitions */
 #include "debugging.h"   /* Enable or disable printing to UART */
+#include "delay.h"       /* Delay functionality */
 #include "util.h"    	 /* Utility functionality */
 #include "ustimer.h"     /* Timer functionality */
+
+
+/* Local definition */
+/** Maximum waiting value before a reset becomes *failed* */
+#define MAX_TIME_CTR 2000
 
 
 /* Local variable */
@@ -48,7 +56,7 @@ static void powerDS18B20 (bool enabled);
 static bool init_DS18B20 (void);
 static void writeByteToDS18B20 (uint8_t data);
 static uint8_t readByteFromDS18B20 (void);
-static float convertTempData (uint8_t tempLS, uint8_t tempMS);
+static uint32_t convertTempData (uint8_t tempLS, uint8_t tempMS);
 
 
 /**************************************************************************//**
@@ -63,9 +71,9 @@ static float convertTempData (uint8_t tempLS, uint8_t tempMS);
  *   float value.
  *
  * @return
- *   The read temperature data (`float`).
+ *   The read temperature data.
  *****************************************************************************/
-float readTempDS18B20 (void)
+uint32_t readTempDS18B20 (void)
 {
 	/* Initialize timer
 	 * Initializing and disabling the timer again adds about 40 µs active time but should conserve sleep energy... */
@@ -113,7 +121,7 @@ float readTempDS18B20 (void)
 		dbcrit("DS18B20 measurement failed");
 #endif /* DEBUGGING */
 
-		error(11);
+		error(13);
 
 		return (0);
 	}
@@ -327,13 +335,13 @@ static uint8_t readByteFromDS18B20 (void)
  *   Most significant byte.
  *
  * @return
- *   The converted temperature data (`float`).
+ *   The converted temperature data.
  *****************************************************************************/
-static float convertTempData (uint8_t tempLS, uint8_t tempMS)
+static uint32_t convertTempData (uint8_t tempLS, uint8_t tempMS)
 {
 	uint16_t rawDataMerge;
 	uint16_t reverseRawDataMerge;
-	float finalTemperature;
+	uint32_t finalTemperature;
 
 	/* Check if it is a negative temperature value
 	 * 0xF8 = 0b1111 1000 */
@@ -351,7 +359,7 @@ static float convertTempData (uint8_t tempLS, uint8_t tempMS)
 		reverseRawDataMerge = ~rawDataMerge;
 
 		/* Calculate the final temperature */
-		finalTemperature = -(reverseRawDataMerge + 1) * 0.0625;
+		finalTemperature = -(reverseRawDataMerge + 1) * 62.5;
 	}
 	/* We're dealing with a positive temperature */
 	else
@@ -365,7 +373,7 @@ static float convertTempData (uint8_t tempLS, uint8_t tempMS)
 		rawDataMerge += tempLS;
 
 		/* Calculate the final temperature */
-		finalTemperature = rawDataMerge * 0.0625;
+		finalTemperature = rawDataMerge * 62.5;
 	}
 
 	return (finalTemperature);
