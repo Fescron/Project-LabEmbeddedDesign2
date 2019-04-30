@@ -17,8 +17,8 @@
  *  Description: Change to your desired settings.
  */
 
-#ifndef _MY_LORA_DEVICE_H_
-#define _MY_LORA_DEVICE_H_
+#ifndef _LORA_SETTINGS_H_
+#define _LORA_SETTINGS_H_
 
 
 /*****************************************************************************************
@@ -39,34 +39,34 @@
  * SF12_BW125
  * SF11_BW125
  * SF10_BW125
- * SF9_BW125
+ * SF7_BW125
  * SF8_BW125
  * SF7_BW125
  *
  * Try changing the SF to see its impact on the energy consumption
  */
-#define DEFAULT_DATA_RATE			SF11_BW125
+#define DEFAULT_DATA_RATE			SF10_BW125
 
 
 #if OVER_THE_AIR_ACTIVATION == 1
 // Copy your settings here
 /* 64-bit device ID */
-#define LORAWAN_DEVICE_EUI			"0034B12486602345"
+#define LORAWAN_DEVICE_EUI			"YOUR_DEVICE_EUI_"
 /* 64-bit application ID */
-#define LORAWAN_APPLICATION_EUI     "70B3D57ED000BD0C"
+#define LORAWAN_APPLICATION_EUI     "YOUR_APP_EUI____"
 /* 128-bit AES key */
-#define LORAWAN_APPLICATION_KEY     "E6DB9A307CBBA197B6A4E2B0F3E125C7"
+#define LORAWAN_APPLICATION_KEY     "YOUR_SECRET_AES_APPLICATION_KEY_"
 // Don't change
 #define JOIN_MECHANISM				OTAA
 
 #elif OVER_THE_AIR_ACTIVATION == 0
 // Copy your settings here
 /* 32-bit device address */
-#define LORAWAN_DEVICE_ADDRESS     	"260128F5"
+#define LORAWAN_DEVICE_ADDRESS     	"DEV_ADDR"
 /* 128-bit AES key */
-#define LORAWAN_NWKSKEY             "6133D7C8710FAD01B903AD55C57610D6"
+#define LORAWAN_NWKSKEY             "YOUR_SECRET_AES_NWK_SESSION_KEY_"
 /* 128-bit AES key */
-#define LORAWAN_APPSKEY             "95939FFF46B513261F52BB498FE7E50C"
+#define LORAWAN_APPSKEY             "YOUR_SECRET_AES_APP_SESSION_KEY_"
 // Don't change
 #define JOIN_MECHANISM				ABP
 #else
@@ -107,4 +107,4 @@
 }
 #endif
 
-#endif /* _MY_LORA_DEVICE_H_ */
+#endif /* _LORA_SETTINGS_H_ */
