@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.c
  * @brief Utility functionality.
- * @version 2.6
+ * @version 2.7
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -21,10 +21,12 @@
  *   @li v2.4: Stopped disabling the GPIO clock.
  *   @li v2.5: Moved documentation.
  *   @li v2.6: Updated code with new DEFINE checks.
+ *   @li v2.7: Added functionality to send error values using LoRaWAN.
  *
  *   @todo
- *     - Don't go in while(true) loop on error when the mode is in **release**.
- *         - Call LoRa method but check beforehand if some clocks need to be disabled after the error call!
+ *     - Check the placement of errors and see (if they get send using LoRaWAN) that they don't break clock functionality.
+ *     - Go back to INIT state?
+ *     - Update used LoRaWAN functionality if necessary.
  *
  * ******************************************************************************
  *
@@ -47,6 +49,10 @@
 #include "pin_mapping.h" /* PORT and PIN definitions */
 #include "debugging.h" 	 /* Enable or disable printing to UART */
 #include "delay.h"     	 /* Delay functionality */
+
+#ifdef RELEASE /* RELEASE */
+#include "lora_wrappers.h" /* LoRaWAN functionality */
+#endif /* RELEASE */
 
 
 /* Local variables */
@@ -85,9 +91,16 @@ void led (bool enabled)
  *   Error method.
  *
  * @details
- *   This method flashes the LED, displays a UART message and holds
- *   the microcontroller forever in a loop until it gets reset. Also
- *   stores the error number in a global variable.
+ *   **DEBUG mode**@n
+ *   In *debug mode* this method flashes the LED, displays a UART message
+ *   and holds the microcontroller forever in a loop until it gets reset.
+ *   The error value gets stored in a global variable.
+ *
+ *   **RELEASE mode**@n
+ *   In *release mode* this method sends the error value to the cloud using
+ *   LoRaWAN if the error number doesn't correspond to LoRaWAN-related functionality
+ *   (numbers 30 - 50).
+ *
  *
  * @param[in] number
  *   The number to indicate where in the code the error was thrown.
@@ -100,6 +113,8 @@ void error (uint8_t number)
 	/* Save the given number in the global variable */
 	errorNumber = number;
 
+#ifdef DEBUG /* DEBUG */
+
 #if DEBUGGING == 1 /* DEBUGGING */
 	dbcritInt(">>> Error (", number, ")! Please reset MCU. <<<");
 #endif /* DEBUGGING */
@@ -109,6 +124,33 @@ void error (uint8_t number)
 		delay(100);
 		GPIO_PinOutToggle(LED_PORT, LED_PIN); /* Toggle LED */
 	}
+
+#else /* RELEASE */
+
+	/* Check if the error number isn't called in LoRaWAN functionality */
+	if ((number < 30) && number > 50)
+	{
+		initLoRaWAN(); /* Initialize LoRaWAN functionality TODO: use something else if we can save the settings */
+
+#if DEBUGGING == 1 /* DEBUGGING */
+		dbcritInt(">>> Error (", number, ")! Sending the message to the cloud. <<<");
+#endif /* DEBUGGING */
+
+		sendStatus(number); /* Send the status value */
+
+		disableLoRaWAN(); /* Disable RN2483 */
+	}
+	else
+	{
+
+#if DEBUGGING == 1 /* DEBUGGING */
+		dbcritInt(">>> Error in LoRaWAN functionality (", number, ")! <<<");
+#endif /* DEBUGGING */
+
+	}
+
+#endif /* DEBUG/RELEASE selection */
+
 }
 
 
