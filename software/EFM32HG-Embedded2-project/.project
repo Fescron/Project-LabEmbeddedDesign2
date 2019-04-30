@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>SLSTK3400A_ADXL362</name>
+	<name>EFM32HG-Embedded2-project</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -29,11 +29,6 @@
 			<name>dbprint-scr</name>
 			<type>2</type>
 			<location>/home/brecht/Qsync/Documents/1-Github-Repositories/dbprint/dbprint-scr</location>
-		</link>
-		<link>
-			<name>BSP/bsp_stk_leds.c</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/hardware/kit/common/bsp/bsp_stk_leds.c</locationURI>
 		</link>
 		<link>
 			<name>drivers/dmactrl.c</name>
