@@ -1,5 +1,6 @@
 var main_8c =
 [
+    [ "LED_ENABLED", "main_8c.html#a2ee109ad948cb91914bc161a8fabdb3f", null ],
     [ "STORM_INTERRUPTS", "main_8c.html#a0f0eb9c2fcd0551bc741bb80081a6e2e", null ],
     [ "WAKE_UP_PERIOD_S", "main_8c.html#ae1c1201a004beb35d405fd396f53f86c", null ],
     [ "checkBTNinterrupts", "main_8c.html#a5f9359bd2c769dbc39709d37da27421d", null ],

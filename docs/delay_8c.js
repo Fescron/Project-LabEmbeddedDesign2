@@ -1,5 +1,9 @@
 var delay_8c =
 [
+    [ "LFXOFREQ", "delay_8c.html#a608c42d50a4df7f45d31ce5e1fbe1270", null ],
+    [ "LFXOFREQ_MS", "delay_8c.html#acde5abcdec802c050f0fdf095fb28343", null ],
+    [ "ULFRCOFREQ", "delay_8c.html#a32d3f5f00133102c9c845ca65e7d5d77", null ],
+    [ "ULFRCOFREQ_MS", "delay_8c.html#a7dfc303d591a9e657e53c979d8e0c664", null ],
     [ "delay", "delay_8c.html#adb46f4276f5ddf111153701858f85df6", null ],
     [ "initRTC", "delay_8c.html#aecf4672ef62001664f5ebc953755da1d", null ],
     [ "RTC_checkWakeup", "delay_8c.html#a7bfbeaf084abaa0fc6baf77a1640b598", null ],

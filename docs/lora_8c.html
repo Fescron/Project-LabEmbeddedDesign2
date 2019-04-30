@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Embedded System Design 2 - Project: SLSTK3400A_project2/lora/lora.c File Reference</title>
+<title>Embedded System Design 2 - Project: EFM32HG-Embedded2-project/lora/lora.c File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -156,7 +156,7 @@ Variables</h2></td></tr>
 <div class="ttc" id="lora_8h_html_a845c0ba6d0f2e0d27c498134c793f6a3aac10d462bda2cb61f848d5b411a45088"><div class="ttname"><a href="lora_8h.html#a845c0ba6d0f2e0d27c498134c793f6a3aac10d462bda2cb61f848d5b411a45088">JOINED</a></div><div class="ttdef"><b>Definition:</b> <a href="lora_8h_source.html#l00034">lora.h:34</a></div></div>
 <div class="ttc" id="rn2483_8c_html_a2a700b1ac4101e7f4069a45768a3e488"><div class="ttname"><a href="rn2483_8c.html#a2a700b1ac4101e7f4069a45768a3e488">RN2483_Setup</a></div><div class="ttdeci">RN2483_Status_t RN2483_Setup(LoRaSettings_t settings, char *receiveBuffer, uint8_t bufferSize)</div><div class="ttdef"><b>Definition:</b> <a href="rn2483_8c_source.html#l00270">rn2483.c:270</a></div></div>
 <div class="ttc" id="rn2483_8c_html_a08ff8ea91535dcea24da455f37424364"><div class="ttname"><a href="rn2483_8c.html#a08ff8ea91535dcea24da455f37424364">RN2483_Init</a></div><div class="ttdeci">void RN2483_Init(void)</div><div class="ttdef"><b>Definition:</b> <a href="rn2483_8c_source.html#l00123">rn2483.c:123</a></div></div>
-<div class="ttc" id="delay_8h_html_adb46f4276f5ddf111153701858f85df6"><div class="ttname"><a href="delay_8h.html#adb46f4276f5ddf111153701858f85df6">delay</a></div><div class="ttdeci">void delay(uint32_t msDelay)</div><div class="ttdoc">Wait for a certain amount of milliseconds in EM2/3. </div><div class="ttdef"><b>Definition:</b> <a href="delay_8c_source.html#l00080">delay.c:80</a></div></div>
+<div class="ttc" id="delay_8h_html_adb46f4276f5ddf111153701858f85df6"><div class="ttname"><a href="delay_8h.html#adb46f4276f5ddf111153701858f85df6">delay</a></div><div class="ttdeci">void delay(uint32_t msDelay)</div><div class="ttdoc">Wait for a certain amount of milliseconds in EM2/3. </div><div class="ttdef"><b>Definition:</b> <a href="delay_8c_source.html#l00089">delay.c:89</a></div></div>
 <div class="ttc" id="lora_8c_html_a50589983479719e04c6b400555682c3a"><div class="ttname"><a href="lora_8c.html#a50589983479719e04c6b400555682c3a">loraReceiveBuffer</a></div><div class="ttdeci">char loraReceiveBuffer[64]</div><div class="ttdef"><b>Definition:</b> <a href="lora_8c_source.html#l00034">lora.c:34</a></div></div>
 <div class="ttc" id="pm_8h_html_a5707045c3617c3aec04e8016e29d249da18ecbb3bd1854a265c45ca38ad91c0f1"><div class="ttname"><a href="pm_8h.html#a5707045c3617c3aec04e8016e29d249da18ecbb3bd1854a265c45ca38ad91c0f1">PM_RN2483</a></div><div class="ttdef"><b>Definition:</b> <a href="pm_8h_source.html#l00026">pm.h:26</a></div></div>
 <div class="ttc" id="lora_8c_html_ae4636b06f70ca82155a7d435862ff50a"><div class="ttname"><a href="lora_8c.html#ae4636b06f70ca82155a7d435862ff50a">MAX_JOIN_RETRIES</a></div><div class="ttdeci">#define MAX_JOIN_RETRIES</div><div class="ttdef"><b>Definition:</b> <a href="lora_8c_source.html#l00032">lora.c:32</a></div></div>
@@ -232,7 +232,7 @@ Variables</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="lora_8c_source.html#l00070">70</a> of file <a class="el" href="lora_8c_source.html">lora.c</a>.</p>
 <div class="fragment"><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                                                            {</div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="rn2483_8c.html#a3804c89f75d89f9b68fd79c008a6404b">RN2483_Sleep</a>(durationMs, <a class="code" href="lora__wrappers_8c.html#a707b8ba78e8ee3404dfb32ed31188714">wakeUp</a>, <a class="code" href="lora_8c.html#a50589983479719e04c6b400555682c3a">loraReceiveBuffer</a>, <a class="code" href="lora_8c.html#adef98f17102092b2051f1de084dbf1dd">LORA_BUFFERSIZE</a>);</div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;}</div><div class="ttc" id="lora_8c_html_adef98f17102092b2051f1de084dbf1dd"><div class="ttname"><a href="lora_8c.html#adef98f17102092b2051f1de084dbf1dd">LORA_BUFFERSIZE</a></div><div class="ttdeci">#define LORA_BUFFERSIZE</div><div class="ttdef"><b>Definition:</b> <a href="lora_8c_source.html#l00031">lora.c:31</a></div></div>
-<div class="ttc" id="lora__wrappers_8c_html_a707b8ba78e8ee3404dfb32ed31188714"><div class="ttname"><a href="lora__wrappers_8c.html#a707b8ba78e8ee3404dfb32ed31188714">wakeUp</a></div><div class="ttdeci">volatile bool wakeUp</div><div class="ttdef"><b>Definition:</b> <a href="lora__wrappers_8c_source.html#l00048">lora_wrappers.c:48</a></div></div>
+<div class="ttc" id="lora__wrappers_8c_html_a707b8ba78e8ee3404dfb32ed31188714"><div class="ttname"><a href="lora__wrappers_8c.html#a707b8ba78e8ee3404dfb32ed31188714">wakeUp</a></div><div class="ttdeci">volatile bool wakeUp</div><div class="ttdef"><b>Definition:</b> <a href="lora__wrappers_8c_source.html#l00050">lora_wrappers.c:50</a></div></div>
 <div class="ttc" id="lora_8c_html_a50589983479719e04c6b400555682c3a"><div class="ttname"><a href="lora_8c.html#a50589983479719e04c6b400555682c3a">loraReceiveBuffer</a></div><div class="ttdeci">char loraReceiveBuffer[64]</div><div class="ttdef"><b>Definition:</b> <a href="lora_8c_source.html#l00034">lora.c:34</a></div></div>
 <div class="ttc" id="rn2483_8c_html_a3804c89f75d89f9b68fd79c008a6404b"><div class="ttname"><a href="rn2483_8c.html#a3804c89f75d89f9b68fd79c008a6404b">RN2483_Sleep</a></div><div class="ttdeci">RN2483_Status_t RN2483_Sleep(uint32_t sleepTime, volatile bool *wakeUp, char *receiveBuffer, uint8_t bufferSize)</div><div class="ttdef"><b>Definition:</b> <a href="rn2483_8c_source.html#l00370">rn2483.c:370</a></div></div>
 </div><!-- fragment -->
@@ -286,8 +286,8 @@ Variables</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_c6fe9a14e775b8c75819cd4ae39c6ec2.html">SLSTK3400A_project2</a></li><li class="navelem"><a class="el" href="dir_32458a09d539836d43c226ac85a91847.html">lora</a></li><li class="navelem"><a class="el" href="lora_8c.html">lora.c</a></li>
-    <li class="footer">Generated on Tue Apr 30 2019 00:36:28 for Embedded System Design 2 - Project by
+    <li class="navelem"><a class="el" href="dir_952e9747e32fbb216a31eb66ba91adc1.html">EFM32HG-Embedded2-project</a></li><li class="navelem"><a class="el" href="dir_d5d08f7ba2dd58682eb7b63819384a2c.html">lora</a></li><li class="navelem"><a class="el" href="lora_8c.html">lora.c</a></li>
+    <li class="footer">Generated on Wed May 1 2019 00:31:53 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

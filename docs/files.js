@@ -1,4 +1,4 @@
 var files =
 [
-    [ "SLSTK3400A_project2", "dir_c6fe9a14e775b8c75819cd4ae39c6ec2.html", "dir_c6fe9a14e775b8c75819cd4ae39c6ec2" ]
+    [ "EFM32HG-Embedded2-project", "dir_952e9747e32fbb216a31eb66ba91adc1.html", "dir_952e9747e32fbb216a31eb66ba91adc1" ]
 ];
