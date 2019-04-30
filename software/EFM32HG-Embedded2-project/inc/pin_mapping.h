@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file pin_mapping.h
  * @brief The pin definitions for the regular and custom Happy Gecko board.
- * @version 1.3
+ * @version 1.4
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -12,6 +12,7 @@
  *   @li v1.1: Added regular board pinout, selectable with define statement.
  *   @li v1.2: Added documentation.
  *   @li v1.3: Updated code with new DEFINE checks.
+ *   @li v1.4: Added IIC definitions.
  *
  ******************************************************************************/
 
@@ -43,19 +44,19 @@
 	#define ADXL_MISO_PIN       11
 	#define ADXL_CLK_PORT       gpioPortE
 	#define ADXL_CLK_PIN        12
-	#define ADXL_NCS_PORT       gpioPortF 	/* Can't use the US0_CS port (PE13) to manually set/clear CS line */
+	#define ADXL_NCS_PORT       gpioPortF /* Can't use the US0_CS port (PE13) to manually set/clear CS line */
 	#define ADXL_NCS_PIN        5
 
 	#define ADXL_INT1_PORT      gpioPortF
 	#define ADXL_INT1_PIN       3
-	#define ADXL_INT2_PORT      gpioPortF
-	#define ADXL_INT2_PIN       4
+	#define ADXL_INT2_PORT      gpioPortF /* Unused */
+	#define ADXL_INT2_PIN       4         /* Unused */
 	#define ADXL_VDD_PORT       gpioPortA
 	#define ADXL_VDD_PIN        1
 
 	/* LED */
-	#define LED_PORT            gpioPortA // Before: A
-	#define LED_PIN             2         // Before: 2
+	#define LED_PORT            gpioPortA
+	#define LED_PIN             2
 
 	/* Buttons */
 	#define PB0_PORT            gpioPortC
@@ -94,10 +95,12 @@
 	#define RN2483_RESET_PIN    10
 
 	/* External header */
-	#define IIC_SDA_PORT        gpioPortC
-	#define IIC_SDA_PIN         0
-	#define IIC_SCL_PORT        gpioPortC
-	#define IIC_SCL_PIN         1
+	#define IIC_EXT             I2C0      /* Unused */
+	#define IIT_EXT_LOC         4         /* Unused */
+	#define IIC_SDA_PORT        gpioPortC /* Unused */
+	#define IIC_SDA_PIN         0         /* Unused */
+	#define IIC_SCL_PORT        gpioPortC /* Unused */
+	#define IIC_SCL_PIN         1         /* Unused */
 
 	/* Power supply enable */
 	#define PM_RN2483_PORT		gpioPortA
@@ -167,10 +170,12 @@
 	#define RN2483_RESET_PIN    10
 
 	/* External header */
-	#define IIC_SDA_PORT        gpioPortC
-	#define IIC_SDA_PIN         0
-	#define IIC_SCL_PORT        gpioPortC
-	#define IIC_SCL_PIN         1
+	#define IIC_EXT             I2C0      /* Unused */
+	#define IIT_EXT_LOC         4         /* Unused */
+	#define IIC_SDA_PORT        gpioPortC /* Unused */
+	#define IIC_SDA_PIN         0         /* Unused */
+	#define IIC_SCL_PORT        gpioPortC /* Unused */
+	#define IIC_SCL_PIN         1         /* Unused */
 
 	/* Power supply enable */
 	#define PM_RN2483_PORT		gpioPortA
