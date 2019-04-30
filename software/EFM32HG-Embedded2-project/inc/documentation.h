@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file documentation.h
  * @brief This file contains useful documentation about the project.
- * @version 1.1
+ * @version 1.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -155,10 +155,10 @@
  *   When the MCU is in EM1, the clock to the CPU is disabled. All peripherals,
  *   as well as RAM and flash, are available.
  *
- *   In EM3, high and low frequency clocks are disabled. No oscillator (except
+ *   @note In EM3, high and low frequency clocks are disabled. No oscillator (except
  *   the ULFRCO) is running. Furthermore, all unwanted oscillators are disabled
- *   in EM3. This means that nothing needs to be manually disabled before
- *   the statement `EMU_EnterEM3(true);`.
+ *   in EM3. **This means that nothing needs to be manually disabled before
+ *   the statement `EMU_EnterEM3(true);`.**
 
  *   The following modules/functions are are generally still available in EM3:
  *     @li I2C address check
