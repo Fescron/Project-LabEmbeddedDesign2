@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.c
  * @brief Delay functionality.
- * @version 2.2
+ * @version 2.4
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -22,6 +22,8 @@
  *   @li v2.0: Added functionality to enable/disable the clocks only when necessary.
  *   @li v2.1: Added functionality to check if a wakeup was caused by the RTC.
  *   @li v2.2: Removed some clock disabling statements.
+ *   @li v2.3: Changed error numbering.
+ *   @li v2.4: Moved definitions from header to source file.
  *
  *   @todo
  *     - Split definition to use the ULFRCO for the delay and sleep method? (if so, also update documentation!)
@@ -50,6 +52,13 @@
 #include "pin_mapping.h" /* PORT and PIN definitions */
 #include "debugging.h" 	 /* Enable or disable printing to UART */
 #include "util.h"    	 /* Utility functionality */
+
+
+/* Local definitions (for RTC compare interrupts) */
+#define ULFRCOFREQ    1000
+#define ULFRCOFREQ_MS 1.000
+#define LFXOFREQ      32768
+#define LFXOFREQ_MS   32.768
 
 
 /* Local variables */
