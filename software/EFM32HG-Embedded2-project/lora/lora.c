@@ -26,6 +26,7 @@
 
 #include "delay.h"       /* Delay functionality */
 #include "pin_mapping.h" /* PORT and PIN definitions */
+#include "debugging.h"   /* Enable or disable printing to UART for debugging */
 
 
 #define LORA_BUFFERSIZE		64
@@ -44,6 +45,11 @@ LoRaStatus_t LoRa_Init(LoRaSettings_t init){
 			break;
 		}
 		retries++;
+
+#if DEBUGGING == 1 /* DEBUGGING */
+		dbwarnInt("Retry join in 5 seconds (LoRa_Init) (", retries, ")\n\r");
+#endif /* DEBUGGING */
+
 		delay(5000);
 	}
 	if(retries == MAX_JOIN_RETRIES){
