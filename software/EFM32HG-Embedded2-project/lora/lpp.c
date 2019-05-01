@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lpp.c
  * @brief Basic Low Power Payload (LPP) functionality.
- * @version 1.2
+ * @version 1.3
  * @author
  *   Geoffrey Ottoy@n
  *   Modified by Brecht Van Eeckhoudt
@@ -13,6 +13,7 @@
  *   @li v1.0: DRAMCO GitHub version (https://github.com/DRAMCO/EFM32-RN2483-LoRa-Node).
  *   @li v1.1: Added custom methods to add specific data to the LPP packet.
  *   @li v1.2: Merged methods to use less bytes when sending the data.
+ *   @li v1.3: Updated documentation.
  *
  ******************************************************************************/
 
@@ -43,7 +44,7 @@
 #include "lpp.h"       /* Corresponding header file */
 #include "datatypes.h" /* Definitions of the custom data-types */
 
-// lpp types
+/* LPP types */
 #define LPP_DIGITAL_INPUT			0x00
 #define LPP_ANALOG_INPUT			0x02
 #define LPP_TEMPERATURE				0x67
@@ -51,7 +52,7 @@
 #define LPP_ACCELEROMETER			0x71
 #define LPP_PRESSURE				0x73
 
-// lpp data sizes
+/* LPP data sizes */
 #define LPP_DIGITAL_INPUT_SIZE		0x03
 #define LPP_ANALOG_INPUT_SIZE		0x04
 #define LPP_TEMPERATURE_SIZE		0x04
@@ -59,7 +60,7 @@
 #define LPP_ACCELEROMETER_SIZE		0x08
 #define LPP_PRESSURE_SIZE			0x04
 
-// lpp channel ids
+/* LPP channel ID's */
 #define LPP_DIGITAL_INPUT_CHANNEL	0x01
 #define LPP_ANALOG_INPUT_CHANNEL	0x02
 #define LPP_TEMPERATURE_CHANNEL		0x03
@@ -74,7 +75,6 @@
 #define LPP_STORM_CHANNEL           0x13
 #define LPP_CABLE_BROKEN_CHANNEL    0x14
 #define LPP_STATUS_CHANNEL          0x15
-
 
 bool LPP_InitBuffer(LPP_Buffer_t *b, uint8_t size)
 {
@@ -164,7 +164,9 @@ bool LPP_AddMeasurements (LPP_Buffer_t *b, MeasurementData_t data)
 
 	for (uint8_t i = 0; i < data.index; i++)
 	{
+		/* Convert battery voltage value (should represent 0.01 signed ) */
 		int16_t batteryLPP = (int16_t)(round((float)data.voltage[i]/10));
+
 		b->buffer[b->fill++] = (uint8_t)((0xFF00 & batteryLPP) >> 8);
 		b->buffer[b->fill++] = (uint8_t)(0x00FF & batteryLPP);
 	}
