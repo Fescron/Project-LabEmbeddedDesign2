@@ -155,7 +155,7 @@
  *   When the MCU is in EM1, the clock to the CPU is disabled. All peripherals,
  *   as well as RAM and flash, are available.
  *
- *   @note In EM3, high and low frequency clocks are disabled. No oscillator (except
+ *   @attention In EM3, high and low frequency clocks are disabled. No oscillator (except
  *   the ULFRCO) is running. Furthermore, all unwanted oscillators are disabled
  *   in EM3. **This means that nothing needs to be manually disabled before
  *   the statement `EMU_EnterEM3(true);`.**
