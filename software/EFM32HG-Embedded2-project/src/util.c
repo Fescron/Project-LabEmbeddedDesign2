@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.c
  * @brief Utility functionality.
- * @version 2.7
+ * @version 2.8
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -22,6 +22,7 @@
  *   @li v2.5: Moved documentation.
  *   @li v2.6: Updated code with new DEFINE checks.
  *   @li v2.7: Added functionality to send error values using LoRaWAN.
+ *   @li v2.8: Added the ability to enable/disable error forwarding to the cloud using a public definition and changed UART error color.
  *
  *   @todo
  *     - Check the placement of errors and see (if they get send using LoRaWAN) that they don't break clock functionality.
@@ -50,9 +51,9 @@
 #include "debugging.h" 	 /* Enable or disable printing to UART */
 #include "delay.h"     	 /* Delay functionality */
 
-#ifdef RELEASE /* RELEASE */
+#if ERROR_FORWARDING == 1 /* ERROR_FORWARDING */
 #include "lora_wrappers.h" /* LoRaWAN functionality */
-#endif /* RELEASE */
+#endif /* ERROR_FORWARDING */
 
 
 /* Local variables */
@@ -99,7 +100,7 @@ void led (bool enabled)
  *   **RELEASE mode**@n
  *   In *release mode* this method sends the error value to the cloud using
  *   LoRaWAN if the error number doesn't correspond to LoRaWAN-related functionality
- *   (numbers 30 - 50).
+ *   (numbers 30 - 55).
  *
  *
  * @param[in] number
@@ -113,28 +114,32 @@ void error (uint8_t number)
 	/* Save the given number in the global variable */
 	errorNumber = number;
 
-#ifdef DEBUG /* DEBUG */
+#if ERROR_FORWARDING == 0 /* ERROR_FORWARDING */
 
 #if DEBUGGING == 1 /* DEBUGGING */
-	dbcritInt(">>> Error (", number, ")! Please reset MCU. <<<");
+	dbprint_color(">>> Error (", 5);
+	dbprintInt(number);
+	dbprintln_color(")! Please reset MCU. <<<", 5);
 #endif /* DEBUGGING */
 
-	while(1)
+	while (1)
 	{
 		delay(100);
 		GPIO_PinOutToggle(LED_PORT, LED_PIN); /* Toggle LED */
 	}
 
-#else /* RELEASE */
+#else /* ERROR_FORWARDING */
 
 	/* Check if the error number isn't called in LoRaWAN functionality */
-	if ((number < 30) && number > 50)
+	if ((number < 30) || number > 55)
 	{
-		initLoRaWAN(); /* Initialize LoRaWAN functionality TODO: use something else if we can save the settings */
-
 #if DEBUGGING == 1 /* DEBUGGING */
-		dbcritInt(">>> Error (", number, ")! Sending the message to the cloud. <<<");
+		dbprint_color(">>> Error (", 5);
+		dbprintInt(number);
+		dbprintln_color(")! Sending the message to the cloud. <<<", 5);
 #endif /* DEBUGGING */
+
+		initLoRaWAN(); /* Initialize LoRaWAN functionality TODO: use something else if we can save the settings */
 
 		sendStatus(number); /* Send the status value */
 
@@ -144,12 +149,14 @@ void error (uint8_t number)
 	{
 
 #if DEBUGGING == 1 /* DEBUGGING */
-		dbcritInt(">>> Error in LoRaWAN functionality (", number, ")! <<<");
+		dbprint_color(">>> Error in LoRaWAN functionality (", 5);
+		dbprintInt(number);
+		dbprintln_color(")! <<<", 5);
 #endif /* DEBUGGING */
 
 	}
 
-#endif /* DEBUG/RELEASE selection */
+#endif /* ERROR_FORWARDING */
 
 }
 
