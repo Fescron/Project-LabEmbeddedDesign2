@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file adc.c
  * @brief ADC functionality for reading the (battery) voltage and internal temperature.
- * @version 1.3
+ * @version 1.4
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -12,6 +12,7 @@
  *   @li v1.1: Removed re-initialization dbprint messages.
  *   @li v1.2: Started using custom enum type and cleaned up some unnecessary statements after testing.
  *   @li v1.3: Changed error numbering.
+ *   @li v1.4: Added timeout to `while` loop and changed types to `int32_t`.
  *
  * ******************************************************************************
  *
@@ -35,6 +36,11 @@
 #include "adc.h"       /* Corresponding header file */
 #include "debugging.h" /* Enable or disable printing to UART for debugging */
 #include "util.h"      /* Utility functionality */
+
+
+/* Local definition */
+/** Maximum waiting value before exiting a `while` loop */
+#define TIMEOUT_COUNTER 100 /* 10 is not enough but 20 is (100 just in case) */
 
 
 /* Local variables */
@@ -125,9 +131,10 @@ void initADC (ADC_Measurement_t peripheral)
  * @return
  *   The measured battery voltage or internal temperature.
  *****************************************************************************/
-uint32_t readADC (ADC_Measurement_t peripheral)
+int32_t readADC (ADC_Measurement_t peripheral)
 {
-	uint32_t value = 0;
+	uint16_t counter = 0; /* Timeout counter */
+	int32_t value = 0; /* Value to eventually return */
 
 	/* Enable necessary clock */
 	CMU_ClockEnable(cmuClock_ADC0, true);
@@ -165,8 +172,21 @@ uint32_t readADC (ADC_Measurement_t peripheral)
 	/* Start single ADC conversion */
 	ADC_Start(ADC0, adcStartSingle);
 
-	/* Wait in EM1 until the conversion is completed */
-	while (!adcConversionComplete) EMU_EnterEM1();
+	/* Wait until the conversion is completed */
+	while ((counter < TIMEOUT_COUNTER) && !adcConversionComplete) counter++;
+
+	/* Exit the function if the maximum waiting time was reached */
+	if (counter == TIMEOUT_COUNTER)
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Waiting time for ADC conversion reached!");
+#endif /* DEBUGGING */
+
+		error(13);
+
+		return (0);
+	}
 
 	/* Get the ADC value */
 	value = ADC_DataSingleGet(ADC0);
@@ -178,12 +198,12 @@ uint32_t readADC (ADC_Measurement_t peripheral)
 	if (peripheral == INTERNAL_TEMPERATURE)
 	{
 		float32_t ft = convertToCelsius(value)*1000;
-		value = (uint32_t) ft;
+		value = (int32_t) ft;
 	}
 	else if (peripheral == BATTERY_VOLTAGE)
 	{
 		float32_t fv = value * 3.75 / 4.096;
-		value = (uint32_t) fv;
+		value = (int32_t) fv;
 	}
 
 	return (value);

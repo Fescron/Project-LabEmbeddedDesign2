@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file adc.h
  * @brief ADC functionality for reading the (battery) voltage and internal temperature.
- * @version 1.3
+ * @version 1.4
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -25,7 +25,7 @@ typedef enum adc_measurements
 
 /* Public prototypes */
 void initADC (ADC_Measurement_t peripheral);
-uint32_t readADC (ADC_Measurement_t peripheral);
+int32_t readADC (ADC_Measurement_t peripheral);
 
 
 #endif /* _ADC_H_ */
