@@ -1,3 +1,21 @@
+/***************************************************************************//**
+ * @file leuart.c
+ * @brief LEUART (serial communication) functionality required by the RN2483 LoRa modem.
+ * @version 1.2
+ * @author
+ *   Guus Leenders@n
+ *   Modified by Brecht Van Eeckhoudt
+ *
+ * ******************************************************************************
+ *
+ * @section Versions
+ *
+ *   @li v1.0: DRAMCO GitHub version (https://github.com/DRAMCO/EFM32-RN2483-LoRa-Node).
+ *   @li v1.1: Removed rtcdriver functionality (timouts)
+ *   @li v1.2: Added (basic) timeout functionality.
+ *
+ ******************************************************************************/
+
 /*  ____  ____      _    __  __  ____ ___
  * |  _ \|  _ \    / \  |  \/  |/ ___/ _ \
  * | | | | |_) |  / _ \ | |\/| | |  | | | |
@@ -18,16 +36,16 @@
  *  	functionality required by the RN2483 LoRa modem.
  */
 
-#include <stdint.h>
-#include <stdbool.h>
 
-#include <em_device.h>
-#include <em_chip.h>
-#include <em_gpio.h>
-#include <em_emu.h>
-#include <em_leuart.h>
-#include <em_dma.h>
-#include <em_cmu.h>
+#include <stdint.h>      /* (u)intXX_t */
+#include <stdbool.h>     /* "bool", "true", "false" */
+#include "em_device.h"   /* Include necessary MCU-specific header file */
+#include "em_chip.h"     /* Chip Initialization */
+#include "em_cmu.h"      /* Clock management unit */
+#include "em_emu.h"      /* Energy Management Unit */
+#include "em_gpio.h"     /* General Purpose IO */
+#include "em_leuart.h"   /* Low Energy Universal Asynchronous Receiver/Transmitter Peripheral API */
+#include "em_dma.h"      /* Direct Memory Access (DMA) API */
 
 #include <dmactrl.h>
 //#include <rtcdriver.h>
@@ -36,11 +54,18 @@
 #include "delay.h"       /* Delay functionality */
 #include "pin_mapping.h" /* PORT and PIN definitions */
 #include "util_string.h" /* Utility functionality regarding strings */
+#include "debugging.h"   /* Enable or disable printing to UART for debugging */
+#include "util.h"        /* Utility functionality */
+
+
+/** Maximum waiting value before exiting a `while` loop */
+#define TIMEOUT_COUNTER 2000000 /* 40 000 is not enough for "DMA Channel Enable", 800 000 is not enough for "Leuart_WaitForResponse" but 900 000 is @SF10 (1 000 000 just in case) */
+                                /* @SF12 2 000 000 works ... */
 
 #define TX_TIMEOUT_DURATION		2000	// ms
 #define RX_TIMEOUT_DURATION		10000	// ms
 
-/** DMA Configurations            */
+/* DMA Configurations */
 #define DMA_CHANNEL_TX       0          /* DMA channel is 0 */
 #define DMA_CHANNEL_RX       1
 #define DMA_CHANNELS 		 2
@@ -65,7 +90,7 @@ void Leuart_ClearBuffers(void){
 	timeout = true;
 } */
 
-/** Static (internal) functions */
+/* Static (internal) functions */
 static void basicTxComplete(unsigned int channel, bool primary, void *user){
 	(void) user;
 	/* Refresh DMA basic transaction cycle */
@@ -173,9 +198,24 @@ void setupDma(void){
 	DMA_CfgDescr(DMA_CHANNEL_TX, true, &txDescrCfg);
 }
 
-static void sendLeuartData(char * buffer, uint8_t bufferLength){
-	// Wait for sync
-	while (RN2483_UART->SYNCBUSY);
+static void sendLeuartData(char * buffer, uint8_t bufferLength)
+{
+	/* Timeout counter */
+	uint32_t counter = 0;
+
+	/* Wait for sync */
+	while ((counter < TIMEOUT_COUNTER) && RN2483_UART->SYNCBUSY) counter++;
+
+	/* Exit the function if the maximum waiting time was reached */
+	if (counter == TIMEOUT_COUNTER)
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Waiting time for sync reached! (sendLeuartData)");
+#endif /* DEBUGGING */
+
+		error(51);
+	}
 
 	DMA_ActivateBasic(DMA_CHANNEL_TX,
 	                  true,
@@ -184,7 +224,22 @@ static void sendLeuartData(char * buffer, uint8_t bufferLength){
 	                  buffer,
 	                  (unsigned int)(bufferLength - 1));
 
-	 while(DMA_ChannelEnabled(DMA_CHANNEL_TX)); // EnterEM
+	/* Reset timeout counter */
+	counter = 0;
+
+	/* Wait in EM1 for DMA channel enable */
+	while ((counter < TIMEOUT_COUNTER) && DMA_ChannelEnabled(DMA_CHANNEL_TX)) counter++;//  EMU_EnterEM1() TODO: check if EM1 works here
+
+	/* Exit the function if the maximum waiting time was reached */
+	if (counter == TIMEOUT_COUNTER)
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Waiting time for DMA channel enable reached! (sendLeuartData)");
+#endif /* DEBUGGING */
+
+		error(52);
+	}
 }
 
 static void setupLeuart(void){
@@ -279,32 +334,60 @@ void Leuart_ReadResponse(char * buffer, uint8_t bufferLength){
 	bufferPointer = 0;
 }
 
-void Leuart_SendData(char * buffer, uint8_t bufferLength){
-	// Send data over LEUART
+void Leuart_SendData(char * buffer, uint8_t bufferLength)
+{
+	/* Timeout counter */
+	uint32_t counter = 0;
+
+	/* Send data over LEUART */
 	sendLeuartData(buffer, bufferLength);
 
 	// Start Timeout-timer if needed
 	timeout = false;
 	/* RTCDRV_StartTimer(xTimerForTimeout, rtcdrvTimerTypeOneshot, 10, (RTCDRV_Callback_t) &timeoutCb, NULL); */
-	// Wait for response or timeout
-	while(!Leuart_ResponseAvailable() && !timeout){
-		EMU_EnterEM2(true);
+
+	/* Wait for response */
+	while ((counter < TIMEOUT_COUNTER) && !Leuart_ResponseAvailable()) counter++; // TODO: before: EMU_EnterEM2(true)
+
+	/* Exit the function if the maximum waiting time was reached */
+	if (counter == TIMEOUT_COUNTER)
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Waiting time for response reached! (Leuart_SendData)");
+#endif /* DEBUGGING */
+
+		error(53);
 	}
 
 	receiveComplete = true;
 }
 
 // Send a command string over the LEUART. Specifying a waitTime > 0 will result in a timeout when no command is received in time.
-Leuart_Status_t Leuart_SendCommand(char * cb, uint8_t cbl, volatile bool * wakeUp){
-	// Send data over LEUART
+Leuart_Status_t Leuart_SendCommand(char * cb, uint8_t cbl, volatile bool * wakeUp)
+{
+	/* Timeout counter */
+	uint32_t counter = 0;
+
+	/* Send data over LEUART */
 	sendLeuartData(cb, cbl);
 
 	// Start Timeout-timer if needed
 	timeout = false;
 	//RTCDRV_StartTimer(xTimerForTimeout, rtcdrvTimerTypeOneshot, waitTime, (RTCDRV_Callback_t) &timeoutCb, NULL);
-	// Wait for response or timeout
-	while(!Leuart_ResponseAvailable() && !timeout && !(*wakeUp)){
-		EMU_EnterEM2(true);
+
+	/* Wait for response */
+	while ((counter < TIMEOUT_COUNTER) && !Leuart_ResponseAvailable()) counter++; // TODO: before: EMU_EnterEM2(true) [&& !(*wakeUp)]
+
+	/* Exit the function if the maximum waiting time was reached */
+	if (counter == TIMEOUT_COUNTER)
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Waiting time for response reached! (Leuart_SendCommand)");
+#endif /* DEBUGGING */
+
+		error(54);
 	}
 
 	// Check for timeout
@@ -319,7 +402,11 @@ Leuart_Status_t Leuart_SendCommand(char * cb, uint8_t cbl, volatile bool * wakeU
 }
 
 
-Leuart_Status_t Leuart_WaitForResponse(){
+Leuart_Status_t Leuart_WaitForResponse()
+{
+	/* Timeout counter */
+	uint32_t counter = 0;
+
 	// Activate DMA
 	DMA_ActivateBasic(	DMA_CHANNEL_RX,
 						true,
@@ -331,10 +418,21 @@ Leuart_Status_t Leuart_WaitForResponse(){
 	// Start Timeout-timer
 	timeout = false;
 	//RTCDRV_StartTimer(xTimerForTimeout, rtcdrvTimerTypeOneshot, RX_TIMEOUT_DURATION, (RTCDRV_Callback_t) &timeoutCb, NULL);
-	// Wait for response or timeout
-	while(!Leuart_ResponseAvailable() && !timeout){
-		EMU_EnterEM2(true);
+
+	/* Wait for response */
+	while ((counter < TIMEOUT_COUNTER) && !Leuart_ResponseAvailable()) counter++; // TODO: before: EMU_EnterEM2(true)
+
+	/* Exit the function if the maximum waiting time was reached */
+	if (counter == TIMEOUT_COUNTER)
+	{
+
+#ifdef DEBUGGING /* DEBUGGING */
+		dbcrit("Waiting time for response reached! (Leuart_WaitForResponse)");
+#endif /* DEBUGGING */
+
+		error(55);
 	}
+
 	//RTCDRV_StopTimer(xTimerForTimeout); // stop timer
 
 	// Check for timeout
@@ -345,3 +443,4 @@ Leuart_Status_t Leuart_WaitForResponse(){
 	// OK
 	return (DATA_RECEIVED);
 }
+
