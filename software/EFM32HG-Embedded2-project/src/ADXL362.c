@@ -30,7 +30,6 @@
  *     - Check initialization (settings)
  *         - Check absolute/relative mode?
  *         - Check `lis3dh.c` in Dramco example (init shake detection)
- *     - Make `ADXL_configActivity` method use **float** as the argument type?
  *     - Enable wake-up mode: `writeADXL(ADXL_REG_POWER_CTL, 0b00001000)` // 5th bit
  *
  * ******************************************************************************
