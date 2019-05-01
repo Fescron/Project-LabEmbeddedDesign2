@@ -17,6 +17,7 @@
 #include "datatypes.h" /* Definitions of the custom data-types */
 
 
+/* Public prototypes */
 void initLoRaWAN (void);
 void disableLoRaWAN (void);
 

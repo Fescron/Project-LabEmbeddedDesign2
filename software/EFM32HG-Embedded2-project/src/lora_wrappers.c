@@ -18,6 +18,7 @@
  *
  *   @todo
  *     - Save LoRaWAN settings before calling `disableLoRaWAN`?
+ *         - Should be possible in ABP (saving to EEPROM? `saveMAC`?) See reference manual!
  *     - Fix `sleepLoRaWAN` and `wakeLoRaWAN` methods.
  *     - Remove unnecessary defines/variables.
  *
@@ -230,7 +231,7 @@ void sendTest (MeasurementData_t data)
 
 	if (!LPP_deprecated_AddStormDetected(&appData, true)) error(47);
 	if (!LPP_deprecated_AddCableBroken(&appData, true)) error(48);
-	if (!LPP_deprecated_AddStatus(&appData, 11)) error(49);
+	if (!LPP_deprecated_AddStatus(&appData, 9)) error(49);
 
 	/* Send LPP-formatted payload */
 	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(50);
