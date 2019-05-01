@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file datatypes.h
  * @brief Definitions of the custom data-types used.
- * @version 1.2
+ * @version 1.3
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -11,6 +11,7 @@
  *   @li v1.0: Moved `mcu_states` enum definition from `main.c` to this file and added `MeasurementData_t` struct data type.
  *   @li v1.1: Added another `MCU_State_t` option.
  *   @li v1.2: Added another `MCU_State_t` option.
+ *   @li v1.3: Changed data types in `MeasurementData_t` struct.
  *
  ******************************************************************************/
 
@@ -41,9 +42,9 @@ typedef enum mcu_states
 typedef struct
 {
 	uint8_t index;
-	uint16_t voltage[6];
-	uint32_t intTemp[6];
-	float extTemp[6];
+	int32_t voltage[6];
+	int32_t intTemp[6];
+	int32_t extTemp[6];
 } MeasurementData_t;
 
 
