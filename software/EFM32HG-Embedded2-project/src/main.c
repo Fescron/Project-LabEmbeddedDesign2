@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 3.1
+ * @version 3.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -34,6 +34,7 @@
  *   @li v2.9: Started adding LoRaWAN functionality, added more wake-up/sleep functionality.
  *   @li v3.0: Started using updated LoRaWAN send methods.
  *   @li v3.1: Added functionality to enable/disable the LED blinking when measuring/sending data.
+ *   @li v3.2: Fixed button wakeup when sleeping for WAKE_UP_PERIOD_S/2.
  *
  * ******************************************************************************
  *
@@ -44,11 +45,15 @@
  *
  * @todo
  *   EXTRA THINGS:
- *     - Add WDOG functionality. (see "powertest" example)
+ *     - Add WDOG functionality (see "powertest" example and *Embedded Muse 365*)
+ *         - Due to *short* interval: Only when awake?
  *         - Also see `getResetCause`(`system.c` in Dramco example)
+ *         - Check all `while` loops (wait for register flags, ...)! (for loops don't pose problems)
+ *         - Add `counter` timeout to exit `while` loops in worst case (`timer` timout functionality disabled...)
  *     - Give the sensors time to power up (40 ms? - Dramco)
- *     - Check if DS18B20 and ADC logic can read negative temperatures (`int32_t` instead of `uint32_t`?)
- *         - Can LPP even handle/display these negative temperatures?
+ *         - ADXL & old temperature sensor
+ *     - Test negative temperatures by putting the module in it's case in the freezer...
+ *         - LPP logic should be able to handle negative values (`int16_t` as input type for methods & analog: 0.01 signed, temp: 0.1 °C signed MSB)
  *
  * @todo
  *   OPTIMALISATIONS:
@@ -59,7 +64,6 @@
  *         - EM3: All unwanted oscillators are disabled, don't need to manually disable them before `EMU_EnterEM3`.
  *     - Set the accelerometer in *movement detection* to spare battery life when the buoy isn't installed yet?
  *         - EM4 wakeup? See `deepsleep` (`system.c` in Dramco example)
- *     - Surround some delay logic with `ATOMIC` statements? (see `rtcdvr`?)
  *
  * ******************************************************************************
  *
@@ -74,6 +78,32 @@
  *
  * @attention
  *   See the file `documentation.h` for a lot of useful documentation about this project!
+ *
+ * ******************************************************************************
+ *
+ * @section Errors
+ *
+ *   If in this project something unexpected occurs, an `error` method gets called.
+ *   What happens in this method can be selected in `util.h` with the definition
+ *   `ERROR_FORWARDING`. If it's value is `0` the MCU displays (if `dbprint` is enabled)
+ *   a UART message and gets put in a `while(true)` to flash the LED. If it's value is
+ *   `1` then certain values (all values except 30 - 55 since these are errors in the
+ *   LoRaWAN functionality itself) get forwarded to the cloud using LoRaWAN functionality
+ *   and the MCU resumes it's code.
+ *
+ *   When calling an `error` method, the following things were kept in mind:
+ *     - **Values 0 - 9:** Reserved for reset and other critical functionality.
+ *     - **Values 10 - ... :** Available to use for anything else.
+ *
+ *   Below is a list of values which correspond to certain functionality:
+ *     - **10:** Problem in the case of the state machine (`main.c`)
+ *     - **11 - 13:** `adc.c`
+ *     - **14 - 17:** `delay.c`
+ *     - **18 - 19:** `interrupt.c`
+ *     - **20 - 27:** `ADXL362.c`
+ *     - **28:** `DS18B20.c`
+ *     - **30 - 50:** `lora_wrappers.c`
+ *     - **51 - 55:** `leuart.c`
  *
  ******************************************************************************/
 
@@ -103,7 +133,7 @@
 /** Time between each wake-up in seconds
  *    @li max 500 seconds when using LFXO delay
  *    @li 3600 seconds (one hour) works fine when using ULFRCO delay */
-#define WAKE_UP_PERIOD_S 3600
+#define WAKE_UP_PERIOD_S 10
 
 /** Amount of PIN interrupt wakeups (before a RTC wakeup) to be considered as a *storm* */
 #define STORM_INTERRUPTS 5
@@ -176,7 +206,7 @@ int main (void)
 	bool stormDetected = false;
 
 	/* Keep a value to send one test LoRaWAN message */
-	bool tested = false; // TODO: remove later
+	bool tested = true; // TODO: remove later (true: disable sending the message on first boot)
 
 	/* Set the index to put the measurements in */
 	data.index = 0;
@@ -237,7 +267,7 @@ int main (void)
 
 					//ADXL_readValues(); /* Read and display values forever */
 
-					ADXL_configActivity(7); /* Configure activity detection on INT1 [g] */
+					ADXL_configActivity(6); /* Configure activity detection on INT1 [g] */
 
 					ADXL_enableMeasure(true); /* Enable measurements */
 
@@ -357,13 +387,13 @@ int main (void)
 				led(true); /* Enable LED */
 #endif /* LED_ENABLED */
 
-				//wakeLoRaWAN(); /* Wake up the LoRaWAN module */
-
-				initLoRaWAN(); /* Initialize LoRaWAN functionality */
-
 #if DEBUGGING == 1 /* DEBUGGING */
 				dbwarnInt("Sending ", data.index, " measurements ...");
 #endif /* DEBUGGING */
+
+				//wakeLoRaWAN(); /* Wake up the LoRaWAN module */
+
+				initLoRaWAN(); /* Initialize LoRaWAN functionality */
 
 				sendMeasurements(data); /* Send the measurements */
 
@@ -387,13 +417,13 @@ int main (void)
 				led(true); /* Enable LED */
 #endif /* LED_ENABLED */
 
-				//wakeLoRaWAN(); /* Wake up the LoRaWAN module */
-
-				initLoRaWAN(); /* Initialize LoRaWAN functionality */
-
 #if DEBUGGING == 1 /* DEBUGGING */
 				dbwarnInt("STORM DETECTED! Sending ", data.index, " measurement(s) ...");
 #endif /* DEBUGGING */
+
+				//wakeLoRaWAN(); /* Wake up the LoRaWAN module */
+
+				initLoRaWAN(); /* Initialize LoRaWAN functionality */
 
 				// TODO: reset this value again?
 				sendStormDetected(true); /* Send a message to indicate that a storm has been detected */
@@ -441,49 +471,55 @@ int main (void)
 				led(true); /* Enable LED */
 #endif /* LED_ENABLED */
 
-				/* Check if we woke up using buttons and take measurements on "case WAKEUP" exit */
-				if (checkBTNinterrupts()) MCUstate = MEASURE;
-
-				/* Check if we woke up using the RTC sleep functionality and act accordingly */
-				if (RTC_checkWakeup())
+				/* Check if we woke up using buttons */
+				if (checkBTNinterrupts())
 				{
-					RTC_clearWakeup(); /* Clear static variable */
-
-					ADXL_clearCounter(); /* Clear the trigger counter because we woke up "normally" */
-
 					MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
 				}
-
-				/* Check if we woke up using the accelerometer */
-				if (ADXL_getTriggered())
+				else
 				{
-					/* Check if we detected a storm */
-					if (ADXL_getCounter() > STORM_INTERRUPTS)
+					/* Check if we woke up using the RTC sleep functionality and act accordingly */
+					if (RTC_checkWakeup())
 					{
-						RTC_Enable(false); /* Disable the counter */
+						RTC_clearWakeup(); /* Clear static variable */
 
-						MCUstate = SEND_STORM; /* Storm detected, send a message on "case WAKEUP" exit */
+						ADXL_clearCounter(); /* Clear the trigger counter because we woke up "normally" */
+
+						MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
 					}
-					else
+
+					/* Check if we woke up using the accelerometer */
+					if (ADXL_getTriggered())
 					{
-
-#if DEBUGGING == 1 /* DEBUGGING */
-						dbprintln_color("INT-PD7 triggered!", 4);
-#endif /* DEBUGGING */
-
-						ADXL_enableSPI(true);  /* Enable SPI functionality */
-						ADXL_ackInterrupt();   /* Acknowledge ADXL interrupt by reading the status register */
-						ADXL_enableSPI(false); /* Disable SPI functionality */
-
-						/* Check if a storm was detected before going to sleep for WAKE_UP_PERIOD_S/2 */
-						if (stormDetected)
+						/* Check if we detected a storm */
+						if (ADXL_getCounter() > STORM_INTERRUPTS)
 						{
-							MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
+							RTC_Enable(false); /* Disable the counter */
+
+							MCUstate = SEND_STORM; /* Storm detected, send a message on "case WAKEUP" exit */
 						}
 						else
 						{
-							/* Go back to sleep, we only take measurements on RTC/button wakeup */
-							MCUstate = SLEEP; /* TODO: go to sleep for somehow the remaining RTC time on wakeup? */
+
+#if DEBUGGING == 1 /* DEBUGGING */
+							dbprintln_color("INT-PD7 triggered!", 4);
+#endif /* DEBUGGING */
+
+							ADXL_enableSPI(true);  /* Enable SPI functionality */
+							ADXL_ackInterrupt();   /* Acknowledge ADXL interrupt by reading the status register */
+							ADXL_enableSPI(false); /* Disable SPI functionality */
+
+							/* Check if a storm was detected before going to sleep for WAKE_UP_PERIOD_S/2 */
+							if (stormDetected)
+							{
+								stormDetected = false; /* Reset variable */
+								MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
+							}
+							else
+							{
+								/* Go back to sleep, we only take measurements on RTC/button wakeup */
+								MCUstate = SLEEP; /* TODO: go to sleep for somehow the remaining RTC time on wakeup? */
+							}
 						}
 					}
 				}
