@@ -4,6 +4,7 @@ var leuart_8c =
     [ "DMA_CHANNEL_TX", "leuart_8c.html#a1623e828301dee72568883d99e87560e", null ],
     [ "DMA_CHANNELS", "leuart_8c.html#a0d6fb71e74f8864162d14233ce5bc95e", null ],
     [ "RX_TIMEOUT_DURATION", "leuart_8c.html#a68415f93d0879a2a307453a56dd8afef", null ],
+    [ "TIMEOUT_COUNTER", "leuart_8c.html#a199da98d8ddcd495482b436d294ec75d", null ],
     [ "TX_TIMEOUT_DURATION", "leuart_8c.html#a93e80805f22d2463076c1903e4ac55dd", null ],
     [ "basicRxComplete", "leuart_8c.html#a6bfd18c99610336ca1cd7e7bc72d4a69", null ],
     [ "basicTxComplete", "leuart_8c.html#a026560409f6dece99995c90b540e3e0a", null ],

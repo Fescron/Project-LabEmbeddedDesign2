@@ -70,7 +70,6 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Check <code>lis3dh.c</code> in Dramco example (init shake detection)</li>
 </ul>
 </li>
-<li>Make <code>ADXL_configActivity</code> method use <b>float</b> as the argument type?</li>
 <li>Enable wake-up mode: <code>writeADXL(ADXL_REG_POWER_CTL, 0b00001000)</code> // 5th bit </li>
 </ul>
 </dd>
@@ -79,27 +78,41 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Split definition to use the ULFRCO for the delay and sleep method? (if so, also update documentation!) </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="lora__wrappers_8c.html">lora_wrappers.c</a>  </dt>
+<dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="DS18B20_8c.html">DS18B20.c</a>  </dt>
 <dd><ul>
-<li>Save LoRaWAN settings before calling <code>disableLoRaWAN</code>?</li>
+<li>Fix first <code>while</code> loop in init method. </li>
+</ul>
+</dd>
+<dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="lora__wrappers_8c.html">lora_wrappers.c</a>  </dt>
+<dd><ul>
+<li>Save LoRaWAN settings before calling <code>disableLoRaWAN</code>?<ul>
+<li>Should be possible in ABP (saving to EEPROM? <code>saveMAC</code>?) See reference manual!</li>
+</ul>
+</li>
 <li>Fix <code>sleepLoRaWAN</code> and <code>wakeLoRaWAN</code> methods.</li>
 <li>Remove unnecessary defines/variables. </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
+<dt><a class="anchor" id="_todo000005"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
 <dd>IMPORTANT:<ul>
 <li><p class="startli">On INT1-PD7, go to sleep for somehow the remaining RTC time on wakeup?</p><ul>
 <li>On ADXL interrupt the RTC doesn't get disabled!</li>
 </ul>
 <p class="startli">EXTRA THINGS:</p>
 </li>
-<li>Add WDOG functionality. (see "powertest" example)<ul>
+<li>Add WDOG functionality (see "powertest" example and <em>Embedded Muse 365</em>)<ul>
+<li>Due to <em>short</em> interval: Only when awake?</li>
 <li>Also see <code>getResetCause</code>(<code>system.c</code> in Dramco example)</li>
+<li>Check all <code>while</code> loops (wait for register flags, ...)! (for loops don't pose problems)</li>
+<li>Add <code>counter</code> timeout to exit <code>while</code> loops in worst case (<code>timer</code> timout functionality disabled...)</li>
 </ul>
 </li>
-<li>Give the sensors time to power up (40 ms? - Dramco)</li>
-<li><p class="startli">Check if DS18B20 and ADC logic can read negative temperatures (<code>int32_t</code> instead of <code>uint32_t</code>?)</p><ul>
-<li>Can LPP even handle/display these negative temperatures?</li>
+<li>Give the sensors time to power up (40 ms? - Dramco)<ul>
+<li>ADXL &amp; old temperature sensor</li>
+</ul>
+</li>
+<li><p class="startli">Test negative temperatures by putting the module in it's case in the freezer...</p><ul>
+<li>LPP logic should be able to handle negative values (<code>int16_t</code> as input type for methods &amp; analog: 0.01 signed, temp: 0.1 °C signed MSB)</li>
 </ul>
 <p class="startli">OPTIMALISATIONS:</p>
 </li>
@@ -113,13 +126,12 @@ $(document).ready(function(){initNavTree('todo.html','');});
 </ul>
 </li>
 <li>Set the accelerometer in <em>movement detection</em> to spare battery life when the buoy isn't installed yet?<ul>
-<li>EM4 wakeup? See <code>deepsleep</code> (<code>system.c</code> in Dramco example)</li>
+<li>EM4 wakeup? See <code>deepsleep</code> (<code>system.c</code> in Dramco example) </li>
 </ul>
 </li>
-<li>Surround some delay logic with <code>ATOMIC</code> statements? (see <code>rtcdvr</code>?) </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000007"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
+<dt><a class="anchor" id="_todo000008"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
 <dd><ul>
 <li>Check the placement of errors and see (if they get send using LoRaWAN) that they don't break clock functionality.</li>
 <li>Go back to INIT state?</li>
@@ -132,7 +144,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed May 1 2019 00:31:53 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Thu May 2 2019 01:16:15 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

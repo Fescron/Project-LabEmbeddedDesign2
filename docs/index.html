@@ -114,7 +114,7 @@ RTCC (RTC calendar)</h1>
 Energy modes (EM1 and EM3)</h1>
 <p>At one point a method was developed to go in EM1 when waiting in a delay. This however didn't seem to work as intended and EM2 would also be fine. Because of this, development for this EM1 delay method was halted. EM1 is sometimes used when waiting on bits to be set.</p>
 <p>When the MCU is in EM1, the clock to the CPU is disabled. All peripherals, as well as RAM and flash, are available.</p>
-<dl class="section note"><dt>Note</dt><dd>In EM3, high and low frequency clocks are disabled. No oscillator (except the ULFRCO) is running. Furthermore, all unwanted oscillators are disabled in EM3. <b>This means that nothing needs to be manually disabled before the statement <code>EMU_EnterEM3(true);</code>.</b></dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>In EM3, high and low frequency clocks are disabled. No oscillator (except the ULFRCO) is running. Furthermore, all unwanted oscillators are disabled in EM3. <b>This means that nothing needs to be manually disabled before the statement <code>EMU_EnterEM3(true);</code>.</b></dd></dl>
 <p>The following modules/functions are are generally still available in EM3: </p><ul>
 <li>I2C address check </li>
 <li>Watchdog </li>
@@ -199,7 +199,7 @@ Bits, bytes, nibbles and unsigned/signed integer value ranges</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed May 1 2019 00:31:53 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Thu May 2 2019 01:16:15 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
