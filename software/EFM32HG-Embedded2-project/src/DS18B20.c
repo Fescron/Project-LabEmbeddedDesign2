@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 2.2
+ * @version 2.3
  * @author
  *   Alec Vanderhaegen & Sarah Goossens@n
  *   Modified by Brecht Van Eeckhoudt
@@ -25,6 +25,10 @@
  *   @li v2.0: Updated documentation.
  *   @li v2.1: Changed method to return `uint32_t` instead of float.
  *   @li v2.2: Changed error numbering, moved definition from header to source file and updated header file include.
+ *   @li v2.3: Changed *timout* variable and changed types to `int32_t`.
+ *
+ *   @todo
+ *     - Fix first `while` loop in init method.
  *
  ******************************************************************************/
 
@@ -44,7 +48,7 @@
 
 /* Local definition */
 /** Maximum waiting value before a reset becomes *failed* */
-#define MAX_TIME_CTR 2000
+#define TIMEOUT_COUNTER 2000
 
 
 /* Local variable */
@@ -56,7 +60,7 @@ static void powerDS18B20 (bool enabled);
 static bool init_DS18B20 (void);
 static void writeByteToDS18B20 (uint8_t data);
 static uint8_t readByteFromDS18B20 (void);
-static uint32_t convertTempData (uint8_t tempLS, uint8_t tempMS);
+static int32_t convertTempData (uint8_t tempLS, uint8_t tempMS);
 
 
 /**************************************************************************//**
@@ -73,7 +77,7 @@ static uint32_t convertTempData (uint8_t tempLS, uint8_t tempMS);
  * @return
  *   The read temperature data.
  *****************************************************************************/
-uint32_t readTempDS18B20 (void)
+int32_t readTempDS18B20 (void)
 {
 	/* Initialize timer
 	 * Initializing and disabling the timer again adds about 40 µs active time but should conserve sleep energy... */
@@ -97,9 +101,9 @@ uint32_t readTempDS18B20 (void)
 		writeByteToDS18B20(0xBE); /* 0xCC = "Read Scratchpad" */
 
 		/* Read the bytes */
-		for (uint8_t n = 0; n < 9; n++)
+		for (uint8_t i = 0; i < 9; i++)
 		{
-			rawDataFromDS18B20Arr[n] = readByteFromDS18B20();
+			rawDataFromDS18B20Arr[i] = readByteFromDS18B20();
 		}
 
 		/* Disable interrupts and turn off the clock to the underlying hardware timer. */
@@ -121,7 +125,7 @@ uint32_t readTempDS18B20 (void)
 		dbcrit("DS18B20 measurement failed");
 #endif /* DEBUGGING */
 
-		error(13);
+		error(28);
 
 		return (0);
 	}
@@ -179,7 +183,7 @@ static void powerDS18B20 (bool enabled)
  *****************************************************************************/
 static bool init_DS18B20 (void)
 {
-	uint16_t counter = 0;
+	uint32_t counter = 0;
 
 	/* In the case of gpioModePushPull", the last argument directly sets the pin state */
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0);
@@ -189,17 +193,19 @@ static bool init_DS18B20 (void)
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0);
 
 	/* Check if the line becomes HIGH during the maximum waiting time */
-	while (counter++ <= MAX_TIME_CTR && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 1)
+	while (counter++ <= TIMEOUT_COUNTER && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 1)
 	{
 		/* EMU_EnterEM1() was tried to put here but it failed to work... */
 	}
 
+	//while ((counter < TIMEOUT_COUNTER) && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 1) counter++; // TODO: This should be the correct logic but doesn't work...
+
 	/* Exit the function if the maximum waiting time was reached (reset failed) */
-	if (counter == MAX_TIME_CTR)
+	if (counter == TIMEOUT_COUNTER)
 	{
 
 #ifdef DEBUGGING /* DEBUGGING */
-		dbcrit("DS18B20 initialization failed");
+		dbcrit("DS18B20 initialization failed while waiting on HIGH");
 #endif /* DEBUGGING */
 
 		return (false);
@@ -209,17 +215,14 @@ static bool init_DS18B20 (void)
 	counter = 0;
 
 	/* Check if the line becomes LOW during the maximum waiting time */
-	while (counter++ <= MAX_TIME_CTR && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 0)
-	{
-		/* EMU_EnterEM1() was tried to put here but it failed to work... */
-	}
+	while ((counter < TIMEOUT_COUNTER) && (GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 0)) counter++;
 
 	/* Exit the function if the maximum waiting time was reached (reset failed) */
-	if (counter == MAX_TIME_CTR)
+	if (counter == TIMEOUT_COUNTER)
 	{
 
 #ifdef DEBUGGING /* DEBUGGING */
-		dbcrit("DS18B20 initialization failed");
+		dbcrit("DS18B20 initialization failed while waiting on LOW");
 #endif /* DEBUGGING */
 
 		return (false);
@@ -257,7 +260,7 @@ static void writeByteToDS18B20 (uint8_t data)
 			GPIO_PinOutClear(TEMP_DATA_PORT, TEMP_DATA_PIN);
 
 			/* 5 µs delay should be called here but this loop works fine too... */
-			for (int i=0; i<5; i++);
+			for (uint8_t i=0; i<5; i++);
 
 			GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
 			USTIMER_DelayIntSafe(60);
@@ -270,7 +273,7 @@ static void writeByteToDS18B20 (uint8_t data)
 			GPIO_PinOutSet(TEMP_DATA_PORT, TEMP_DATA_PIN);
 
 			/* 5 µs delay should be called here but this loop works fine too... */
-			for (int i=0; i<5; i++);
+			for (uint8_t i=0; i<5; i++);
 		}
 		/* Right shift bits once */
 		data >>= 1;
@@ -337,11 +340,12 @@ static uint8_t readByteFromDS18B20 (void)
  * @return
  *   The converted temperature data.
  *****************************************************************************/
-static uint32_t convertTempData (uint8_t tempLS, uint8_t tempMS)
+static int32_t convertTempData (uint8_t tempLS, uint8_t tempMS)
 {
 	uint16_t rawDataMerge;
 	uint16_t reverseRawDataMerge;
-	uint32_t finalTemperature;
+
+	int32_t finalTemperature;
 
 	/* Check if it is a negative temperature value
 	 * 0xF8 = 0b1111 1000 */
