@@ -59,7 +59,8 @@ $(document).ready(function(){initNavTree('cable_8c.html','');});
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">cable.c File Reference</div>  </div>
 </div><!--header-->
@@ -67,24 +68,35 @@ $(document).ready(function(){initNavTree('cable_8c.html','');});
 
 <p>Cable checking functionality.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;stdbool.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
+<code>#include &lt;stdbool.h&gt;</code><br />
 <code>#include &quot;em_device.h&quot;</code><br />
 <code>#include &quot;em_cmu.h&quot;</code><br />
 <code>#include &quot;em_gpio.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="cable_8h_source.html">cable.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="pin__mapping_8h_source.html">pin_mapping.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="debug__dbprint_8h_source.html">debug_dbprint.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="lora__wrappers_8h_source.html">lora_wrappers.h</a>&quot;</code><br />
 </div>
 <p><a href="cable_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:af3994387a62811a825f973e1a09a533a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cable_8c.html#af3994387a62811a825f973e1a09a533a">checkCable</a> (void)</td></tr>
-<tr class="memdesc:af3994387a62811a825f973e1a09a533a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to check if the wire is broken.  <a href="#af3994387a62811a825f973e1a09a533a">More...</a><br /></td></tr>
-<tr class="separator:af3994387a62811a825f973e1a09a533a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49750d4f491520d6b553ecfba7e0144b"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cable_8c.html#a49750d4f491520d6b553ecfba7e0144b">checkCable_internal</a> (void)</td></tr>
+<tr class="memdesc:a49750d4f491520d6b553ecfba7e0144b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to check if the wire is broken.  <a href="#a49750d4f491520d6b553ecfba7e0144b">More...</a><br /></td></tr>
+<tr class="separator:a49750d4f491520d6b553ecfba7e0144b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bc68ebbd115a7d1a928ee6e4482f0ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cable_8c.html#a3bc68ebbd115a7d1a928ee6e4482f0ee">checkCable</a> (void)</td></tr>
+<tr class="memdesc:a3bc68ebbd115a7d1a928ee6e4482f0ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to check if the wire is broken.  <a href="#a3bc68ebbd115a7d1a928ee6e4482f0ee">More...</a><br /></td></tr>
+<tr class="separator:a3bc68ebbd115a7d1a928ee6e4482f0ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a66649a9408ec001273dd99d6fd6ed363"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cable_8c.html#a66649a9408ec001273dd99d6fd6ed363">cableBrokenSendTimes</a> = 0</td></tr>
+<tr class="separator:a66649a9408ec001273dd99d6fd6ed363"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Cable checking functionality. </p>
-<dl class="section version"><dt>Version</dt><dd>1.4 </dd></dl>
+<dl class="section version"><dt>Version</dt><dd>1.5 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Matthias Alleman<br />
  Modified by Brecht Van Eeckhoudt</dd></dl>
 <p>Originally this functionality should've detected a cable breaking event using an <b>interrupt</b>, but due to the low water resistance this unfortunately wasn't possible to implement.</p>
@@ -96,8 +108,13 @@ Versions</h1>
 <li>v1.1: Updated code with new DEFINE checks. </li>
 <li>v1.2: Moved ADC functionality to <code><a class="el" href="adc_8c.html" title="ADC functionality for reading the (battery) voltage and internal temperature. ">adc.c</a></code>. </li>
 <li>v1.3: Changed filename to <code><a class="el" href="cable_8c.html" title="Cable checking functionality. ">cable.c</a></code> </li>
-<li>v1.4: Fixed cable checking method.</li>
+<li>v1.4: Fixed cable checking method. </li>
+<li>v1.5: Moved more functionality to this file.</li>
 </ul>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd><ul>
+<li>Also send measurements on cable breaking?</li>
+</ul>
+</dd></dl>
 <hr/>
 <h1><a class="anchor" id="License"></a>
 License</h1>
@@ -105,20 +122,55 @@ License</h1>
 
 <p class="definition">Definition in file <a class="el" href="cable_8c_source.html">cable.c</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="af3994387a62811a825f973e1a09a533a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af3994387a62811a825f973e1a09a533a">&#9670;&nbsp;</a></span>checkCable()</h2>
+<a id="a3bc68ebbd115a7d1a928ee6e4482f0ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bc68ebbd115a7d1a928ee6e4482f0ee">&#9670;&nbsp;</a></span>checkCable()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool checkCable </td>
+          <td class="memname">void checkCable </td>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+<p>Method to check if the wire is broken. </p>
+
+<p class="definition">Definition at line <a class="el" href="cable_8c_source.html#l00062">62</a> of file <a class="el" href="cable_8c_source.html">cable.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;{</div><div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="comment">/* Check if the cable is broken */</span></div><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="cable_8c.html#a49750d4f491520d6b553ecfba7e0144b">checkCable_internal</a>())</div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    {</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="comment">/* Only send a message 4 times */</span></div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="cable_8c.html#a66649a9408ec001273dd99d6fd6ed363">cableBrokenSendTimes</a> &lt; 4)</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        {</div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#if DEBUG_DBPRINT == 1 </span><span class="comment">/* DEBUG_DBPRINT */</span><span class="preprocessor"></span></div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            dbcrit(<span class="stringliteral">&quot;Cable broken! Sending the data ...&quot;</span>);</div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DEBUG_DBPRINT */</span><span class="preprocessor"></span></div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;            <a class="code" href="lora__wrappers_8h.html#a66be1f59b1529ebee2fb41b252c05a52">initLoRaWAN</a>(); <span class="comment">/* Initialize LoRaWAN functionality */</span></div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;            <a class="code" href="lora__wrappers_8h.html#ad081e2fea9e62cd0e6db6789ceb2ae1e">sendCableBroken</a>(<span class="keyword">true</span>); <span class="comment">/* Send the LoRaWAN message TODO: also send measurement data here? */</span></div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;            <a class="code" href="lora__wrappers_8h.html#aa124f250dab5120ab1199f7592e06ae4">disableLoRaWAN</a>(); <span class="comment">/* Disable RN2483 */</span></div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            <a class="code" href="cable_8c.html#a66649a9408ec001273dd99d6fd6ed363">cableBrokenSendTimes</a>++; <span class="comment">/* Increment the counter */</span></div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        }</div><div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keywordflow">else</span></div><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        {</div><div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">#if DEBUG_DBPRINT == 1 </span><span class="comment">/* DEBUG_DBPRINT */</span><span class="preprocessor"></span></div><div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;            dbcrit(<span class="stringliteral">&quot;Cable broken but no longer sending the data&quot;</span>);</div><div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DEBUG_DBPRINT */</span><span class="preprocessor"></span></div><div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        }</div><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    }</div><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">else</span></div><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    {</div><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#if DEBUG_DBPRINT == 1 </span><span class="comment">/* DEBUG_DBPRINT */</span><span class="preprocessor"></span></div><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        dbinfo(<span class="stringliteral">&quot;Cable still intact&quot;</span>);</div><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DEBUG_DBPRINT */</span><span class="preprocessor"></span></div><div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div><div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    }</div><div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}</div><div class="ttc" id="cable_8c_html_a49750d4f491520d6b553ecfba7e0144b"><div class="ttname"><a href="cable_8c.html#a49750d4f491520d6b553ecfba7e0144b">checkCable_internal</a></div><div class="ttdeci">static bool checkCable_internal(void)</div><div class="ttdoc">Method to check if the wire is broken. </div><div class="ttdef"><b>Definition:</b> <a href="cable_8c_source.html#l00115">cable.c:115</a></div></div>
+<div class="ttc" id="lora__wrappers_8h_html_ad081e2fea9e62cd0e6db6789ceb2ae1e"><div class="ttname"><a href="lora__wrappers_8h.html#ad081e2fea9e62cd0e6db6789ceb2ae1e">sendCableBroken</a></div><div class="ttdeci">void sendCableBroken(bool cableBroken)</div><div class="ttdoc">Send a packet to the cloud using LoRaWAN to indicate that the cable is broken. </div><div class="ttdef"><b>Definition:</b> <a href="lora__wrappers_8c_source.html#l00164">lora_wrappers.c:164</a></div></div>
+<div class="ttc" id="lora__wrappers_8h_html_aa124f250dab5120ab1199f7592e06ae4"><div class="ttname"><a href="lora__wrappers_8h.html#aa124f250dab5120ab1199f7592e06ae4">disableLoRaWAN</a></div><div class="ttdeci">void disableLoRaWAN(void)</div><div class="ttdoc">Disable LoRaWAN functionality. </div><div class="ttdef"><b>Definition:</b> <a href="lora__wrappers_8c_source.html#l00068">lora_wrappers.c:68</a></div></div>
+<div class="ttc" id="lora__wrappers_8h_html_a66be1f59b1529ebee2fb41b252c05a52"><div class="ttname"><a href="lora__wrappers_8h.html#a66be1f59b1529ebee2fb41b252c05a52">initLoRaWAN</a></div><div class="ttdeci">void initLoRaWAN(void)</div><div class="ttdoc">Initialize LoRaWAN functionality. </div><div class="ttdef"><b>Definition:</b> <a href="lora__wrappers_8c_source.html#l00053">lora_wrappers.c:53</a></div></div>
+<div class="ttc" id="cable_8c_html_a66649a9408ec001273dd99d6fd6ed363"><div class="ttname"><a href="cable_8c.html#a66649a9408ec001273dd99d6fd6ed363">cableBrokenSendTimes</a></div><div class="ttdeci">uint8_t cableBrokenSendTimes</div><div class="ttdef"><b>Definition:</b> <a href="cable_8c_source.html#l00052">cable.c:52</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a49750d4f491520d6b553ecfba7e0144b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49750d4f491520d6b553ecfba7e0144b">&#9670;&nbsp;</a></span>checkCable_internal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool checkCable_internal </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Method to check if the wire is broken. </p>
@@ -129,12 +181,30 @@ License</h1>
 </ul>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cable_8c_source.html#l00056">56</a> of file <a class="el" href="cable_8c_source.html">cable.c</a>.</p>
-<div class="fragment"><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;{</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">/* Value to eventually return */</span></div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">bool</span> check = <span class="keyword">false</span>;</div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="comment">/* Enable necessary clocks (just in case) */</span></div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    CMU_ClockEnable(cmuClock_HFPER, <span class="keyword">true</span>); <span class="comment">/* GPIO is a High Frequency Peripheral */</span></div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    CMU_ClockEnable(cmuClock_GPIO, <span class="keyword">true</span>);</div><div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="comment">/* Change mode of first pin */</span></div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#a9025093577a98cb941e599d4e45606fb">BREAK1_PORT</a>, <a class="code" href="pin__mapping_8h.html#a4f943438afb0469fd04a05d4471cc2c2">BREAK1_PIN</a>, gpioModeInput, 0);</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="comment">/* Change mode of second pin and also set it low with the last argument */</span></div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#aaa342d9130233e5b0cf9dea5071681c0">BREAK2_PORT</a>, <a class="code" href="pin__mapping_8h.html#aa03bdfbf4a2a4b274be0a09c1d91c946">BREAK2_PIN</a>, gpioModePushPull, 0);</div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="comment">/* Check the connection */</span></div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordflow">if</span> (!GPIO_PinInGet(<a class="code" href="pin__mapping_8h.html#a9025093577a98cb941e599d4e45606fb">BREAK1_PORT</a>,<a class="code" href="pin__mapping_8h.html#a4f943438afb0469fd04a05d4471cc2c2">BREAK1_PIN</a>)) check = <span class="keyword">true</span>;</div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="comment">/* Disable the pins */</span></div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#a9025093577a98cb941e599d4e45606fb">BREAK1_PORT</a>, <a class="code" href="pin__mapping_8h.html#a4f943438afb0469fd04a05d4471cc2c2">BREAK1_PIN</a>, gpioModeDisabled, 0);</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#aaa342d9130233e5b0cf9dea5071681c0">BREAK2_PORT</a>, <a class="code" href="pin__mapping_8h.html#aa03bdfbf4a2a4b274be0a09c1d91c946">BREAK2_PIN</a>, gpioModeDisabled, 0);</div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordflow">return</span> (check);</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;}</div><div class="ttc" id="pin__mapping_8h_html_a9025093577a98cb941e599d4e45606fb"><div class="ttname"><a href="pin__mapping_8h.html#a9025093577a98cb941e599d4e45606fb">BREAK1_PORT</a></div><div class="ttdeci">#define BREAK1_PORT</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00082">pin_mapping.h:82</a></div></div>
+<p class="definition">Definition at line <a class="el" href="cable_8c_source.html#l00115">115</a> of file <a class="el" href="cable_8c_source.html">cable.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;{</div><div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="comment">/* Value to eventually return */</span></div><div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordtype">bool</span> check = <span class="keyword">false</span>;</div><div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;</div><div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="comment">/* Enable necessary clocks (just in case) */</span></div><div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    CMU_ClockEnable(cmuClock_HFPER, <span class="keyword">true</span>); <span class="comment">/* GPIO is a High Frequency Peripheral */</span></div><div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    CMU_ClockEnable(cmuClock_GPIO, <span class="keyword">true</span>);</div><div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div><div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="comment">/* Change mode of first pin */</span></div><div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#a9025093577a98cb941e599d4e45606fb">BREAK1_PORT</a>, <a class="code" href="pin__mapping_8h.html#a4f943438afb0469fd04a05d4471cc2c2">BREAK1_PIN</a>, gpioModeInput, 0);</div><div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div><div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="comment">/* Change mode of second pin and also set it low with the last argument */</span></div><div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#aaa342d9130233e5b0cf9dea5071681c0">BREAK2_PORT</a>, <a class="code" href="pin__mapping_8h.html#aa03bdfbf4a2a4b274be0a09c1d91c946">BREAK2_PIN</a>, gpioModePushPull, 0);</div><div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div><div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="comment">/* Check the connection */</span></div><div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keywordflow">if</span> (!GPIO_PinInGet(<a class="code" href="pin__mapping_8h.html#a9025093577a98cb941e599d4e45606fb">BREAK1_PORT</a>,<a class="code" href="pin__mapping_8h.html#a4f943438afb0469fd04a05d4471cc2c2">BREAK1_PIN</a>)) check = <span class="keyword">true</span>;</div><div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div><div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="comment">/* Disable the pins */</span></div><div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#a9025093577a98cb941e599d4e45606fb">BREAK1_PORT</a>, <a class="code" href="pin__mapping_8h.html#a4f943438afb0469fd04a05d4471cc2c2">BREAK1_PIN</a>, gpioModeDisabled, 0);</div><div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    GPIO_PinModeSet(<a class="code" href="pin__mapping_8h.html#aaa342d9130233e5b0cf9dea5071681c0">BREAK2_PORT</a>, <a class="code" href="pin__mapping_8h.html#aa03bdfbf4a2a4b274be0a09c1d91c946">BREAK2_PIN</a>, gpioModeDisabled, 0);</div><div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div><div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keywordflow">return</span> (check);</div><div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;}</div><div class="ttc" id="pin__mapping_8h_html_a9025093577a98cb941e599d4e45606fb"><div class="ttname"><a href="pin__mapping_8h.html#a9025093577a98cb941e599d4e45606fb">BREAK1_PORT</a></div><div class="ttdeci">#define BREAK1_PORT</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00082">pin_mapping.h:82</a></div></div>
 <div class="ttc" id="pin__mapping_8h_html_aa03bdfbf4a2a4b274be0a09c1d91c946"><div class="ttname"><a href="pin__mapping_8h.html#aa03bdfbf4a2a4b274be0a09c1d91c946">BREAK2_PIN</a></div><div class="ttdeci">#define BREAK2_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00085">pin_mapping.h:85</a></div></div>
 <div class="ttc" id="pin__mapping_8h_html_aaa342d9130233e5b0cf9dea5071681c0"><div class="ttname"><a href="pin__mapping_8h.html#aaa342d9130233e5b0cf9dea5071681c0">BREAK2_PORT</a></div><div class="ttdeci">#define BREAK2_PORT</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00084">pin_mapping.h:84</a></div></div>
 <div class="ttc" id="pin__mapping_8h_html_a4f943438afb0469fd04a05d4471cc2c2"><div class="ttname"><a href="pin__mapping_8h.html#a4f943438afb0469fd04a05d4471cc2c2">BREAK1_PIN</a></div><div class="ttdeci">#define BREAK1_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00083">pin_mapping.h:83</a></div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a66649a9408ec001273dd99d6fd6ed363"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66649a9408ec001273dd99d6fd6ed363">&#9670;&nbsp;</a></span>cableBrokenSendTimes</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t cableBrokenSendTimes = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Keep the amount of times a message has been send to indicate the cable is broken (only send 4 messages in total) </p>
+
+<p class="definition">Definition at line <a class="el" href="cable_8c_source.html#l00052">52</a> of file <a class="el" href="cable_8c_source.html">cable.c</a>.</p>
+
 </div>
 </div>
 </div><!-- contents -->
@@ -143,7 +213,7 @@ License</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_952e9747e32fbb216a31eb66ba91adc1.html">EFM32HG-Embedded2-project</a></li><li class="navelem"><a class="el" href="dir_4be578414597071060019317d61cdf19.html">src</a></li><li class="navelem"><a class="el" href="cable_8c.html">cable.c</a></li>
-    <li class="footer">Generated on Thu May 2 2019 01:16:14 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Fri May 3 2019 02:34:35 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

@@ -1,11 +1,13 @@
 var leuart_8c =
 [
+    [ "DBPRINT_TIMEOUT", "leuart_8c.html#a3ce97199df8725e09a70857d43c34b48", null ],
     [ "DMA_CHANNEL_RX", "leuart_8c.html#a31489a585c6a03e3e372871433fbeea8", null ],
     [ "DMA_CHANNEL_TX", "leuart_8c.html#a1623e828301dee72568883d99e87560e", null ],
     [ "DMA_CHANNELS", "leuart_8c.html#a0d6fb71e74f8864162d14233ce5bc95e", null ],
-    [ "RX_TIMEOUT_DURATION", "leuart_8c.html#a68415f93d0879a2a307453a56dd8afef", null ],
-    [ "TIMEOUT_COUNTER", "leuart_8c.html#a199da98d8ddcd495482b436d294ec75d", null ],
-    [ "TX_TIMEOUT_DURATION", "leuart_8c.html#a93e80805f22d2463076c1903e4ac55dd", null ],
+    [ "TIMEOUT_DMA", "leuart_8c.html#a4927084e5a1ae2b067c8469f630afe2d", null ],
+    [ "TIMEOUT_SENDCMD", "leuart_8c.html#a570b9d23be6b42e2ce5e456800689d02", null ],
+    [ "TIMEOUT_SYNC", "leuart_8c.html#a5facdb83d8a1adc5c3b80b1bd8a0c0bd", null ],
+    [ "TIMEOUT_WAITRESPONSE", "leuart_8c.html#a2501ce39f8ce778957dee84f3886f857", null ],
     [ "basicRxComplete", "leuart_8c.html#a6bfd18c99610336ca1cd7e7bc72d4a69", null ],
     [ "basicTxComplete", "leuart_8c.html#a026560409f6dece99995c90b540e3e0a", null ],
     [ "Leuart_BreakCondition", "leuart_8c.html#ac817dbeec5156a03e0c004eb7e200d99", null ],
@@ -23,6 +25,5 @@ var leuart_8c =
     [ "bufferPointer", "leuart_8c.html#a83092fef5d81b8c30eee0b5b60893245", null ],
     [ "dmaCallBack", "leuart_8c.html#a61a14c052e7020c296df6d4122c67550", null ],
     [ "receiveBuffer", "leuart_8c.html#a4bf76aacebec17fc6d7dc094aeceb5b9", null ],
-    [ "receiveComplete", "leuart_8c.html#a4e6f525ef41e27db7ba83a3538428ed6", null ],
-    [ "timeout", "leuart_8c.html#ab4fcc504ef4f0ecdbec52ebfc265634b", null ]
+    [ "receiveComplete", "leuart_8c.html#a4e6f525ef41e27db7ba83a3538428ed6", null ]
 ];

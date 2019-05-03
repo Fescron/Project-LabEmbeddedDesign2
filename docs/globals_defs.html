@@ -61,15 +61,6 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 &#160;
 
 <h3><a id="index_a"></a>- a -</h3><ul>
-<li>A_HOUR
-: <a class="el" href="lora__wrappers_8c.html#a605befbda949f2c1b54f75e54457d91f">lora_wrappers.c</a>
-</li>
-<li>A_MINUTE
-: <a class="el" href="lora__wrappers_8c.html#ab9becb7983b4920b6c85fdae6b509b10">lora_wrappers.c</a>
-</li>
-<li>A_SECOND
-: <a class="el" href="lora__wrappers_8c.html#afc96eb8b099b058fe89d3df8bdb4e1aa">lora_wrappers.c</a>
-</li>
 <li>ADXL_CLK_PIN
 : <a class="el" href="pin__mapping_8h.html#aacac8ee1b757d389d7c15ed2efcaccaa">pin_mapping.h</a>
 </li>
@@ -220,8 +211,13 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <li>DBG_UART_LOC
 : <a class="el" href="pin__mapping_8h.html#a123ccd79d2ee0a5cd12968e0805e9ce3">pin_mapping.h</a>
 </li>
-<li>DEBUGGING
-: <a class="el" href="debugging_8h.html#a7180786c98af534f76855fef6f1b97ab">debugging.h</a>
+<li>DBPRINT_TIMEOUT
+: <a class="el" href="adc_8c.html#a3ce97199df8725e09a70857d43c34b48">adc.c</a>
+, <a class="el" href="DS18B20_8c.html#a3ce97199df8725e09a70857d43c34b48">DS18B20.c</a>
+, <a class="el" href="leuart_8c.html#a3ce97199df8725e09a70857d43c34b48">leuart.c</a>
+</li>
+<li>DEBUG_DBPRINT
+: <a class="el" href="debug__dbprint_8h.html#a4ef257e0f94ec070ab7a49a0431dfbec">debug_dbprint.h</a>
 </li>
 <li>DEFAULT_DATA_RATE
 : <a class="el" href="lora__settings_8h.html#ae7a182688b4324c473de38eb78bf454a">lora_settings.h</a>
@@ -483,9 +479,6 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <li>RN2483_UART_LOC
 : <a class="el" href="pin__mapping_8h.html#ac6781798f5792cf47986a925c2d320aa">pin_mapping.h</a>
 </li>
-<li>RX_TIMEOUT_DURATION
-: <a class="el" href="leuart_8c.html#a68415f93d0879a2a307453a56dd8afef">leuart.c</a>
-</li>
 </ul>
 
 
@@ -512,13 +505,24 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <li>TEMP_VDD_PORT
 : <a class="el" href="pin__mapping_8h.html#a9b49e9431941e967d2961f662fafd24d">pin_mapping.h</a>
 </li>
-<li>TIMEOUT_COUNTER
-: <a class="el" href="adc_8c.html#a199da98d8ddcd495482b436d294ec75d">adc.c</a>
-, <a class="el" href="DS18B20_8c.html#a199da98d8ddcd495482b436d294ec75d">DS18B20.c</a>
-, <a class="el" href="leuart_8c.html#a199da98d8ddcd495482b436d294ec75d">leuart.c</a>
+<li>TIMEOUT_CONVERSION
+: <a class="el" href="adc_8c.html#a2207a269d247f40650eb3463f3700b43">adc.c</a>
+, <a class="el" href="DS18B20_8c.html#a2207a269d247f40650eb3463f3700b43">DS18B20.c</a>
 </li>
-<li>TX_TIMEOUT_DURATION
-: <a class="el" href="leuart_8c.html#a93e80805f22d2463076c1903e4ac55dd">leuart.c</a>
+<li>TIMEOUT_DMA
+: <a class="el" href="leuart_8c.html#a4927084e5a1ae2b067c8469f630afe2d">leuart.c</a>
+</li>
+<li>TIMEOUT_INIT
+: <a class="el" href="DS18B20_8c.html#ae305f3dbacc26e6156ddbd8bea11f439">DS18B20.c</a>
+</li>
+<li>TIMEOUT_SENDCMD
+: <a class="el" href="leuart_8c.html#a570b9d23be6b42e2ce5e456800689d02">leuart.c</a>
+</li>
+<li>TIMEOUT_SYNC
+: <a class="el" href="leuart_8c.html#a5facdb83d8a1adc5c3b80b1bd8a0c0bd">leuart.c</a>
+</li>
+<li>TIMEOUT_WAITRESPONSE
+: <a class="el" href="leuart_8c.html#a2501ce39f8ce778957dee84f3886f857">leuart.c</a>
 </li>
 </ul>
 
@@ -546,7 +550,7 @@ $(document).ready(function(){initNavTree('globals_defs.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu May 2 2019 01:16:15 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Fri May 3 2019 02:34:35 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

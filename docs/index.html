@@ -70,7 +70,7 @@ Doxygen</h1>
 <hr/>
 <h1><a class="anchor" id="SETTINGS"></a>
 Settings using definitions in dbprint and delay functionality</h1>
-<p>In the file <code><a class="el" href="debugging_8h.html" title="Enable or disable printing to UART. ">debugging.h</a></code> <b>dbprint UART functionality can be enabled/disabled</b> with the definition <code>#define DEBUGGING</code>. If it's value is <code>0</code>, all dbprint statements are disabled throughout the source code because they're all surrounded with <code>#if DEBUGGING == 1 ... #endif</code> checks.</p>
+<p>In the file <code><a class="el" href="debug__dbprint_8h.html" title="Enable or disable printing to UART. ">debug_dbprint.h</a></code> <b>dbprint UART functionality can be enabled/disabled</b> with the definition <code>#define DEBUG_DBPRINT</code>. If it's value is <code>0</code>, all dbprint statements are disabled throughout the source code because they're all surrounded with <code>#if DEBUG_DBPRINT == 1 ... #endif</code> checks.</p>
 <p>In the file <code><a class="el" href="delay_8h.html" title="Delay functionality. ">delay.h</a></code> one can <b>choose between SysTicks or RTC sleep functionality</b> for delays. This can be selected with the definition <code>#define SYSTICKDELAY</code>. If it's value is <code>0</code>, the RTC compare sleep functionality is used. if it's value is <code>1</code>, delays are generated using SysTicks.</p>
 <p>In the file <code><a class="el" href="delay_8h.html" title="Delay functionality. ">delay.h</a></code> one can also <b>choose between the use of the ultra low-frequency RC oscillator (ULFRCO) or the low-frequency crystal oscillator (LFXO)</b> when being in a delay or sleeping. If the ULFRCO is selected, the MCU sleeps in EM3 and if the LFXO is selected the MCU sleeps in EM2. This can be selected with the definition <code>#define ULFRCO</code>. If it's value is <code>0</code>, the LFXO is used as the clock source. If it's value is <code>1</code> the ULFRCO is used.</p>
 <dl class="section note"><dt>Note</dt><dd>Check the section <a class="el" href="index.html#CLOCKS1">Crystals and RC oscillators</a> for more info about this.</dd></dl>
@@ -199,7 +199,7 @@ Bits, bytes, nibbles and unsigned/signed integer value ranges</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu May 2 2019 01:16:15 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Fri May 3 2019 02:34:35 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

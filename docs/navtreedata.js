@@ -47,8 +47,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "ADXL362_8c.html",
-"leuart_8c.html#a68415f93d0879a2a307453a56dd8afef",
-"pm_8h.html#a5707045c3617c3aec04e8016e29d249daeb6d77e86ece9746c13493c34145473c"
+"leuart_8c.html#a3ce97199df8725e09a70857d43c34b48",
+"pm_8h.html#a5707045c3617c3aec04e8016e29d249da52f50fb21a050570800a28a0872ae1c6"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

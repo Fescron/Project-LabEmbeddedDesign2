@@ -1,6 +1,8 @@
 var DS18B20_8c =
 [
-    [ "TIMEOUT_COUNTER", "DS18B20_8c.html#a199da98d8ddcd495482b436d294ec75d", null ],
+    [ "DBPRINT_TIMEOUT", "DS18B20_8c.html#a3ce97199df8725e09a70857d43c34b48", null ],
+    [ "TIMEOUT_CONVERSION", "DS18B20_8c.html#a2207a269d247f40650eb3463f3700b43", null ],
+    [ "TIMEOUT_INIT", "DS18B20_8c.html#ae305f3dbacc26e6156ddbd8bea11f439", null ],
     [ "convertTempData", "DS18B20_8c.html#a9a3bda987c27e677880c5435f43a0da7", null ],
     [ "init_DS18B20", "DS18B20_8c.html#afa07203657ccb8eec9f88518640ff70d", null ],
     [ "powerDS18B20", "DS18B20_8c.html#a84d8cb45da1e9ecfbf71aae818823a12", null ],

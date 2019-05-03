@@ -3,12 +3,12 @@ var ADXL362_8h =
     [ "ADXL_ODR_t", "ADXL362_8h.html#a898e557af22dabfada2fbff306466fd8", null ],
     [ "ADXL_Range_t", "ADXL362_8h.html#a1b3d080554bfb9f6d92b2bb7de90bcaa", null ],
     [ "adxl_odr", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1ac", [
-      [ "ADXL_ODR_12_5", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1aca01748c0a0ebbcd2b912b062b25a6a374", null ],
-      [ "ADXL_ODR_25", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1acaef755f6a5beacd2284bb5d30b2f4ade1", null ],
-      [ "ADXL_ODR_50", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1aca4524fe62036ce63057ecabafbd16247f", null ],
-      [ "ADXL_ODR_100", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1acaff630e791b1458af720f3c1a8ac81b05", null ],
-      [ "ADXL_ODR_200", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1aca12aabf90680cbefbc9cefb57d032a1d7", null ],
-      [ "ADXL_ODR_400", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1acabee93bf07531afe03d29271a5e8beb1d", null ]
+      [ "ADXL_ODR_12_5_HZ", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1acacda26fbf536bff8d806af35c80166519", null ],
+      [ "ADXL_ODR_25_HZ", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1acac42dd772f185fcfdc836385c6ac8b407", null ],
+      [ "ADXL_ODR_50_HZ", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1aca4445d653333a89b277a3f71245c13980", null ],
+      [ "ADXL_ODR_100_HZ", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1aca07647e4eda52ba4ba7a570141ebe9561", null ],
+      [ "ADXL_ODR_200_HZ", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1acaee8747c10990308247a67b06643f13b4", null ],
+      [ "ADXL_ODR_400_HZ", "ADXL362_8h.html#a1f41212fbb669b45200d0d72d6bea1aca1d05a7180789eef94b7c129f8fe6c4b4", null ]
     ] ],
     [ "adxl_range", "ADXL362_8h.html#a5fb1203de521040cf84015c2d0bc4ac8", [
       [ "ADXL_RANGE_2G", "ADXL362_8h.html#a5fb1203de521040cf84015c2d0bc4ac8a185a4817d137ff7ad9b262a6f90261eb", null ],

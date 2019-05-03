@@ -66,21 +66,32 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <dt><a class="anchor" id="_todo000001"></a>File <a class="el" href="ADXL362_8c.html">ADXL362.c</a>  </dt>
 <dd><ul>
 <li>Check initialization (settings)<ul>
-<li>Check absolute/relative mode?</li>
-<li>Check <code>lis3dh.c</code> in Dramco example (init shake detection)</li>
+<li>Check configurations by reading the registers again?</li>
+<li>Check difference absolute/referenced mode</li>
 </ul>
 </li>
-<li>Enable wake-up mode: <code>writeADXL(ADXL_REG_POWER_CTL, 0b00001000)</code> // 5th bit </li>
+<li>Enable wake-up mode?<ul>
+<li><code>writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit</code></li>
+</ul>
+</li>
+<li>Enable loop mode (interrupts don't need to be acknowledged by host)<ul>
+<li><code>writeADXL(ADXL_REG_ACT_INACT_CTL, 0b00110000);</code> </li>
+</ul>
+</li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000002"></a>File <a class="el" href="delay_8c.html">delay.c</a>  </dt>
+<dt><a class="anchor" id="_todo000002"></a>File <a class="el" href="cable_8c.html">cable.c</a>  </dt>
 <dd><ul>
-<li>Split definition to use the ULFRCO for the delay and sleep method? (if so, also update documentation!) </li>
+<li>Also send measurements on cable breaking? </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="DS18B20_8c.html">DS18B20.c</a>  </dt>
+<dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="delay_8c.html">delay.c</a>  </dt>
 <dd><ul>
-<li>Fix first <code>while</code> loop in init method. </li>
+<li>Split definition to use the ULFRCO for the delay and sleep method?<ul>
+<li>Try to fix sleep/wakeup functions for LoRaWAN functionality?</li>
+<li>If so, also update documentation! </li>
+</ul>
+</li>
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="lora__wrappers_8c.html">lora_wrappers.c</a>  </dt>
@@ -89,46 +100,35 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Should be possible in ABP (saving to EEPROM? <code>saveMAC</code>?) See reference manual!</li>
 </ul>
 </li>
-<li>Fix <code>sleepLoRaWAN</code> and <code>wakeLoRaWAN</code> methods.</li>
-<li>Remove unnecessary defines/variables. </li>
+<li>Fix <code>sleepLoRaWAN</code> and <code>wakeLoRaWAN</code> methods. </li>
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000005"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
-<dd>IMPORTANT:<ul>
+<dd><p class="startdd">IMPORTANT:</p><ul>
 <li><p class="startli">On INT1-PD7, go to sleep for somehow the remaining RTC time on wakeup?</p><ul>
 <li>On ADXL interrupt the RTC doesn't get disabled!</li>
+<li>Loop mode &amp; timer @ ADXL? (act/inact time registers)</li>
 </ul>
 <p class="startli">EXTRA THINGS:</p>
 </li>
-<li>Add WDOG functionality (see "powertest" example and <em>Embedded Muse 365</em>)<ul>
-<li>Due to <em>short</em> interval: Only when awake?</li>
-<li>Also see <code>getResetCause</code>(<code>system.c</code> in Dramco example)</li>
-<li>Check all <code>while</code> loops (wait for register flags, ...)! (for loops don't pose problems)</li>
-<li>Add <code>counter</code> timeout to exit <code>while</code> loops in worst case (<code>timer</code> timout functionality disabled...)</li>
+<li>Add information about WDOG in <code><a class="el" href="documentation_8h.html" title="This file contains useful documentation about the project. ">documentation.h</a></code><ul>
+<li>Check all <code>while</code> loops (wait for register flags, ...) and add <em>exit counters</em> if necessary! (for loops don't pose problems)</li>
+<li>see <em>powertest</em> example, <code>getResetCause</code>(<code>system.c</code> in Dramco example) and <em>Embedded Muse 365</em>)</li>
+<li>Due to <em>short</em> interval: Only when awake? 9 - 256k cycles, ~ max 256 sec?</li>
 </ul>
 </li>
-<li>Give the sensors time to power up (40 ms? - Dramco)<ul>
-<li>ADXL &amp; old temperature sensor</li>
+<li>Test negative temperatures by putting the module in it's case in the freezer ?</li>
+<li>ADC temperature 2-3 degree's off external one?</li>
+<li>Add DBPRINT as files instead of global includes.</li>
 </ul>
-</li>
-<li><p class="startli">Test negative temperatures by putting the module in it's case in the freezer...</p><ul>
-<li>LPP logic should be able to handle negative values (<code>int16_t</code> as input type for methods &amp; analog: 0.01 signed, temp: 0.1 °C signed MSB)</li>
-</ul>
-<p class="startli">OPTIMALISATIONS:</p>
-</li>
+<p class="enddd">OPTIMALISATIONS:</p><ul>
 <li>Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).<ul>
 <li>Also see <em>AN0007: 2.8 Optimizing Code</em></li>
 </ul>
 </li>
-<li>Change LoRaWAN Spreading Factor</li>
-<li>Add <code>disableClocks</code> (see <code>emodes.c</code> example) and <code>disableUnusedPins</code> functionality.<ul>
-<li>EM3: All unwanted oscillators are disabled, don't need to manually disable them before <code>EMU_EnterEM3</code>.</li>
-</ul>
-</li>
-<li>Set the accelerometer in <em>movement detection</em> to spare battery life when the buoy isn't installed yet?<ul>
-<li>EM4 wakeup? See <code>deepsleep</code> (<code>system.c</code> in Dramco example) </li>
-</ul>
-</li>
+<li>Change LoRaWAN Spreading Factor and send power.</li>
+<li>Use EM4 wakeup? See <code>deepsleep</code> (<code>system.c</code> in Dramco example)</li>
+<li>Try to shorten delays? (for example: 40 ms power-up time for RN2483) </li>
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000008"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
@@ -144,7 +144,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu May 2 2019 01:16:15 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Fri May 3 2019 02:34:35 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
