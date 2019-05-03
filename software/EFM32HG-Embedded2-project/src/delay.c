@@ -26,7 +26,9 @@
  *   @li v2.4: Moved definitions from header to source file.
  *
  *   @todo
- *     - Split definition to use the ULFRCO for the delay and sleep method? (if so, also update documentation!)
+ *     - Split definition to use the ULFRCO for the delay and sleep method?
+ *         - Try to fix sleep/wakeup functions for LoRaWAN functionality?
+ *         - If so, also update documentation!
  *
  * ******************************************************************************
  *
@@ -40,18 +42,18 @@
  ******************************************************************************/
 
 
-#include <stdint.h>      /* (u)intXX_t */
-#include <stdbool.h>     /* "bool", "true", "false" */
-#include "em_device.h"   /* Include necessary MCU-specific header file */
-#include "em_cmu.h"      /* Clock management unit */
-#include "em_emu.h"      /* Energy Management Unit */
-#include "em_gpio.h"     /* General Purpose IO */
-#include "em_rtc.h"      /* Real Time Counter (RTC) */
+#include <stdint.h>        /* (u)intXX_t */
+#include <stdbool.h>       /* "bool", "true", "false" */
+#include "em_device.h"     /* Include necessary MCU-specific header file */
+#include "em_cmu.h"        /* Clock management unit */
+#include "em_emu.h"        /* Energy Management Unit */
+#include "em_gpio.h"       /* General Purpose IO */
+#include "em_rtc.h"        /* Real Time Counter (RTC) */
 
-#include "delay.h"       /* Corresponding header file */
-#include "pin_mapping.h" /* PORT and PIN definitions */
-#include "debugging.h" 	 /* Enable or disable printing to UART */
-#include "util.h"    	 /* Utility functionality */
+#include "delay.h"         /* Corresponding header file */
+#include "pin_mapping.h"   /* PORT and PIN definitions */
+#include "debug_dbprint.h" /* Enable or disable printing to UART */
+#include "util.h"    	   /* Utility functionality */
 
 
 /* Local definitions (for RTC compare interrupts) */
@@ -98,9 +100,9 @@ void delay (uint32_t msDelay)
 		 * Number of ticks between interrupt = cmuClock_CORE/1000 */
 		if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000)) while (1);
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 	dbinfo("SysTick initialized");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		SysTick_initialized = true;
 	}
@@ -153,9 +155,9 @@ void delay (uint32_t msDelay)
 	else
 	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Delay too long, can't fit in the field!");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(14);
 	}
@@ -166,9 +168,9 @@ void delay (uint32_t msDelay)
 	else
 	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Delay too long, can't fit in the field!");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(15);
 	}
@@ -253,13 +255,13 @@ void sleep (uint32_t sSleep)
 		CMU_ClockEnable(cmuClock_RTC, true);
 	}
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 #if ULFRCO == 1 /* ULFRCO selected */
 	dbwarnInt("Sleeping in EM3 for ", sSleep, " s\n\r");
 #else /* LFXO selected */
 	dbwarnInt("Sleeping in EM2 for ", sSleep, " s\n\r");
 #endif /* ULFRCO/LFXO selection */
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 	/* Set RTC compare value for RTC compare register 0 depending on ULFRCO/LFXO selection */
 
@@ -269,9 +271,9 @@ void sleep (uint32_t sSleep)
 	else
 	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Delay too long, can't fit in the field!");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(16);
 	}
@@ -282,9 +284,9 @@ void sleep (uint32_t sSleep)
 	else
 	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Delay too long, can't fit in the field!");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(17);
 	}
@@ -412,13 +414,13 @@ static void initRTC (void)
 	/* Initialize RTC with pre-defined settings */
 	RTC_Init(&rtc);
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 #if ULFRCO == 1 /* ULFRCO selected */
 	dbinfo("RTC initialized with ULFRCO\n\r");
 #else /* LFXO selected */
 	dbinfo("RTC initialized with LFXO\n\r");
 #endif /* ULFRCO/LFXO selection */
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 	RTC_initialized = true;
 }

@@ -41,15 +41,15 @@
  ******************************************************************************/
 
 
-#include <stdint.h>      /* (u)intXX_t */
-#include <stdbool.h>     /* "bool", "true", "false" */
-#include "em_cmu.h"      /* Clock Management Unit */
-#include "em_gpio.h"     /* General Purpose IO */
+#include <stdint.h>        /* (u)intXX_t */
+#include <stdbool.h>       /* "bool", "true", "false" */
+#include "em_cmu.h"        /* Clock Management Unit */
+#include "em_gpio.h"       /* General Purpose IO */
 
-#include "util.h"        /* Corresponding header file */
-#include "pin_mapping.h" /* PORT and PIN definitions */
-#include "debugging.h" 	 /* Enable or disable printing to UART */
-#include "delay.h"     	 /* Delay functionality */
+#include "util.h"          /* Corresponding header file */
+#include "pin_mapping.h"   /* PORT and PIN definitions */
+#include "debug_dbprint.h" /* Enable or disable printing to UART */
+#include "delay.h"         /* Delay functionality */
 
 #if ERROR_FORWARDING == 1 /* ERROR_FORWARDING */
 #include "lora_wrappers.h" /* LoRaWAN functionality */
@@ -116,11 +116,11 @@ void error (uint8_t number)
 
 #if ERROR_FORWARDING == 0 /* ERROR_FORWARDING */
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 	dbprint_color(">>> Error (", 5);
 	dbprintInt(number);
 	dbprintln_color(")! Please reset MCU. <<<", 5);
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 	while (1)
 	{
@@ -133,11 +133,11 @@ void error (uint8_t number)
 	/* Check if the error number isn't called in LoRaWAN functionality */
 	if ((number < 30) || number > 55)
 	{
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbprint_color(">>> Error (", 5);
 		dbprintInt(number);
 		dbprintln_color(")! Sending the message to the cloud. <<<", 5);
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		initLoRaWAN(); /* Initialize LoRaWAN functionality TODO: use something else if we can save the settings */
 
@@ -148,11 +148,11 @@ void error (uint8_t number)
 	else
 	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbprint_color(">>> Error in LoRaWAN functionality (", 5);
 		dbprintInt(number);
 		dbprintln_color(")! <<<", 5);
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 	}
 
@@ -178,9 +178,9 @@ static void initLED (void)
 	/* In the case of gpioModePushPull, the last argument directly sets the pin state */
 	GPIO_PinModeSet(LED_PORT, LED_PIN, gpioModePushPull, 0);
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 	dbinfo("LED pin initialized");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 	LED_initialized = true;
 }

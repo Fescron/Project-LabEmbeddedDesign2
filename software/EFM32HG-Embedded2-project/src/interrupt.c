@@ -42,18 +42,19 @@
  ******************************************************************************/
 
 
-#include <stdint.h>      /* (u)intXX_t */
-#include <stdbool.h>     /* "bool", "true", "false" */
-#include "em_device.h"   /* Include necessary MCU-specific header file */
-#include "em_cmu.h"      /* Clock management unit */
-#include "em_gpio.h"     /* General Purpose IO */
-#include "em_rtc.h"      /* Real Time Counter (RTC) */
 
-#include "interrupt.h"   /* Corresponding header file */
-#include "pin_mapping.h" /* PORT and PIN definitions */
-#include "debugging.h"   /* Enable or disable printing to UART */
-#include "util.h"     	 /* Utility functionality */
-#include "ADXL362.h"     /* Functions related to the accelerometer */
+#include <stdint.h>        /* (u)intXX_t */
+#include <stdbool.h>       /* "bool", "true", "false" */
+#include "em_device.h"     /* Include necessary MCU-specific header file */
+#include "em_cmu.h"        /* Clock management unit */
+#include "em_gpio.h"       /* General Purpose IO */
+#include "em_rtc.h"        /* Real Time Counter (RTC) */
+
+#include "interrupt.h"     /* Corresponding header file */
+#include "pin_mapping.h"   /* PORT and PIN definitions */
+#include "debug_dbprint.h" /* Enable or disable printing to UART */
+#include "util.h"     	   /* Utility functionality */
+#include "ADXL362.h"       /* Functions related to the accelerometer */
 
 
 /* Local variables */
@@ -106,9 +107,9 @@ void initGPIOwakeup (void)
 	/* Enable rising-edge interrupts for ADXL_INT1 */
 	GPIO_ExtIntConfig(ADXL_INT1_PORT, ADXL_INT1_PIN, ADXL_INT1_PIN, true, false, true);
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 	dbinfo("GPIO wake-up initialized");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 }
 
@@ -131,9 +132,9 @@ bool BTN_getTriggered (uint8_t number)
 	else
 	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Non-existing button selected!");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(18);
 
@@ -160,9 +161,9 @@ void BTN_setTriggered (uint8_t number, bool value)
 	else
 	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Non-existing button selected!");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(19);
 	}

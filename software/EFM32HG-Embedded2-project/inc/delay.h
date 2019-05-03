@@ -23,7 +23,8 @@
 
 /** Public definition to select the use of the crystal or the oscillator
  *    @li `0` - Use the low-frequency crystal oscillator (LFXO), EM2 sleep is used.
- *    @li `1` - Use the ultra low-frequency RC oscillator (ULFRCO), EM3 sleep is used but delays are less precise timing-wise.  */
+ *    @li `1` - Use the ultra low-frequency RC oscillator (ULFRCO), EM3 sleep is used but delays are less precise timing-wise.
+ *              ** EM3: All unwanted oscillators are disabled, they don't need to manually disabled before `EMU_EnterEM3`.**    */
 #define ULFRCO 1
 
 

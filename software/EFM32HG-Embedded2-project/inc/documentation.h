@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file documentation.h
  * @brief This file contains useful documentation about the project.
- * @version 1.2
+ * @version 1.3
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -26,10 +26,10 @@
  *
  * @section SETTINGS Settings using definitions in dbprint and delay functionality
  *
- *   In the file `debugging.h` **dbprint UART functionality can be enabled/disabled**
- *   with the definition `#define DEBUGGING`. If it's value is `0`, all dbprint statements
+ *   In the file `debug_dbprint.h` **dbprint UART functionality can be enabled/disabled**
+ *   with the definition `#define DEBUG_DBPRINT`. If it's value is `0`, all dbprint statements
  *   are disabled throughout the source code because they're all surrounded with
- *   `#if DEBUGGING == 1 ... #endif` checks.
+ *   `#if DEBUG_DBPRINT == 1 ... #endif` checks.
  *
  *   In the file `delay.h` one can **choose between SysTicks or RTC sleep functionality**
  *   for delays. This can be selected with the definition `#define SYSTICKDELAY`.
