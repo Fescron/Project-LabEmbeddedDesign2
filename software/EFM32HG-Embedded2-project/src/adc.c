@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file adc.c
  * @brief ADC functionality for reading the (battery) voltage and internal temperature.
- * @version 1.4
+ * @version 1.5
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -13,6 +13,7 @@
  *   @li v1.2: Started using custom enum type and cleaned up some unnecessary statements after testing.
  *   @li v1.3: Changed error numbering.
  *   @li v1.4: Added timeout to `while` loop and changed types to `int32_t`.
+ *   @li v1.5: Refined timout functionality.
  *
  * ******************************************************************************
  *
@@ -26,21 +27,23 @@
  ******************************************************************************/
 
 
-#include <stdint.h>    /* (u)intXX_t */
-#include <stdbool.h>   /* "bool", "true", "false" */
-#include "em_device.h" /* Include necessary MCU-specific header file */
-#include "em_cmu.h"    /* Clock management unit */
-#include "em_emu.h"    /* Energy Management Unit */
-#include "em_adc.h"    /* Analog to Digital Converter */
+#include <stdint.h>        /* (u)intXX_t */
+#include <stdbool.h>       /* "bool", "true", "false" */
+#include "em_device.h"     /* Include necessary MCU-specific header file */
+#include "em_cmu.h"        /* Clock management unit */
+#include "em_adc.h"        /* Analog to Digital Converter */
 
-#include "adc.h"       /* Corresponding header file */
-#include "debugging.h" /* Enable or disable printing to UART for debugging */
-#include "util.h"      /* Utility functionality */
+#include "adc.h"           /* Corresponding header file */
+#include "debug_dbprint.h" /* Enable or disable printing to UART for debugging */
+#include "util.h"          /* Utility functionality */
 
 
-/* Local definition */
-/** Maximum waiting value before exiting a `while` loop */
-#define TIMEOUT_COUNTER 100 /* 10 is not enough but 20 is (100 just in case) */
+/* Local definitions */
+/** Enable (1) or disable (0) printing the timeout counter value using DBPRINT */
+#define DBPRINT_TIMEOUT 0
+
+/** Maximum value for the counter before exiting a `while` loop */
+#define TIMEOUT_CONVERSION 50
 
 
 /* Local variables */
@@ -88,9 +91,9 @@ void initADC (ADC_Measurement_t peripheral)
 	else
 	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Unknown ADC peripheral selected!");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(11);
 	}
@@ -110,10 +113,10 @@ void initADC (ADC_Measurement_t peripheral)
 	/* Disable used clock */
 	CMU_ClockEnable(cmuClock_ADC0, false);
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 	if (peripheral == INTERNAL_TEMPERATURE) dbinfo("ADC0 initialized for internal temperature");
 	else if (peripheral == BATTERY_VOLTAGE) dbinfo("ADC0 initialized for VBAT");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 }
 
@@ -159,11 +162,13 @@ int32_t readADC (ADC_Measurement_t peripheral)
 	else
 	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Unknown ADC peripheral selected!");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(12);
+
+		return (0);
 	}
 
 	/* Set variable false just in case */
@@ -173,20 +178,30 @@ int32_t readADC (ADC_Measurement_t peripheral)
 	ADC_Start(ADC0, adcStartSingle);
 
 	/* Wait until the conversion is completed */
-	while ((counter < TIMEOUT_COUNTER) && !adcConversionComplete) counter++;
+	while ((counter < TIMEOUT_CONVERSION) && !adcConversionComplete) counter++;
 
 	/* Exit the function if the maximum waiting time was reached */
-	if (counter == TIMEOUT_COUNTER)
+	if (counter == TIMEOUT_CONVERSION)
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Waiting time for ADC conversion reached!");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(13);
 
 		return (0);
 	}
+#if DBPRINT_TIMEOUT == 1 /* DBPRINT_TIMEOUT */
+	else
+	{
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+		dbwarnInt("ADC conversion (", counter, ")");
+#endif /* DEBUG_DBPRINT */
+
+	}
+#endif /* DBPRINT_TIMEOUT */
 
 	/* Get the ADC value */
 	value = ADC_DataSingleGet(ADC0);

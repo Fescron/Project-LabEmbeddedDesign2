@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file leuart.c
  * @brief LEUART (serial communication) functionality required by the RN2483 LoRa modem.
- * @version 1.2
+ * @version 1.3
  * @author
  *   Guus Leenders@n
  *   Modified by Brecht Van Eeckhoudt
@@ -11,8 +11,9 @@
  * @section Versions
  *
  *   @li v1.0: DRAMCO GitHub version (https://github.com/DRAMCO/EFM32-RN2483-LoRa-Node).
- *   @li v1.1: Removed rtcdriver functionality (timouts)
+ *   @li v1.1: Removed rtcdriver functionality (timeouts)
  *   @li v1.2: Added (basic) timeout functionality.
+ *   @li v1.3: Refined timeout functionality and cleaned up unused things in comments.
  *
  ******************************************************************************/
 
@@ -37,61 +38,56 @@
  */
 
 
-#include <stdint.h>      /* (u)intXX_t */
-#include <stdbool.h>     /* "bool", "true", "false" */
-#include "em_device.h"   /* Include necessary MCU-specific header file */
-#include "em_chip.h"     /* Chip Initialization */
-#include "em_cmu.h"      /* Clock management unit */
-#include "em_emu.h"      /* Energy Management Unit */
-#include "em_gpio.h"     /* General Purpose IO */
-#include "em_leuart.h"   /* Low Energy Universal Asynchronous Receiver/Transmitter Peripheral API */
-#include "em_dma.h"      /* Direct Memory Access (DMA) API */
+#include <stdint.h>        /* (u)intXX_t */
+#include <stdbool.h>       /* "bool", "true", "false" */
+#include "em_device.h"     /* Include necessary MCU-specific header file */
+#include "em_chip.h"       /* Chip Initialization */
+#include "em_cmu.h"        /* Clock management unit */
+#include "em_gpio.h"       /* General Purpose IO */
+#include "em_leuart.h"     /* Low Energy Universal Asynchronous Receiver/Transmitter Peripheral API */
+#include "em_dma.h"        /* Direct Memory Access (DMA) API */
+#include "dmactrl.h"       /* DMA driver */
 
-#include <dmactrl.h>
-//#include <rtcdriver.h>
-
-#include "leuart.h"      /* Corresponding header file */
-#include "delay.h"       /* Delay functionality */
-#include "pin_mapping.h" /* PORT and PIN definitions */
-#include "util_string.h" /* Utility functionality regarding strings */
-#include "debugging.h"   /* Enable or disable printing to UART for debugging */
-#include "util.h"        /* Utility functionality */
+#include "leuart.h"        /* Corresponding header file */
+#include "delay.h"         /* Delay functionality */
+#include "pin_mapping.h"   /* PORT and PIN definitions */
+#include "debug_dbprint.h" /* Enable or disable printing to UART for debugging */
+#include "util_string.h"   /* Utility functionality regarding strings */
+#include "util.h"          /* Utility functionality */
 
 
-/** Maximum waiting value before exiting a `while` loop */
-#define TIMEOUT_COUNTER 2000000 /* 40 000 is not enough for "DMA Channel Enable", 800 000 is not enough for "Leuart_WaitForResponse" but 900 000 is @SF10 (1 000 000 just in case) */
-                                /* @SF12 2 000 000 works ... */
+/* Local definitions */
+/** Enable (1) or disable (0) printing the timeout counter value using DBPRINT */
+#define DBPRINT_TIMEOUT 0
 
-#define TX_TIMEOUT_DURATION		2000	// ms
-#define RX_TIMEOUT_DURATION		10000	// ms
+/* Maximum values for the counters before exiting a `while` loop */
+#define TIMEOUT_SYNC         80
+#define TIMEOUT_DMA          50000
+#define TIMEOUT_SENDCMD      40000
+#define TIMEOUT_WAITRESPONSE 2000000 /* Depends on spreading factor! */
 
 /* DMA Configurations */
-#define DMA_CHANNEL_TX       0          /* DMA channel is 0 */
+#define DMA_CHANNEL_TX       0 /* DMA channel is 0 */
 #define DMA_CHANNEL_RX       1
 #define DMA_CHANNELS 		 2
 
-/** DMA callback structure */
-static DMA_CB_TypeDef dmaCallBack[DMA_CHANNELS];
 
-//char commandBuffer[COMMAND_BUFFER_SIZE];
+/* Local variables */
+static DMA_CB_TypeDef dmaCallBack[DMA_CHANNELS]; /* DMA callback structure */
 char receiveBuffer[RECEIVE_BUFFER_SIZE];
 volatile uint8_t bufferPointer = 0;
 volatile bool receiveComplete = false;
 
-/* RTCDRV_TimerID_t xTimerForTimeout; */
-static volatile bool timeout = false;
 
-void Leuart_ClearBuffers(void){
+void Leuart_ClearBuffers(void)
+{
 	memset(receiveBuffer, '\0', RECEIVE_BUFFER_SIZE);
 	receiveComplete = false;
 }
 
-/* void timeoutCb(RTCDRV_TimerID_t id, void *user){
-	timeout = true;
-} */
-
 /* Static (internal) functions */
-static void basicTxComplete(unsigned int channel, bool primary, void *user){
+static void basicTxComplete(unsigned int channel, bool primary, void *user)
+{
 	(void) user;
 	/* Refresh DMA basic transaction cycle */
 	DMA_ActivateBasic(DMA_CHANNEL_RX,
@@ -103,7 +99,8 @@ static void basicTxComplete(unsigned int channel, bool primary, void *user){
 	bufferPointer = 0;
 }
 
-static void basicRxComplete(unsigned int channel, bool primary, void *user){
+static void basicRxComplete(unsigned int channel, bool primary, void *user)
+{
 	(void) user;
 
 	/* Refresh DMA basic transaction cycle */
@@ -152,7 +149,7 @@ void setupDma(void){
 	rxChnlCfg.highPri   = false; /* Can't use with peripherals */
 	rxChnlCfg.enableInt = true;  /* Enabling interrupt to refresh DMA cycle*/
 	/*Setting up DMA transfer trigger request*/
-	rxChnlCfg.select = DMAREQ_LEUART0_RXDATAV; //DMAREQ_LEUART0_RXDATAV;
+	rxChnlCfg.select = DMAREQ_LEUART0_RXDATAV; /* DMAREQ_LEUART0_RXDATAV; */
 	/* Setting up callback function to refresh descriptors*/
 	rxChnlCfg.cb     = &(dmaCallBack[DMA_CHANNEL_RX]);
 	DMA_CfgChannel(DMA_CHANNEL_RX, &rxChnlCfg);
@@ -180,7 +177,7 @@ void setupDma(void){
 	txChnlCfg.highPri   = false; /* Can't use with peripherals */
 	txChnlCfg.enableInt = true;  /* Enabling interrupt to refresh DMA cycle*/
 	/*Setting up DMA transfer trigger request*/
-	txChnlCfg.select = DMAREQ_LEUART0_TXBL; //DMAREQ_LEUART0_RXDATAV;
+	txChnlCfg.select = DMAREQ_LEUART0_TXBL; /* DMAREQ_LEUART0_RXDATAV; */
 	/* Setting up callback function to refresh descriptors*/
 	txChnlCfg.cb     = &(dmaCallBack[DMA_CHANNEL_TX]);
 	DMA_CfgChannel(DMA_CHANNEL_TX, &txChnlCfg);
@@ -204,18 +201,28 @@ static void sendLeuartData(char * buffer, uint8_t bufferLength)
 	uint32_t counter = 0;
 
 	/* Wait for sync */
-	while ((counter < TIMEOUT_COUNTER) && RN2483_UART->SYNCBUSY) counter++;
+	while ((counter < TIMEOUT_SYNC) && RN2483_UART->SYNCBUSY) counter++;
 
 	/* Exit the function if the maximum waiting time was reached */
-	if (counter == TIMEOUT_COUNTER)
+	if (counter == TIMEOUT_SYNC)
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Waiting time for sync reached! (sendLeuartData)");
-#endif /* DEBUGGING */
+#endif  /* DEBUG_DBPRINT */
 
 		error(51);
 	}
+#if DBPRINT_TIMEOUT == 1 /* DBPRINT_TIMEOUT */
+	else
+	{
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+		dbwarnInt("sendLeuartData SYNC (", counter, ")");
+#endif /* DEBUG_DBPRINT */
+
+	}
+#endif /* DBPRINT_TIMEOUT */
 
 	DMA_ActivateBasic(DMA_CHANNEL_TX,
 	                  true,
@@ -228,24 +235,33 @@ static void sendLeuartData(char * buffer, uint8_t bufferLength)
 	counter = 0;
 
 	/* Wait in EM1 for DMA channel enable */
-	while ((counter < TIMEOUT_COUNTER) && DMA_ChannelEnabled(DMA_CHANNEL_TX)) counter++;//  EMU_EnterEM1() TODO: check if EM1 works here
+	while ((counter < TIMEOUT_DMA) && DMA_ChannelEnabled(DMA_CHANNEL_TX)) counter++;
 
 	/* Exit the function if the maximum waiting time was reached */
-	if (counter == TIMEOUT_COUNTER)
+	if (counter == TIMEOUT_DMA)
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Waiting time for DMA channel enable reached! (sendLeuartData)");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(52);
 	}
+#if DBPRINT_TIMEOUT == 1 /* DBPRINT_TIMEOUT */
+	else
+	{
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+		dbwarnInt("sendLeuartData DMA (", counter, ")");
+#endif /* DEBUG_DBPRINT */
+
+	}
+#endif /* DBPRINT_TIMEOUT */
+
 }
 
-static void setupLeuart(void){
-	/* Allocate timer for Timeout detection*/
-	/* RTCDRV_AllocateTimer(&xTimerForTimeout); */
-
+static void setupLeuart(void)
+{
 	/* Enable peripheral clocks */
 	CMU_ClockEnable(cmuClock_HFPER, true);
 	/* Configure GPIO pins */
@@ -254,7 +270,7 @@ static void setupLeuart(void){
 	GPIO_PinModeSet(RN2483_TX_PORT, RN2483_TX_PIN, gpioModePushPull, 1);
 	GPIO_PinModeSet(RN2483_RX_PORT, RN2483_RX_PIN, gpioModeInput, 0);
 
-	LEUART_Init_TypeDef init = LEUART_INIT_DEFAULT; // Default config is fine
+	LEUART_Init_TypeDef init = LEUART_INIT_DEFAULT; /* Default config is fine */
 	init.baudrate = 4800;
 
 	/* Enable CORE LE clock in order to access LE modules */
@@ -286,8 +302,9 @@ static void setupLeuart(void){
 	LEUART_Enable(RN2483_UART, leuartEnable);
 }
 
-void Leuart_Init(void){
-	// Brecht: added 3 lines below
+void Leuart_Init(void)
+{
+	// TODO: Lines below might fix some sleep functionality...
 	//CMU_ClockEnable(cmuClock_CORELE, true);
 	//CMU_ClockEnable(cmuClock_DMA, true);
 	//CMU_ClockEnable(cmuClock_LEUART0, true);
@@ -296,14 +313,15 @@ void Leuart_Init(void){
 	Leuart_BreakCondition();
 	setupLeuart();
 
-	// Auto baud setting
+	/* Auto baud setting */
 	char b[] = "U";
 	sendLeuartData(b, 1);
 	delay(500);
 }
 
-void Leuart_Reinit(void){
-	// Brecht: added 3 lines below
+void Leuart_Reinit(void)
+{
+	// TODO: Lines below might fix some sleep functionality...
 	//CMU_ClockEnable(cmuClock_CORELE, true);
 	//CMU_ClockEnable(cmuClock_DMA, true);
 	//CMU_ClockEnable(cmuClock_LEUART0, true);
@@ -312,7 +330,7 @@ void Leuart_Reinit(void){
 	Leuart_BreakCondition();
 	setupLeuart();
 
-	// Auto baud setting
+	/* Auto baud setting */
 	char b[] = "U";
 	sendLeuartData(b, 1);
 	Leuart_WaitForResponse();
@@ -320,7 +338,8 @@ void Leuart_Reinit(void){
 	Leuart_WaitForResponse();
 }
 
-void Leuart_BreakCondition(void){
+void Leuart_BreakCondition(void)
+{
 	GPIO_PinModeSet(RN2483_TX_PORT, RN2483_TX_PIN, gpioModePushPull, 1);
 	delay(40);
 	GPIO_PinModeSet(RN2483_TX_PORT, RN2483_TX_PIN, gpioModePushPull, 0);
@@ -328,13 +347,14 @@ void Leuart_BreakCondition(void){
 	GPIO_PinOutSet(RN2483_TX_PORT, RN2483_TX_PIN);
 }
 
-void Leuart_ReadResponse(char * buffer, uint8_t bufferLength){
+void Leuart_ReadResponse(char * buffer, uint8_t bufferLength)
+{
 	sprintf(buffer, "%s", receiveBuffer);
 	receiveComplete = false;
 	bufferPointer = 0;
 }
 
-void Leuart_SendData(char * buffer, uint8_t bufferLength)
+void Leuart_SendData(char * buffer, uint8_t bufferLength) /* TODO: Not used... */
 {
 	/* Timeout counter */
 	uint32_t counter = 0;
@@ -342,28 +362,32 @@ void Leuart_SendData(char * buffer, uint8_t bufferLength)
 	/* Send data over LEUART */
 	sendLeuartData(buffer, bufferLength);
 
-	// Start Timeout-timer if needed
-	timeout = false;
-	/* RTCDRV_StartTimer(xTimerForTimeout, rtcdrvTimerTypeOneshot, 10, (RTCDRV_Callback_t) &timeoutCb, NULL); */
-
 	/* Wait for response */
-	while ((counter < TIMEOUT_COUNTER) && !Leuart_ResponseAvailable()) counter++; // TODO: before: EMU_EnterEM2(true)
+	while ((counter < TIMEOUT_WAITRESPONSE) && !Leuart_ResponseAvailable()) counter++;
 
 	/* Exit the function if the maximum waiting time was reached */
-	if (counter == TIMEOUT_COUNTER)
+	if (counter == TIMEOUT_WAITRESPONSE)
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Waiting time for response reached! (Leuart_SendData)");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(53);
+	}
+	else
+	{
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+		dbwarnInt("Leuart_SendData (", counter, ")");
+#endif /* DEBUG_DBPRINT */
+
 	}
 
 	receiveComplete = true;
 }
 
-// Send a command string over the LEUART. Specifying a waitTime > 0 will result in a timeout when no command is received in time.
+/** Send a command string over the LEUART. "wakeUp" IS NOT USED */
 Leuart_Status_t Leuart_SendCommand(char * cb, uint8_t cbl, volatile bool * wakeUp)
 {
 	/* Timeout counter */
@@ -372,31 +396,31 @@ Leuart_Status_t Leuart_SendCommand(char * cb, uint8_t cbl, volatile bool * wakeU
 	/* Send data over LEUART */
 	sendLeuartData(cb, cbl);
 
-	// Start Timeout-timer if needed
-	timeout = false;
-	//RTCDRV_StartTimer(xTimerForTimeout, rtcdrvTimerTypeOneshot, waitTime, (RTCDRV_Callback_t) &timeoutCb, NULL);
-
 	/* Wait for response */
-	while ((counter < TIMEOUT_COUNTER) && !Leuart_ResponseAvailable()) counter++; // TODO: before: EMU_EnterEM2(true) [&& !(*wakeUp)]
+	while ((counter < TIMEOUT_SENDCMD) && !Leuart_ResponseAvailable()) counter++;
 
 	/* Exit the function if the maximum waiting time was reached */
-	if (counter == TIMEOUT_COUNTER)
+	if (counter == TIMEOUT_SENDCMD)
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Waiting time for response reached! (Leuart_SendCommand)");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(54);
-	}
 
-	// Check for timeout
-	if(timeout){ // if running is false, we got here because of the timeout.
 		return (TX_TIMEOUT);
 	}
+#if DBPRINT_TIMEOUT == 1 /* DBPRINT_TIMEOUT */
+	else
+	{
 
-	// Stop Timeout-timer when command is received
-	//RTCDRV_StopTimer(xTimerForTimeout); // stop timer
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+		dbwarnInt("Leuart_SendCommand (", counter, ")");
+#endif /* DEBUG_DBPRINT */
+
+	}
+#endif /* DBPRINT_TIMEOUT */
 
 	return (DATA_SENT);
 }
@@ -407,7 +431,7 @@ Leuart_Status_t Leuart_WaitForResponse()
 	/* Timeout counter */
 	uint32_t counter = 0;
 
-	// Activate DMA
+	/* Activate DMA */
 	DMA_ActivateBasic(	DMA_CHANNEL_RX,
 						true,
 						false,
@@ -415,32 +439,32 @@ Leuart_Status_t Leuart_WaitForResponse()
 						(void *)&RN2483_UART->RXDATA,
 						0);
 
-	// Start Timeout-timer
-	timeout = false;
-	//RTCDRV_StartTimer(xTimerForTimeout, rtcdrvTimerTypeOneshot, RX_TIMEOUT_DURATION, (RTCDRV_Callback_t) &timeoutCb, NULL);
-
 	/* Wait for response */
-	while ((counter < TIMEOUT_COUNTER) && !Leuart_ResponseAvailable()) counter++; // TODO: before: EMU_EnterEM2(true)
+	while ((counter < TIMEOUT_WAITRESPONSE) && !Leuart_ResponseAvailable()) counter++;
 
 	/* Exit the function if the maximum waiting time was reached */
-	if (counter == TIMEOUT_COUNTER)
+	if (counter == TIMEOUT_WAITRESPONSE)
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbcrit("Waiting time for response reached! (Leuart_WaitForResponse)");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		error(55);
-	}
 
-	//RTCDRV_StopTimer(xTimerForTimeout); // stop timer
-
-	// Check for timeout
-	if(timeout){ // if running is false, we got here because of the timeout.
 		return (RX_TIMEOUT);
 	}
+#if DBPRINT_TIMEOUT == 1 /* DBPRINT_TIMEOUT */
+	else
+	{
 
-	// OK
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+		dbwarnInt("Leuart_WaitForResponse (", counter, ")");
+#endif /* DEBUG_DBPRINT */
+
+	}
+#endif /* DBPRINT_TIMEOUT */
+
 	return (DATA_RECEIVED);
 }
 
