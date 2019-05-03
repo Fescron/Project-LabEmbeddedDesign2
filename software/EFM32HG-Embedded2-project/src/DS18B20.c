@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 2.3
+ * @version 2.4
  * @author
  *   Alec Vanderhaegen & Sarah Goossens@n
  *   Modified by Brecht Van Eeckhoudt
@@ -25,30 +25,32 @@
  *   @li v2.0: Updated documentation.
  *   @li v2.1: Changed method to return `uint32_t` instead of float.
  *   @li v2.2: Changed error numbering, moved definition from header to source file and updated header file include.
- *   @li v2.3: Changed *timout* variable and changed types to `int32_t`.
- *
- *   @todo
- *     - Fix first `while` loop in init method.
+ *   @li v2.3: Changed *timeout* variable and changed types to `int32_t`.
+ *   @li v2.4: Fixed temperature measurement and refined timeout functionality.
  *
  ******************************************************************************/
 
 
-#include <stdint.h>      /* (u)intXX_t */
-#include <stdbool.h>     /* "bool", "true", "false" */
-#include "em_cmu.h"      /* Clock Management Unit */
-#include "em_gpio.h"     /* General Purpose IO (GPIO) peripheral API */
+#include <stdint.h>        /* (u)intXX_t */
+#include <stdbool.h>       /* "bool", "true", "false" */
+#include "em_cmu.h"        /* Clock Management Unit */
+#include "em_gpio.h"       /* General Purpose IO (GPIO) peripheral API */
 
-#include "DS18B20.h"     /* Corresponding header file */
-#include "pin_mapping.h" /* PORT and PIN definitions */
-#include "debugging.h"   /* Enable or disable printing to UART */
-#include "delay.h"       /* Delay functionality */
-#include "util.h"    	 /* Utility functionality */
-#include "ustimer.h"     /* Timer functionality */
+#include "DS18B20.h"       /* Corresponding header file */
+#include "pin_mapping.h"   /* PORT and PIN definitions */
+#include "debug_dbprint.h" /* Enable or disable printing to UART */
+#include "delay.h"         /* Delay functionality */
+#include "util.h"    	   /* Utility functionality */
+#include "ustimer.h"       /* Timer functionality */
 
 
-/* Local definition */
-/** Maximum waiting value before a reset becomes *failed* */
-#define TIMEOUT_COUNTER 2000
+/* Local definitions */
+/** Enable (1) or disable (0) printing the timeout counter value using DBPRINT */
+#define DBPRINT_TIMEOUT 0
+
+/* Maximum values for the counters before exiting a `while` loop */
+#define TIMEOUT_INIT       20
+#define TIMEOUT_CONVERSION 500 /* 12 bit resolution (reset default) = 750 ms max resolving time */
 
 
 /* Local variable */
@@ -79,6 +81,15 @@ static int32_t convertTempData (uint8_t tempLS, uint8_t tempMS);
  *****************************************************************************/
 int32_t readTempDS18B20 (void)
 {
+	/* Timeout counter */
+	uint16_t counter = 0;
+
+	/* Variable to indicate if a conversion has been completed */
+	bool conversionCompleted = false;
+
+	/* Variable to hold raw data bytes */
+	uint8_t rawDataFromDS18B20Arr[9] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+
 	/* Initialize timer
 	 * Initializing and disabling the timer again adds about 40 µs active time but should conserve sleep energy... */
 	USTIMER_Init();
@@ -86,49 +97,67 @@ int32_t readTempDS18B20 (void)
 	/* Initialize and power VDD pin */
 	powerDS18B20(true);
 
-	/* Raw data bytes */
-	uint8_t rawDataFromDS18B20Arr[9] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+	/* Power-up delay of 5 ms */
+	delay(5);
 
-	/* Read a temperature value (see datasheet) if initialization was successful */
-	if (init_DS18B20())
+	init_DS18B20();           /* Initialize communication */
+	writeByteToDS18B20(0xCC); /* 0xCC = "Skip Rom" (address all devices on the bus simultaneously without sending out any ROM code information) */
+	writeByteToDS18B20(0x44); /* 0x44 = "Convert T" */
+
+	/* MASTER now generates "read time slots", the DS18B20 will write HIGH to the bus if the conversion is completed
+	 *   The datasheet gives the following directions for time slots, but reading bytes also seems to work...
+	 *     - Read time slots have a 60 µs duration and 1 µs recovery between slots
+	 *     - After the master pulls the line low for 1 µs, the data is valid for up to 15 µs */
+	while ((counter < TIMEOUT_CONVERSION) && !conversionCompleted)
 	{
-		writeByteToDS18B20(0xCC); /* 0xCC = "Skip Rom" */
-		writeByteToDS18B20(0x44); /* 0x44 = "Convert T" */
+		uint8_t testByte = readByteFromDS18B20();
+		if (testByte > 0) conversionCompleted = true;
 
-		init_DS18B20();
-
-		writeByteToDS18B20(0xCC); /* 0xCC = "Skip Rom" */
-		writeByteToDS18B20(0xBE); /* 0xCC = "Read Scratchpad" */
-
-		/* Read the bytes */
-		for (uint8_t i = 0; i < 9; i++)
-		{
-			rawDataFromDS18B20Arr[i] = readByteFromDS18B20();
-		}
-
-		/* Disable interrupts and turn off the clock to the underlying hardware timer. */
-		USTIMER_DeInit();
-
-		/* Disable data pin (otherwise we got a "sleep" current of about 330 µA due to the on-board 10k pull-up) */
-		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeDisabled, 0);
-
-		/* Disable the VDD pin */
-		powerDS18B20(false);
-
-		/* Return the converted byte */
-		return (convertTempData(rawDataFromDS18B20Arr[0], rawDataFromDS18B20Arr[1]));
+		counter++;
 	}
+
+	/* Exit the function if the maximum waiting time was reached */
+	if (counter == TIMEOUT_CONVERSION)
+	{
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+		dbcrit("Waiting time for DS18B20 conversion reached!");
+#endif /* DEBUG_DBPRINT */
+
+		error(29);
+
+		return (0);
+
+	}
+#if DBPRINT_TIMEOUT == 1 /* DBPRINT_TIMEOUT */
 	else
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
-		dbcrit("DS18B20 measurement failed");
-#endif /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+		dbwarnInt("DS18B20 conversion (", counter, ")");
+#endif /* DEBUG_DBPRINT */
 
-		error(28);
-
-		return (0);
 	}
+#endif /* DBPRINT_TIMEOUT */
+
+	init_DS18B20();           /* Initialize communication */
+	writeByteToDS18B20(0xCC); /* 0xCC = "Skip Rom" */
+	writeByteToDS18B20(0xBE); /* 0xCC = "Read Scratchpad" */
+
+	/* Read the bytes */
+	for (uint8_t i = 0; i < 9; i++) rawDataFromDS18B20Arr[i] = readByteFromDS18B20();
+
+	/* Disable interrupts and turn off the clock to the underlying hardware timer. */
+	USTIMER_DeInit();
+
+	/* Disable data pin (otherwise we got a "sleep" current of about 330 µA due to the on-board 10k pull-up) */
+	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeDisabled, 0);
+
+	/* Disable the VDD pin */
+	powerDS18B20(false);
+
+	/* Return the converted byte */
+	return (convertTempData(rawDataFromDS18B20Arr[0], rawDataFromDS18B20Arr[1]));
 }
 
 
@@ -171,64 +200,57 @@ static void powerDS18B20 (bool enabled)
 
 /**************************************************************************//**
  * @brief
- *   Initialize (reset) DS18B20.
+ *   Initialize communication to the DS18B20.
  *
  * @note
  *   This is a static method because it's only internally used in this file
  *   and called by other methods if necessary.
  *
  * @return
- *   @li `true` - Initialization (reset) successful.
- *   @li `false` - Initialization (reset) failed.
+ *   @li `true` - *Presence* pulse detected in time.
+ *   @li `false` - No *presence* pulse detected.
  *****************************************************************************/
 static bool init_DS18B20 (void)
 {
+	/* Timeout counter */
 	uint32_t counter = 0;
 
-	/* In the case of gpioModePushPull", the last argument directly sets the pin state */
-	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0);
+	/* MASTER RESET: Pull data line LOW for at least 480 µs (Master TX) */
+	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModePushPull, 0); /* gpioModePushPull: Last argument directly sets the pin state */
 	USTIMER_DelayIntSafe(480);
 
-	/* Change pin-mode to input */
+	/* Change pin-mode to input - External pull-up resistor pulls data line back HIGH */
 	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeInput, 0);
 
-	/* Check if the line becomes HIGH during the maximum waiting time */
-	while (counter++ <= TIMEOUT_COUNTER && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 1)
-	{
-		/* EMU_EnterEM1() was tried to put here but it failed to work... */
-	}
+	/* Check if the line becomes LOW (~ wait while it stays high) during the maximum waiting time
+	 *   The DS18B20 should detect the data line rising due to the pull-up resistor, waits 15 - 50 µs
+	 *    and then pulls the line back LOW (for 60 - 240 µs) to indicate it's PRESENCE */
+	while ((counter < TIMEOUT_INIT) && (GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 1)) counter++;
 
-	//while ((counter < TIMEOUT_COUNTER) && GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 1) counter++; // TODO: This should be the correct logic but doesn't work...
-
-	/* Exit the function if the maximum waiting time was reached (reset failed) */
-	if (counter == TIMEOUT_COUNTER)
+	/* Exit the function if the maximum waiting time was reached */
+	if (counter == TIMEOUT_INIT)
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
-		dbcrit("DS18B20 initialization failed while waiting on HIGH");
-#endif /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+		dbcrit("No DS18B20 presence pulse detected in time!");
+#endif /* DEBUG_DBPRINT */
+
+		error(28);
 
 		return (false);
 	}
-
-	/* Reset counter value */
-	counter = 0;
-
-	/* Check if the line becomes LOW during the maximum waiting time */
-	while ((counter < TIMEOUT_COUNTER) && (GPIO_PinInGet(TEMP_DATA_PORT, TEMP_DATA_PIN) == 0)) counter++;
-
-	/* Exit the function if the maximum waiting time was reached (reset failed) */
-	if (counter == TIMEOUT_COUNTER)
+#if DBPRINT_TIMEOUT == 1 /* DBPRINT_TIMEOUT */
+	else
 	{
 
-#ifdef DEBUGGING /* DEBUGGING */
-		dbcrit("DS18B20 initialization failed while waiting on LOW");
-#endif /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+		dbwarnInt("DS18B20 INIT (", counter, ")");
+#endif /* DEBUG_DBPRINT */
 
-		return (false);
 	}
+#endif /* DBPRINT_TIMEOUT */
 
-	/* Continue waiting and finally return that the reset was successful */
+	/* Master RX should be at least 480 µs */
 	USTIMER_DelayIntSafe(480);
 
 	return (true);
