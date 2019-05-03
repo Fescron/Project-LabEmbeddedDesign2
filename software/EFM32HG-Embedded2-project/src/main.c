@@ -42,28 +42,25 @@
  *   IMPORTANT:
  *     - On INT1-PD7, go to sleep for somehow the remaining RTC time on wakeup?
  *         - On ADXL interrupt the RTC doesn't get disabled!
+ *         - Loop mode & timer @ ADXL? (act/inact time registers)
  *
  * @todo
  *   EXTRA THINGS:
- *     - Add WDOG functionality (see "powertest" example and *Embedded Muse 365*)
- *         - Due to *short* interval: Only when awake?
- *         - Also see `getResetCause`(`system.c` in Dramco example)
- *         - Check all `while` loops (wait for register flags, ...)! (for loops don't pose problems)
- *         - Add `counter` timeout to exit `while` loops in worst case (`timer` timout functionality disabled...)
- *     - Give the sensors time to power up (40 ms? - Dramco)
- *         - ADXL & old temperature sensor
- *     - Test negative temperatures by putting the module in it's case in the freezer...
- *         - LPP logic should be able to handle negative values (`int16_t` as input type for methods & analog: 0.01 signed, temp: 0.1 °C signed MSB)
+ *     - Add information about WDOG in `documentation.h`
+ *         - Check all `while` loops (wait for register flags, ...) and add *exit counters* if necessary! (for loops don't pose problems)
+ *         - see *powertest* example, `getResetCause`(`system.c` in Dramco example) and *Embedded Muse 365*)
+ *         - Due to *short* interval: Only when awake? 9 - 256k cycles, ~ max 256 sec?
+ *     - Test negative temperatures by putting the module in it's case in the freezer ?
+ *     - ADC temperature 2-3 degree's off external one?
+ *     - Add DBPRINT as files instead of global includes.
  *
  * @todo
  *   OPTIMALISATIONS:
  *     - Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
  *         - Also see *AN0007: 2.8 Optimizing Code*
- *     - Change LoRaWAN Spreading Factor
- *     - Add `disableClocks` (see `emodes.c` example) and `disableUnusedPins` functionality.
- *         - EM3: All unwanted oscillators are disabled, don't need to manually disable them before `EMU_EnterEM3`.
- *     - Set the accelerometer in *movement detection* to spare battery life when the buoy isn't installed yet?
- *         - EM4 wakeup? See `deepsleep` (`system.c` in Dramco example)
+ *     - Change LoRaWAN Spreading Factor and send power.
+ *     - Use EM4 wakeup? See `deepsleep` (`system.c` in Dramco example)
+ *     - Try to shorten delays? (for example: 40 ms power-up time for RN2483)
  *
  * ******************************************************************************
  *
@@ -101,11 +98,12 @@
  *     - **14 - 17:** `delay.c`
  *     - **18 - 19:** `interrupt.c`
  *     - **20 - 27:** `ADXL362.c`
- *     - **28:** `DS18B20.c`
+ *     - **28 - 29:** `DS18B20.c`
  *     - **30 - 50:** `lora_wrappers.c`
  *     - **51 - 55:** `leuart.c`
  *
  ******************************************************************************/
+
 
 
 #include <stdint.h>        /* (u)intXX_t */
@@ -117,7 +115,7 @@
 #include "em_rtc.h"        /* Real Time Counter (RTC) */
 
 #include "pin_mapping.h"   /* PORT and PIN definitions */
-#include "debugging.h"     /* Enable or disable printing to UART for debugging */
+#include "debug_dbprint.h" /* Enable or disable printing to UART for debugging */
 #include "delay.h"         /* Delay functionality */
 #include "util.h"          /* Utility functionality */
 #include "interrupt.h"     /* GPIO wake-up initialization and interrupt handlers */
@@ -133,7 +131,7 @@
 /** Time between each wake-up in seconds
  *    @li max 500 seconds when using LFXO delay
  *    @li 3600 seconds (one hour) works fine when using ULFRCO delay */
-#define WAKE_UP_PERIOD_S 10
+#define WAKE_UP_PERIOD_S 600 // 600 = every 10 minutes
 
 /** Amount of PIN interrupt wakeups (before a RTC wakeup) to be considered as a *storm* */
 #define STORM_INTERRUPTS 5
@@ -167,9 +165,9 @@ bool checkBTNinterrupts (void)
 	if (BTN_getTriggered(0))
 	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbprintln_color("PB0 pushed!", 4);
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		value = true;
 
@@ -180,9 +178,9 @@ bool checkBTNinterrupts (void)
 	if (BTN_getTriggered(1))
 	{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbprintln_color("PB1 pushed!", 4);
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		value = true;
 
@@ -199,9 +197,6 @@ bool checkBTNinterrupts (void)
  *****************************************************************************/
 int main (void)
 {
-	/* Keep the amount of times a message has been send to indicate the cable is broken */
-	uint8_t cableBrokenSendTimes = 0;
-
 	/* Keep a value if a storm has been detected */
 	bool stormDetected = false;
 
@@ -219,7 +214,7 @@ int main (void)
 			{
 				CHIP_Init(); /* Initialize chip */
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 #if CUSTOM_BOARD == 1 /* Custom Happy Gecko pinout */
 				dbprint_INIT(DBG_UART, DBG_UART_LOC, false, false);
 				dbwarn("CUSTOM board pinout selected");
@@ -228,9 +223,11 @@ int main (void)
 				dbwarn("REGULAR board pinout selected");
 				//dbprint_INIT(USART1, 0, false, false); /* US1_TX = PC0 */
 #endif /* Board pinout selection */
-#endif /* DEBUGGING */
+#endif  /* DEBUG_DBPRINT */
 
 				led(true); /* Enable (and initialize) LED */
+
+				delay(2000); /* 2 second delay to notice initialization */
 
 				initGPIOwakeup(); /* Initialize GPIO wake-up */
 
@@ -263,7 +260,7 @@ int main (void)
 
 					ADXL_configRange(ADXL_RANGE_8G); /* Set the measurement range */
 
-					ADXL_configODR(ADXL_ODR_12_5); /* Configure ODR */
+					ADXL_configODR(ADXL_ODR_12_5_HZ); /* Configure ODR */
 
 					//ADXL_readValues(); /* Read and display values forever */
 
@@ -284,9 +281,9 @@ int main (void)
 				//GPIO_PinOutSet(gpioPortC, 0); /* Debug pin */
 				//GPIO_PinOutClear(gpioPortC, 0); /* Debug pin */
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 				dbprintln("");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 				led(false); /* Disable LED */
 
@@ -309,58 +306,23 @@ int main (void)
 				/* Measure and store the internal temperature */
 				data.intTemp[data.index] = readADC(INTERNAL_TEMPERATURE);
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 				dbinfoInt("Measurement ", data.index + 1, "");
 				dbinfoInt("Temperature: ", data.extTemp[data.index], "");
 				dbinfoInt("Battery voltage: ", data.voltage[data.index], "");
 				dbinfoInt("Internal temperature: ", data.intTemp[data.index], "");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
-				/* Check if the cable is broken */
-				if (!checkCable())
-				{
-					/* Only send a message 4 times */
-					if (cableBrokenSendTimes < 4)
-					{
-
-#if DEBUGGING == 1 /* DEBUGGING */
-						dbcrit("Cable broken! Sending the data ...");
-#endif /* DEBUGGING */
-
-						initLoRaWAN(); /* Initialize LoRaWAN functionality */
-
-						sendCableBroken(true); /* Send the LoRaWAN message TODO: also send measurement data here? */
-
-						disableLoRaWAN(); /* Disable RN2483 */
-
-						cableBrokenSendTimes++; /* Increment the counter */
-					}
-					else
-					{
-
-#if DEBUGGING == 1 /* DEBUGGING */
-						dbcrit("Cable broken but no longer sending the data");
-#endif /* DEBUGGING */
-
-					}
-				}
-				else
-				{
-
-#if DEBUGGING == 1 /* DEBUGGING */
-					dbinfo("Cable still intact");
-#endif /* DEBUGGING */
-
-				}
+				checkCable(); /* Check if the cable is intact and send LoRaWAN message if necessary */
 
 				data.index++; /* Increase the index to put the next measurements in */
 
 				if (!tested)
 				{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 					dbwarn("Sending test LPP data once ...");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 					initLoRaWAN(); /* Initialize LoRaWAN functionality */
 
@@ -387,9 +349,9 @@ int main (void)
 				led(true); /* Enable LED */
 #endif /* LED_ENABLED */
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 				dbwarnInt("Sending ", data.index, " measurements ...");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 				//wakeLoRaWAN(); /* Wake up the LoRaWAN module */
 
@@ -417,18 +379,17 @@ int main (void)
 				led(true); /* Enable LED */
 #endif /* LED_ENABLED */
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 				dbwarnInt("STORM DETECTED! Sending ", data.index, " measurement(s) ...");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 				//wakeLoRaWAN(); /* Wake up the LoRaWAN module */
 
 				initLoRaWAN(); /* Initialize LoRaWAN functionality */
 
-				// TODO: reset this value again?
 				sendStormDetected(true); /* Send a message to indicate that a storm has been detected */
 
-				sendMeasurements(data); /* Send the measurements */
+				if (data.index > 0) sendMeasurements(data); /* Send the already gathered measurements */
 
 				disableLoRaWAN(); /* Disable RN2483 */
 
@@ -474,6 +435,7 @@ int main (void)
 				/* Check if we woke up using buttons */
 				if (checkBTNinterrupts())
 				{
+					ADXL_clearCounter(); /* Clear the trigger counter */
 					MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
 				}
 				else
@@ -501,9 +463,9 @@ int main (void)
 						else
 						{
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 							dbprintln_color("INT-PD7 triggered!", 4);
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 							ADXL_enableSPI(true);  /* Enable SPI functionality */
 							ADXL_ackInterrupt();   /* Acknowledge ADXL interrupt by reading the status register */
