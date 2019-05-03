@@ -14,13 +14,12 @@
  *   @li v1.1: Modified a lot of code, implemented custom LPP data type methods.
  *   @li v1.2: Updated code to use new functionality to add data to the LPP packet.
  *   @li v1.3: Added method to use deprecated methods to test if data gets send correctly.
- *   @li v1.4: Changed error numbering.
+ *   @li v1.4: Changed error numbering and removed unnecessary variables and definitions.
  *
  *   @todo
  *     - Save LoRaWAN settings before calling `disableLoRaWAN`?
  *         - Should be possible in ABP (saving to EEPROM? `saveMAC`?) See reference manual!
  *     - Fix `sleepLoRaWAN` and `wakeLoRaWAN` methods.
- *     - Remove unnecessary defines/variables.
  *
  ******************************************************************************/
 
@@ -41,17 +40,7 @@
 #include "util.h"          /* Utility functionality */
 
 
-/* Local definitions TODO: remove? */
-#define A_SECOND 1000
-#define A_MINUTE 60000
-#define A_HOUR 3600000
-
-
-/* Local variable TODO: remove? */
-volatile bool wakeUp;
-
-
-/* Application variables */
+/* Local (application) variables */
 static LoRaSettings_t loraSettings = LORA_INIT_MY_DEVICE;
 static LoRaStatus_t loraStatus;
 static LPP_Buffer_t appData;
@@ -95,8 +84,9 @@ void disableLoRaWAN (void)
  *****************************************************************************/
 void sleepLoRaWAN (uint32_t sSleep)
 {
-	wakeUp = false;
-	LoRa_Sleep((A_SECOND*sSleep), &wakeUp);
+	bool wakeUp = false;
+	LoRa_Sleep((1000*sSleep), &wakeUp); /* "wakeUp" is not used in underlying method */
+
 }
 
 
