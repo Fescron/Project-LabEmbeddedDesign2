@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.h
  * @brief All code for the ADXL362 accelerometer.
- * @version 2.4
+ * @version 2.5
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -27,12 +27,12 @@ typedef enum adxl_range
 /** Enum type for the ODR */
 typedef enum adxl_odr
 {
-	ADXL_ODR_12_5, /* 12.5 Hz */
-	ADXL_ODR_25,   /* 25 Hz */
-	ADXL_ODR_50,   /* 50 Hz */
-	ADXL_ODR_100,  /* 100 Hz (reset default) */
-	ADXL_ODR_200,  /* 200 Hz */
-	ADXL_ODR_400   /* 400 Hz */
+	ADXL_ODR_12_5_HZ, /* 12.5 Hz */
+	ADXL_ODR_25_HZ,   /* 25 Hz */
+	ADXL_ODR_50_HZ,   /* 50 Hz */
+	ADXL_ODR_100_HZ,  /* 100 Hz (reset default) */
+	ADXL_ODR_200_HZ,  /* 200 Hz */
+	ADXL_ODR_400_HZ   /* 400 Hz */
 } ADXL_ODR_t;
 
 
