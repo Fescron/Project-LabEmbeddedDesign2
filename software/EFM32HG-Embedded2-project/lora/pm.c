@@ -34,11 +34,11 @@ void PM_Enable(PM_SubSystem_t pmss){
 	switch(pmss){
 		case PM_SENS_GECKO: {
 			//GPIO_PinOutSet(PM_SENS_GECKO_PORT, PM_SENS_GECKO_PIN);
-			//DelayMs(40); // give sensor time to power up
+			//DelayMs(40); /* Give sensor time to power up */
 		} break;
 		case PM_SENS_EXT: {
 			GPIO_PinOutSet(PM_SENS_EXT_PORT, PM_SENS_EXT_PIN);
-			delay(40); // give sensor time to power up
+			delay(40); /* Give sensor time to power up */
 		} break;
 		case PM_RN2483: {
 			GPIO_PinOutSet(PM_RN2483_PORT, PM_RN2483_PIN);
@@ -46,7 +46,7 @@ void PM_Enable(PM_SubSystem_t pmss){
 		case PM_ALL: {
 			//GPIO_PinOutSet(PM_SENS_GECKO_PORT, PM_SENS_GECKO_PIN);
 			GPIO_PinOutSet(PM_SENS_EXT_PORT, PM_SENS_EXT_PIN);
-			delay(40); // give sensor time to power up
+			delay(40); /* Give sensor time to power up */
 			GPIO_PinOutSet(PM_RN2483_PORT, PM_RN2483_PIN);
 		} break;
 		default: {
