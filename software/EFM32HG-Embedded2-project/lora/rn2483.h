@@ -20,13 +20,8 @@
 #ifndef _RN2483_H_
 #define _RN2483_H_
 
-//#include "em_device.h"
-//#include "em_chip.h"
-//#include "em_cmu.h"
-//#include "em_emu.h"
-//#include "em_usart.h"
 #include <stdint.h> /* (u)intXX_t */
-#include "lora.h"  /* LoRa functionality */
+#include "lora.h"   /* LoRa functionality */
 
 #define RN2483_COMMANDBUFFER_SIZE 80
 #define RN2483_POWER_14DBM 1

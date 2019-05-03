@@ -69,12 +69,12 @@
 #define LPP_PRESSURE_CHANNEL		0x06
 
 /* Custom channel ID's */
-#define LPP_VBAT_CHANNEL            0x10
-#define LPP_TEMPERATURE_CHANNEL_INT 0x11
-#define LPP_TEMPERATURE_CHANNEL_EXT 0x12
-#define LPP_STORM_CHANNEL           0x13
-#define LPP_CABLE_BROKEN_CHANNEL    0x14
-#define LPP_STATUS_CHANNEL          0x15
+#define LPP_VBAT_CHANNEL            0x10 /* 16 */
+#define LPP_TEMPERATURE_CHANNEL_INT 0x11 /* 17 */
+#define LPP_TEMPERATURE_CHANNEL_EXT 0x12 /* 18 */
+#define LPP_STORM_CHANNEL           0x13 /* 19 */
+#define LPP_CABLE_BROKEN_CHANNEL    0x14 /* 20 */
+#define LPP_STATUS_CHANNEL          0x15 /* 21 */
 
 bool LPP_InitBuffer(LPP_Buffer_t *b, uint8_t size)
 {
@@ -233,7 +233,7 @@ bool LPP_AddStormDetected (LPP_Buffer_t *b, uint8_t stormDetected)
 	if (space < LPP_DIGITAL_INPUT_SIZE + 1) return (false); /* "+1": One extra byte for the amount of measurements */
 
 	/* Fill the first byte with the amount of measurements (in this case always one) */
-	b->buffer[b->fill++] = 1;
+	b->buffer[b->fill++] = 0x01;
 
 	/* Fill the next bytes following the default LPP packet convention */
 	b->buffer[b->fill++] = LPP_STORM_CHANNEL;
@@ -276,7 +276,7 @@ bool LPP_AddCableBroken (LPP_Buffer_t *b, uint8_t cableBroken)
 	if (space < LPP_DIGITAL_INPUT_SIZE + 1) return (false); /* "+1": One extra byte for the amount of measurements */
 
 	/* Fill the first byte with the amount of measurements (in this case always one) */
-	b->buffer[b->fill++] = 1;
+	b->buffer[b->fill++] = 0x01;
 
 	/* Fill the next bytes following the default LPP packet convention */
 	b->buffer[b->fill++] = LPP_CABLE_BROKEN_CHANNEL;
@@ -319,7 +319,7 @@ bool LPP_AddStatus (LPP_Buffer_t *b, uint8_t status)
 	if (space < LPP_DIGITAL_INPUT_SIZE + 1) return (false); /* "+1": One extra byte for the amount of measurements */
 
 	/* Fill the first byte with the amount of measurements (in this case always one) */
-	b->buffer[b->fill++] = 1;
+	b->buffer[b->fill++] = 0x01;
 
 	/* Fill the next bytes following the default LPP packet convention */
 	b->buffer[b->fill++] = LPP_STATUS_CHANNEL;

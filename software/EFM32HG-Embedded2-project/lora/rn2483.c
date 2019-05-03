@@ -47,17 +47,17 @@ static RN2483_Status_t RN2483_ProcessMacCommand(char * receiveBuffer, uint8_t bu
 		return (RN_TX_TIMEOUT);
 	}
 
-	// read first response
+	/* Read first response */
 	Leuart_ReadResponse(receiveBuffer, bufferSize);
 
-	// analyze response
+	/* Analyze response */
 	if(StringStartsWith(receiveBuffer, "ok")){
 		if(secondResponse){
-			// wait for second response
+			/* Wait for second response */
 			Leuart_WaitForResponse(receiveBuffer, bufferSize);
-			// read second response
+			/* Read second response */
 			Leuart_ReadResponse(receiveBuffer, bufferSize);
-			// analyze response
+			/* Analyze response */
 			if(StringStartsWith(receiveBuffer, "accepted")){
 				return (JOIN_ACCEPTED);
 			} else if(StringStartsWith(receiveBuffer, "denied")){
@@ -107,10 +107,10 @@ static RN2483_Status_t RN2483_ProcessSleepCommand(char * receiveBuffer, uint8_t 
 		return (RN_TX_TIMEOUT);
 	}
 
-	// read first response
+	/* Read first response */
 	Leuart_ReadResponse(receiveBuffer, bufferSize);
 
-	// analyze response
+	/* Analyze response */
 	if(StringStartsWith(receiveBuffer, "ok")){
 		return (MAC_OK);
 	} else if(StringStartsWith(receiveBuffer, "invalid_param")){
@@ -120,7 +120,7 @@ static RN2483_Status_t RN2483_ProcessSleepCommand(char * receiveBuffer, uint8_t 
 	return (UNKOWN_ERR);
 }
 
-void RN2483_Init(void){ // Setup with autobaud
+void RN2483_Init(void){ /* Setup with autobaud */
 	GPIO_PinModeSet(RN2483_TX_PORT, RN2483_TX_PIN, gpioModePushPull, 1);
 	delay(100);
 	GPIO_PinModeSet(RN2483_RESET_PORT, RN2483_RESET_PIN, gpioModePushPull, 1);
@@ -212,9 +212,9 @@ RN2483_Status_t RN2483_GetDataRate(int8_t *dr, char * receiveBuffer, uint8_t buf
 		return (status);
 	}
 
-	// convert ascii to unsigned
+	/* Convert ascii to unsigned */
 	*dr = receiveBuffer[0] - '0';
-	// final data check
+	/* Final data check */
 	if(*dr >= 0 && *dr <= 7){
 		return (MAC_OK);
 	}
@@ -375,9 +375,9 @@ RN2483_Status_t RN2483_Sleep(uint32_t sleepTime, volatile bool * wakeUp, char * 
 RN2483_Status_t RN2483_Wake(char * receiveBuffer, uint8_t bufferSize){
 	Leuart_Reinit();
 
-	// capture response "ok" from previous sleep command
+	/* Capture response "ok" from previous sleep command */
 	Leuart_WaitForResponse();
-	// read second response
+	/* Read second response */
 	Leuart_ReadResponse(receiveBuffer, bufferSize);
 	if(StringStartsWith(receiveBuffer, "ok")){
 		return (MAC_OK);

@@ -18,15 +18,15 @@
  */
 
 
-#include "lora.h"        /* Corresponding header file */
+#include "lora.h"          /* Corresponding header file */
 
-#include "lpp.h"         /* LPP_Buffer_t definition */
-#include "pm.h"          /* PM_Enable */
-#include "rn2483.h"      /* RN2483_xxxx */
+#include "lpp.h"           /* LPP_Buffer_t definition */
+#include "pm.h"            /* PM_Enable */
+#include "rn2483.h"        /* RN2483_xxxx */
 
-#include "delay.h"       /* Delay functionality */
-#include "pin_mapping.h" /* PORT and PIN definitions */
-#include "debugging.h"   /* Enable or disable printing to UART for debugging */
+#include "delay.h"         /* Delay functionality */
+#include "pin_mapping.h"   /* PORT and PIN definitions */
+#include "debug_dbprint.h" /* Enable or disable printing to UART for debugging */
 
 
 #define LORA_BUFFERSIZE		64
@@ -46,9 +46,9 @@ LoRaStatus_t LoRa_Init(LoRaSettings_t init){
 		}
 		retries++;
 
-#if DEBUGGING == 1 /* DEBUGGING */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbwarnInt("Retry join in 5 seconds (LoRa_Init) (", retries, ")\n\r");
-#endif /* DEBUGGING */
+#endif /* DEBUG_DBPRINT */
 
 		delay(5000);
 	}
@@ -59,7 +59,7 @@ LoRaStatus_t LoRa_Init(LoRaSettings_t init){
 }
 
 LoRaStatus_t LoRa_SendLppBuffer(LPP_Buffer_t b, bool ackNoAck){
-	if(ackNoAck == LORA_CONFIRMED){ // not tested yet !!
+	if(ackNoAck == LORA_CONFIRMED){ // Not tested yet !!
 		if(RN2483_TransmitConfirmed(b.buffer, b.fill, loraReceiveBuffer, LORA_BUFFERSIZE) != MAC_RX){
 			return (ERROR);
 		}
