@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 2.4
+ * @version 2.6
  * @author
  *   Alec Vanderhaegen & Sarah Goossens@n
  *   Modified by Brecht Van Eeckhoudt
@@ -27,6 +27,8 @@
  *   @li v2.2: Changed error numbering, moved definition from header to source file and updated header file include.
  *   @li v2.3: Changed *timeout* variable and changed types to `int32_t`.
  *   @li v2.4: Fixed temperature measurement and refined timeout functionality.
+ *   @li v2.5: Updated documentation.
+ *   @li v2.6: Updated code to don't execute code further if the first initialization failed.
  *
  ******************************************************************************/
 
@@ -70,11 +72,10 @@ static int32_t convertTempData (uint8_t tempLS, uint8_t tempMS);
  *   Get a temperature value from the DS18B20.
  *
  * @details
- *   A measurement takes about 23 ms if successful, about 60 ms if no sensor is attached.
  *   USTimer gets initialized, the sensor gets powered, the data-transmission
  *   takes place, the timer gets de-initialized to disable the clocks and interrupts,
- *   the data and power pin get disabled and finally the read values are converted to a
- *   float value.
+ *   the data and power pin get disabled and finally the read values are converted
+ *   to an `int32_t` value.
  *
  * @return
  *   The read temperature data.
@@ -100,64 +101,72 @@ int32_t readTempDS18B20 (void)
 	/* Power-up delay of 5 ms */
 	delay(5);
 
-	init_DS18B20();           /* Initialize communication */
-	writeByteToDS18B20(0xCC); /* 0xCC = "Skip Rom" (address all devices on the bus simultaneously without sending out any ROM code information) */
-	writeByteToDS18B20(0x44); /* 0x44 = "Convert T" */
-
-	/* MASTER now generates "read time slots", the DS18B20 will write HIGH to the bus if the conversion is completed
-	 *   The datasheet gives the following directions for time slots, but reading bytes also seems to work...
-	 *     - Read time slots have a 60 µs duration and 1 µs recovery between slots
-	 *     - After the master pulls the line low for 1 µs, the data is valid for up to 15 µs */
-	while ((counter < TIMEOUT_CONVERSION) && !conversionCompleted)
+	/* Initialize communication and only continue if successful */
+	if (init_DS18B20())
 	{
-		uint8_t testByte = readByteFromDS18B20();
-		if (testByte > 0) conversionCompleted = true;
+		writeByteToDS18B20(0xCC); /* 0xCC = "Skip Rom" (address all devices on the bus simultaneously without sending out any ROM code information) */
+		writeByteToDS18B20(0x44); /* 0x44 = "Convert T" */
 
-		counter++;
-	}
+		/* MASTER now generates "read time slots", the DS18B20 will write HIGH to the bus if the conversion is completed
+		 *   The datasheet gives the following directions for time slots, but reading bytes also seems to work...
+		 *     - Read time slots have a 60 µs duration and 1 µs recovery between slots
+		 *     - After the master pulls the line low for 1 µs, the data is valid for up to 15 µs */
+		while ((counter < TIMEOUT_CONVERSION) && !conversionCompleted)
+		{
+			uint8_t testByte = readByteFromDS18B20();
+			if (testByte > 0) conversionCompleted = true;
 
-	/* Exit the function if the maximum waiting time was reached */
-	if (counter == TIMEOUT_CONVERSION)
-	{
+			counter++;
+		}
+
+		/* Exit the function if the maximum waiting time was reached */
+		if (counter == TIMEOUT_CONVERSION)
+		{
 
 #if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
-		dbcrit("Waiting time for DS18B20 conversion reached!");
+			dbcrit("Waiting time for DS18B20 conversion reached!");
 #endif /* DEBUG_DBPRINT */
 
-		error(29);
+			error(29);
 
-		return (0);
+			return (0);
 
-	}
+		}
 #if DBPRINT_TIMEOUT == 1 /* DBPRINT_TIMEOUT */
-	else
-	{
+		else
+		{
 
 #if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
-		dbwarnInt("DS18B20 conversion (", counter, ")");
+			dbwarnInt("DS18B20 conversion (", counter, ")");
 #endif /* DEBUG_DBPRINT */
 
-	}
+		}
 #endif /* DBPRINT_TIMEOUT */
 
-	init_DS18B20();           /* Initialize communication */
-	writeByteToDS18B20(0xCC); /* 0xCC = "Skip Rom" */
-	writeByteToDS18B20(0xBE); /* 0xCC = "Read Scratchpad" */
+		init_DS18B20();           /* Initialize communication */
+		writeByteToDS18B20(0xCC); /* 0xCC = "Skip Rom" */
+		writeByteToDS18B20(0xBE); /* 0xCC = "Read Scratchpad" */
 
-	/* Read the bytes */
-	for (uint8_t i = 0; i < 9; i++) rawDataFromDS18B20Arr[i] = readByteFromDS18B20();
+		/* Read the bytes */
+		for (uint8_t i = 0; i < 9; i++) rawDataFromDS18B20Arr[i] = readByteFromDS18B20();
 
-	/* Disable interrupts and turn off the clock to the underlying hardware timer. */
-	USTIMER_DeInit();
+		/* Disable interrupts and turn off the clock to the underlying hardware timer. */
+		USTIMER_DeInit();
 
-	/* Disable data pin (otherwise we got a "sleep" current of about 330 µA due to the on-board 10k pull-up) */
-	GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeDisabled, 0);
+		/* Disable data pin (otherwise we got a "sleep" current of about 330 µA due to the on-board 10k pull-up) */
+		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeDisabled, 0);
 
-	/* Disable the VDD pin */
-	powerDS18B20(false);
+		/* Disable the VDD pin */
+		powerDS18B20(false);
 
-	/* Return the converted byte */
-	return (convertTempData(rawDataFromDS18B20Arr[0], rawDataFromDS18B20Arr[1]));
+		/* Return the converted byte */
+		return (convertTempData(rawDataFromDS18B20Arr[0], rawDataFromDS18B20Arr[1]));
+	}
+	else
+	{
+		return (0);
+	}
+
 }
 
 
