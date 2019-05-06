@@ -19,7 +19,7 @@
 /** Public definition to enable/disable the logic to send certain error call values (everything except 30 - 50) to the cloud using LoRaWAN.
  *    @li `0` - Keep the MCU in a `while(true)` loop if the `error` method is called while flashing the LED and displaying a UART message.
  *    @li `1` - Display a UART message when the `error` method is called but also forward the number to the cloud using LoRaWAN. Don't go in a `while(true)` loop.  */
-#define ERROR_FORWARDING 0
+#define ERROR_FORWARDING 1
 
 
 /* Public prototypes */
