@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lora_wrappers.c
  * @brief LoRa wrapper methods
- * @version 1.4
+ * @version 1.6
  * @author
  *   Benjamin Van der Smissen@n
  *   Heavily modified by Brecht Van Eeckhoudt
@@ -15,6 +15,8 @@
  *   @li v1.2: Updated code to use new functionality to add data to the LPP packet.
  *   @li v1.3: Added method to use deprecated methods to test if data gets send correctly.
  *   @li v1.4: Changed error numbering and removed unnecessary variables and definitions.
+ *   @li v1.5: Moved `data.index` reset to LoRaWAN sending functionality.
+ *   @li v1.6: Moved `data.index` reset back to `main.c` because it doesn't affect the correct variable here.
  *
  *   @todo
  *     - Save LoRaWAN settings before calling `disableLoRaWAN`?

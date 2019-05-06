@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 3.2
+ * @version 3.3
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -35,6 +35,8 @@
  *   @li v3.0: Started using updated LoRaWAN send methods.
  *   @li v3.1: Added functionality to enable/disable the LED blinking when measuring/sending data.
  *   @li v3.2: Fixed button wakeup when sleeping for WAKE_UP_PERIOD_S/2.
+ *   @li v3.3: Moved `data.index` reset to LoRaWAN sending functionality and updated documentation.
+ *   @li v3.4: Moved `data.index` reset back to `main.c`.
  *
  * ******************************************************************************
  *
@@ -102,8 +104,18 @@
  *     - **30 - 50:** `lora_wrappers.c`
  *     - **51 - 55:** `leuart.c`
  *
+ * ******************************************************************************
+ *
+ * @section CHANNELS LoRaWAN sensor channels
+ *
+ *   - `LPP_VBAT_CHANNEL            0x10 // 16`
+ *   - `LPP_TEMPERATURE_CHANNEL_INT 0x11 // 17`
+ *   - `LPP_TEMPERATURE_CHANNEL_EXT 0x12 // 18`
+ *   - `LPP_STORM_CHANNEL           0x13 // 19`
+ *   - `LPP_CABLE_BROKEN_CHANNEL    0x14 // 20`
+ *   - `LPP_STATUS_CHANNEL          0x15 // 21`
+ *
  ******************************************************************************/
-
 
 
 #include <stdint.h>        /* (u)intXX_t */
@@ -131,15 +143,15 @@
 /** Time between each wake-up in seconds
  *    @li max 500 seconds when using LFXO delay
  *    @li 3600 seconds (one hour) works fine when using ULFRCO delay */
-#define WAKE_UP_PERIOD_S 600 // 600 = every 10 minutes
+#define WAKE_UP_PERIOD_S 3600 // 600 = every 10 minutes
 
 /** Amount of PIN interrupt wakeups (before a RTC wakeup) to be considered as a *storm* */
-#define STORM_INTERRUPTS 5
+#define STORM_INTERRUPTS 6
 
 /** Public definition to select if the LED is turned on while measuring or sending data
  *    @li `1` - Enable the LED when while measuring or sending data.
  *    @li `0` - Don't enable the LED while measuring or sending data. */
-#define LED_ENABLED 1
+#define LED_ENABLED 0
 
 
 /* Local variables */
@@ -200,8 +212,8 @@ int main (void)
 	/* Keep a value if a storm has been detected */
 	bool stormDetected = false;
 
-	/* Keep a value to send one test LoRaWAN message */
-	bool tested = true; // TODO: remove later (true: disable sending the message on first boot)
+	/* Keep a value to send one test LoRaWAN message after booting */
+	bool firstBoot = true;
 
 	/* Set the index to put the measurements in */
 	data.index = 0;
@@ -227,7 +239,10 @@ int main (void)
 
 				led(true); /* Enable (and initialize) LED */
 
-				delay(2000); /* 2 second delay to notice initialization */
+				delay(4000); /* 4 second delay to notice initialization */
+				led(false); /* Disable LED */
+				delay(100);
+				led(true); /* Enable LED */
 
 				initGPIOwakeup(); /* Initialize GPIO wake-up */
 
@@ -297,7 +312,7 @@ int main (void)
 				led(true); /* Enable LED */
 #endif /* LED_ENABLED */
 
-				/* Measure and store the external temperature (a measurement takes about 23 ms if successful, about 60 ms if no sensor is attached)*/
+				/* Measure and store the external temperature */
 				data.extTemp[data.index] = readTempDS18B20();
 
 				/* Measure and store the battery voltage */
@@ -317,20 +332,22 @@ int main (void)
 
 				data.index++; /* Increase the index to put the next measurements in */
 
-				if (!tested)
+				if (firstBoot)
 				{
 
 #if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
-					dbwarn("Sending test LPP data once ...");
+					dbwarn("Sending first measurements ...");
 #endif /* DEBUG_DBPRINT */
 
 					initLoRaWAN(); /* Initialize LoRaWAN functionality */
 
-					sendTest(data); /* Send the LoRaWAN test message */
+					sendMeasurements(data); /* Send the measurements */
+
+					data.index = 0; /* Reset the index to put the measurements in (needs to be here for the correct data to be affected) */
 
 					disableLoRaWAN(); /* Disable RN2483 */
 
-					tested = true;
+					firstBoot = false;
 				}
 
 #if LED_ENABLED == 1 /* LED_ENABLED */
@@ -359,11 +376,11 @@ int main (void)
 
 				sendMeasurements(data); /* Send the measurements */
 
+				data.index = 0; /* Reset the index to put the measurements in (needs to be here for the correct data to be affected) */
+
 				disableLoRaWAN(); /* Disable RN2483 */
 
 				//sleepLoRaWAN(WAKE_UP_PERIOD_S); /* Put the LoRaWAN module back to sleep */
-
-				data.index = 0; /* Reset the index to put the measurements in */
 
 #if LED_ENABLED == 1 /* LED_ENABLED */
 				led(false); /* Disable LED */
@@ -389,13 +406,16 @@ int main (void)
 
 				sendStormDetected(true); /* Send a message to indicate that a storm has been detected */
 
-				if (data.index > 0) sendMeasurements(data); /* Send the already gathered measurements */
+				if (data.index > 0)
+				{
+					sendMeasurements(data); /* Send the already gathered measurements */
+
+					data.index = 0; /* Reset the index to put the measurements in (needs to be here for the correct data to be affected) */
+				}
 
 				disableLoRaWAN(); /* Disable RN2483 */
 
 				//sleepLoRaWAN(WAKE_UP_PERIOD_S); /* Put the LoRaWAN module back to sleep */
-
-				data.index = 0; /* Reset the index to put the measurements in */
 
 				stormDetected = true; /* Indicate that a storm has been detected */
 
@@ -438,50 +458,48 @@ int main (void)
 					ADXL_clearCounter(); /* Clear the trigger counter */
 					MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
 				}
-				else
+
+				/* Check if we woke up using the RTC sleep functionality and act accordingly */
+				if (RTC_checkWakeup())
 				{
-					/* Check if we woke up using the RTC sleep functionality and act accordingly */
-					if (RTC_checkWakeup())
+					RTC_clearWakeup(); /* Clear static variable */
+
+					ADXL_clearCounter(); /* Clear the trigger counter because we woke up "normally" */
+
+					MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
+				}
+
+				/* Check if we woke up using the accelerometer */
+				if (ADXL_getTriggered())
+				{
+					/* Check if we detected a storm */
+					if (ADXL_getCounter() > STORM_INTERRUPTS)
 					{
-						RTC_clearWakeup(); /* Clear static variable */
+						RTC_Enable(false); /* Disable the counter */
 
-						ADXL_clearCounter(); /* Clear the trigger counter because we woke up "normally" */
-
-						MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
+						MCUstate = SEND_STORM; /* Storm detected, send a message on "case WAKEUP" exit */
 					}
-
-					/* Check if we woke up using the accelerometer */
-					if (ADXL_getTriggered())
+					else
 					{
-						/* Check if we detected a storm */
-						if (ADXL_getCounter() > STORM_INTERRUPTS)
-						{
-							RTC_Enable(false); /* Disable the counter */
 
-							MCUstate = SEND_STORM; /* Storm detected, send a message on "case WAKEUP" exit */
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+						dbprintln_color("INT-PD7 triggered!", 4);
+#endif /* DEBUG_DBPRINT */
+
+						ADXL_enableSPI(true);  /* Enable SPI functionality */
+						ADXL_ackInterrupt();   /* Acknowledge ADXL interrupt by reading the status register */
+						ADXL_enableSPI(false); /* Disable SPI functionality */
+
+						/* Check if a storm was detected before going to sleep for WAKE_UP_PERIOD_S/2 */
+						if (stormDetected)
+						{
+							stormDetected = false; /* Reset variable */
+							MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
 						}
 						else
 						{
-
-#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
-							dbprintln_color("INT-PD7 triggered!", 4);
-#endif /* DEBUG_DBPRINT */
-
-							ADXL_enableSPI(true);  /* Enable SPI functionality */
-							ADXL_ackInterrupt();   /* Acknowledge ADXL interrupt by reading the status register */
-							ADXL_enableSPI(false); /* Disable SPI functionality */
-
-							/* Check if a storm was detected before going to sleep for WAKE_UP_PERIOD_S/2 */
-							if (stormDetected)
-							{
-								stormDetected = false; /* Reset variable */
-								MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
-							}
-							else
-							{
-								/* Go back to sleep, we only take measurements on RTC/button wakeup */
-								MCUstate = SLEEP; /* TODO: go to sleep for somehow the remaining RTC time on wakeup? */
-							}
+							/* Go back to sleep, we only take measurements on RTC/button wakeup */
+							MCUstate = SLEEP; /* TODO: go to sleep for somehow the remaining RTC time on wakeup? */
 						}
 					}
 				}
