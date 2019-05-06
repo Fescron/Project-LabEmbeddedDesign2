@@ -18,7 +18,7 @@
 /** Public definition to enable/disable UART debugging
  *    @li `1` - Enable the UART debugging statements.
  *    @li `0` - Remove all UART debugging statements from the uploaded code. */
-#define DEBUG_DBPRINT 1
+#define DEBUG_DBPRINT 0
 
 
 #if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
