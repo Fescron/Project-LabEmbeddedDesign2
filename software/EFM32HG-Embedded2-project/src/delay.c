@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.c
  * @brief Delay functionality.
- * @version 2.4
+ * @version 3.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -24,15 +24,39 @@
  *   @li v2.2: Removed some clock disabling statements.
  *   @li v2.3: Changed error numbering.
  *   @li v2.4: Moved definitions from header to source file.
+ *   @li v2.5: Added functionality to the time spend sleeping.
+ *   @li v3.0: Disabled peripheral clock before entering an `error` function, added
+ *             functionality to exit methods after `error` call and updated version number.
  *
- *   @todo
- *     - Split definition to use the ULFRCO for the delay and sleep method?
- *         - Try to fix sleep/wakeup functions for LoRaWAN functionality?
- *         - If so, also update documentation!
+ * ******************************************************************************
+ *
+ * @todo
+ *   **Future improvements:**@n
+ *     - Split definition to use the `ULFRCO` for the *delay* and *sleep* method separately.
+ *         - This isn't that easy because of the common INIT method.
+ *         - Don't forget to update `documentation.h` if this functionality is changed.
+ *     - Enable/disable clock functionality? (see comments using `//`)
  *
  * ******************************************************************************
  *
  * @section License
+ *
+ *   **Copyright (C) 2019 - Brecht Van Eeckhoudt**
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the **GNU General Public License** as published by
+ *   the Free Software Foundation, either **version 3** of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   *A copy of the GNU General Public License can be found in the `LICENSE`
+ *   file along with this source code.*
+ *
+ *   @n
  *
  *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
  *   These sections are licensed under the Silabs License Agreement. See the file
@@ -159,7 +183,13 @@ void delay (uint32_t msDelay)
 		dbcrit("Delay too long, can't fit in the field!");
 #endif /* DEBUG_DBPRINT */
 
+		/* Turn off the RTC clock */
+		CMU_ClockEnable(cmuClock_RTC, false);
+
 		error(14);
+
+		/* Exit function */
+		return;
 	}
 
 #else /* LFXO selected */
@@ -172,7 +202,13 @@ void delay (uint32_t msDelay)
 		dbcrit("Delay too long, can't fit in the field!");
 #endif /* DEBUG_DBPRINT */
 
+		/* Turn off the RTC clock */
+		CMU_ClockEnable(cmuClock_RTC, false);
+
 		error(15);
+
+		/* Exit function */
+		return;
 	}
 
 #endif /* ULFRCO/LFXO selection */
@@ -275,7 +311,13 @@ void sleep (uint32_t sSleep)
 		dbcrit("Delay too long, can't fit in the field!");
 #endif /* DEBUG_DBPRINT */
 
+		/* Turn off the RTC clock */
+		CMU_ClockEnable(cmuClock_RTC, false);
+
 		error(16);
+
+		/* Exit function */
+		return;
 	}
 
 #else /* LFXO selected */
@@ -288,7 +330,13 @@ void sleep (uint32_t sSleep)
 		dbcrit("Delay too long, can't fit in the field!");
 #endif /* DEBUG_DBPRINT */
 
+		/* Turn off the RTC clock */
+		CMU_ClockEnable(cmuClock_RTC, false);
+
 		error(17);
+
+		/* Exit function */
+		return;
 	}
 
 #endif /* ULFRCO/LFXO selection */
@@ -362,6 +410,31 @@ void RTC_clearWakeup (void)
 
 /**************************************************************************//**
  * @brief
+ *   Method to get the time spend sleeping (in seconds) in the case
+ *   of GPIO wake-up.
+ *
+ * @return
+ *   The time spend sleeping in **seconds**.
+ *****************************************************************************/
+uint32_t RTC_getPassedSleeptime (void)
+{
+	uint32_t sSleep = RTC_CounterGet();
+
+	/* Disable the counter */
+	RTC_Enable(false);
+
+#if ULFRCO == 1 /* ULFRCO selected */
+		sSleep /= ULFRCOFREQ;
+#else /* LFXO selected */
+		sSleep /= LFXOFREQ;
+#endif /* ULFRCO/LFXO selection */
+
+	return (sSleep);
+}
+
+
+/**************************************************************************//**
+ * @brief
  *   RTC initialization.
  *
  * @note
@@ -396,7 +469,6 @@ static void initRTC (void)
 	CMU_ClockSelectSet(cmuClock_LFA, cmuSelect_LFXO);
 
 #endif /* ULFRCO/LFXO selection */
-
 
 	/* Turn on the RTC clock */
 	CMU_ClockEnable(cmuClock_RTC, true);

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.h
  * @brief Delay functionality.
- * @version 2.4
+ * @version 3.0
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -33,6 +33,7 @@ void delay (uint32_t msDelay);
 void sleep (uint32_t sSleep);
 bool RTC_checkWakeup (void);
 void RTC_clearWakeup (void);
+uint32_t RTC_getPassedSleeptime (void);
 
 
 #endif /* _DELAY_H_ */
