@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file pin_mapping.h
  * @brief The pin definitions for the regular and custom Happy Gecko board.
- * @version 1.4
+ * @version 2.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -13,6 +13,7 @@
  *   @li v1.2: Added documentation.
  *   @li v1.3: Updated code with new DEFINE checks.
  *   @li v1.4: Added IIC definitions.
+ *   @li v2.0: Updated version number.
  *
  ******************************************************************************/
 

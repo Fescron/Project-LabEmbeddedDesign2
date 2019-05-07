@@ -5,7 +5,7 @@
  *   This header file is called in every other file where there are UART
  *   debugging statements. Depending on the value of `DEBUGGING`, UART statements
  *   are enabled or disabled.
- * @version 1.2
+ * @version 2.0
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 

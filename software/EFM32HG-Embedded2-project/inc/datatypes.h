@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file datatypes.h
  * @brief Definitions of the custom data-types used.
- * @version 1.3
+ * @version 2.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -12,6 +12,7 @@
  *   @li v1.1: Added another `MCU_State_t` option.
  *   @li v1.2: Added another `MCU_State_t` option.
  *   @li v1.3: Changed data types in `MeasurementData_t` struct.
+ *   @li v2.0: Updated version number.
  *
  ******************************************************************************/
 
