@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file cable.h
  * @brief Cable checking functionality.
- * @version 1.5
+ * @version 2.0
  * @author Brecht Van Eeckhoudt
  ******************************************************************************/
 
@@ -11,8 +11,13 @@
 #define _CABLE_H_
 
 
+/* Includes necessary for this header file */
+#include <stdbool.h>   /* "bool", "true", "false" */
+#include "datatypes.h" /* Definitions of the custom data-types */
+
+
 /* Public prototype */
-void checkCable (void);
+bool checkCable (MeasurementData_t data);
 
 
 #endif /* _CABLE_H_ */
