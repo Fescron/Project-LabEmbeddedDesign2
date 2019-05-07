@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.c
  * @brief Utility functionality.
- * @version 2.8
+ * @version 3.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -23,15 +23,38 @@
  *   @li v2.6: Updated code with new DEFINE checks.
  *   @li v2.7: Added functionality to send error values using LoRaWAN.
  *   @li v2.8: Added the ability to enable/disable error forwarding to the cloud using a public definition and changed UART error color.
+ *   @li v3.0: Updated version number.
  *
- *   @todo
- *     - Check the placement of errors and see (if they get send using LoRaWAN) that they don't break clock functionality.
- *     - Go back to INIT state?
- *     - Update used LoRaWAN functionality if necessary.
+ * ******************************************************************************
+ *
+ * @todo
+ *   **Future improvements:**@n
+ *     - Only send a maximum amount of errors to the could using LoRaWAN according to a defined value.
+ *         - Reset the counter in the MEASURE/SEND state?
+ *     - Go back to INIT state on an error call?
+ *         - `GOTO` is supported in C but is dangerous to use (nested loops, ...)
+ *         - Check if the clock functionality doesn't break when this is implemented ...
  *
  * ******************************************************************************
  *
  * @section License
+ *
+ *   **Copyright (C) 2019 - Brecht Van Eeckhoudt**
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the **GNU General Public License** as published by
+ *   the Free Software Foundation, either **version 3** of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   *A copy of the GNU General Public License can be found in the `LICENSE`
+ *   file along with this source code.*
+ *
+ *   @n
  *
  *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
  *   These sections are licensed under the Silabs License Agreement. See the file
@@ -92,16 +115,14 @@ void led (bool enabled)
  *   Error method.
  *
  * @details
- *   **DEBUG mode**@n
- *   In *debug mode* this method flashes the LED, displays a UART message
- *   and holds the microcontroller forever in a loop until it gets reset.
- *   The error value gets stored in a global variable.
+ *   **ERROR_FORWARDING == 0**@n
+ *   The method flashes the LED, displays a UART message and holds the MCU
+ *   forever in a loop until it gets reset. The error value gets stored in
+ *   a global variable.
  *
- *   **RELEASE mode**@n
- *   In *release mode* this method sends the error value to the cloud using
- *   LoRaWAN if the error number doesn't correspond to LoRaWAN-related functionality
- *   (numbers 30 - 55).
- *
+ *   **ERROR_FORWARDING == 1**@n
+ *   The method sends the error value to the cloud using LoRaWAN if the error
+ *   number doesn't correspond to LoRaWAN-related functionality (numbers 30 - 55).
  *
  * @param[in] number
  *   The number to indicate where in the code the error was thrown.
@@ -131,7 +152,7 @@ void error (uint8_t number)
 #else /* ERROR_FORWARDING */
 
 	/* Check if the error number isn't called in LoRaWAN functionality */
-	if ((number < 30) || number > 55)
+	if ((number < 30) || (number > 55))
 	{
 #if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 		dbprint_color(">>> Error (", 5);
@@ -139,7 +160,7 @@ void error (uint8_t number)
 		dbprintln_color(")! Sending the message to the cloud. <<<", 5);
 #endif /* DEBUG_DBPRINT */
 
-		initLoRaWAN(); /* Initialize LoRaWAN functionality TODO: use something else if we can save the settings */
+		initLoRaWAN(); /* Initialize LoRaWAN functionality */
 
 		sendStatus(number); /* Send the status value */
 

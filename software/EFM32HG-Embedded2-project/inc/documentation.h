@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file documentation.h
  * @brief This file contains useful documentation about the project.
- * @version 1.3
+ * @version 2.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -133,6 +133,26 @@
  *
  *   @note Alongside this peripheral clock, `cmuClock_HFPER` is also always enabled
  *   since GPIO is a High Frequency Peripheral.
+ *
+ * ******************************************************************************
+ *
+ * @section WATCHDOG Watchdog and while loops
+ *
+ *   At the start of this project it was the plan to also implement a *watchdog* timer
+ *   to make sure the MCU wouldn't get stuck in some logic and waste unnecessary power.
+ *   `RMU_ResetCauseGet` and `RMU_ResetCauseClear` also seemed interesting methods to use.
+ *   However, because of the relatively short time this watchdog can handle (9 - 256 000 cycles,
+ *   max 256 seconds) it would only be able to be active when the MCU was awake, and because
+ *   implementing this would take extra time it was opted to just focus on writing
+ *   code which couldn't get stuck anywhere.
+ *
+ *   This was done by carefully **making sure that the MCU couldn't get stuck in a WHILE
+ *   loop anywhere**, by also **incrementing a counter and checking it's value against a
+ *   *timeout* value**, defined at the top of each file.
+ *
+ *   @warning `While` loops can pose problems if for some reason the thing they are waiting
+ *   for doesn't happen (for example a bit doesn't get set). Because of this it's necessary
+ *   to also implement another way to exit them. `For` loops don't have this possible problem.
  *
  * ******************************************************************************
  *
