@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lpp.c
  * @brief Basic Low Power Payload (LPP) functionality.
- * @version 1.3
+ * @version 2.0
  * @author
  *   Geoffrey Ottoy@n
  *   Modified by Brecht Van Eeckhoudt
@@ -14,6 +14,7 @@
  *   @li v1.1: Added custom methods to add specific data to the LPP packet.
  *   @li v1.2: Merged methods to use less bytes when sending the data.
  *   @li v1.3: Updated documentation.
+ *   @li v2.0: Updated version number.
  *
  ******************************************************************************/
 

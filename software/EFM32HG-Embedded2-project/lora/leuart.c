@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file leuart.c
  * @brief LEUART (serial communication) functionality required by the RN2483 LoRa modem.
- * @version 1.3
+ * @version 2.0
  * @author
  *   Guus Leenders@n
  *   Modified by Brecht Van Eeckhoudt
@@ -14,6 +14,7 @@
  *   @li v1.1: Removed rtcdriver functionality (timeouts)
  *   @li v1.2: Added (basic) timeout functionality.
  *   @li v1.3: Refined timeout functionality and cleaned up unused things in comments.
+ *   @li v2.0: Updated version number.
  *
  ******************************************************************************/
 

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lpp.h
  * @brief Basic Low Power Payload (LPP) functionality.
- * @version 1.3
+ * @version 2.0
  * @author
  *   Geoffrey Ottoy@n
  *   Modified by Brecht Van Eeckhoudt
