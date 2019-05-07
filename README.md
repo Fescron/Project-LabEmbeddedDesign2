@@ -1,5 +1,6 @@
 # Project-LabEmbeddedDesign2
 
+![License](https://img.shields.io/badge/license-GNU%20GPL%20v3.0-blue.svg)
 ![GitHub Release Date](https://img.shields.io/github/release-date/Fescron/Project-LabEmbeddedDesign2.svg)
 ![GitHub release](https://img.shields.io/github/release/Fescron/Project-LabEmbeddedDesign2.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Fescron/Project-LabEmbeddedDesign2.svg)
