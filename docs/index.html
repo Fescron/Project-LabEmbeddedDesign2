@@ -106,6 +106,12 @@ GPIO clock (cmuClock_GPIO)</h1>
 <p><code>cmuClock_GPIO</code> is however just in case enabled in INIT methods where GPIO functionality is necessary.</p>
 <dl class="section note"><dt>Note</dt><dd>Alongside this peripheral clock, <code>cmuClock_HFPER</code> is also always enabled since GPIO is a High Frequency Peripheral.</dd></dl>
 <hr/>
+<h1><a class="anchor" id="WATCHDOG"></a>
+Watchdog and while loops</h1>
+<p>At the start of this project it was the plan to also implement a <em>watchdog</em> timer to make sure the MCU wouldn't get stuck in some logic and waste unnecessary power. <code>RMU_ResetCauseGet</code> and <code>RMU_ResetCauseClear</code> also seemed interesting methods to use. However, because of the relatively short time this watchdog can handle (9 - 256 000 cycles, max 256 seconds) it would only be able to be active when the MCU was awake, and because implementing this would take extra time it was opted to just focus on writing code which couldn't get stuck anywhere.</p>
+<p>This was done by carefully <b>making sure that the MCU couldn't get stuck in a WHILE loop anywhere</b>, by also <b>incrementing a counter and checking it's value against a <em>timeout</em> value</b>, defined at the top of each file.</p>
+<dl class="section warning"><dt>Warning</dt><dd><code>While</code> loops can pose problems if for some reason the thing they are waiting for doesn't happen (for example a bit doesn't get set). Because of this it's necessary to also implement another way to exit them. <code>For</code> loops don't have this possible problem.</dd></dl>
+<hr/>
 <h1><a class="anchor" id="RTCC"></a>
 RTCC (RTC calendar)</h1>
 <p>At another point in the development phase there was looked into using the RTCC (RTC calendar) to wake up the MCU every hour. This peripheral can run down to EM4H when using LFRCO, LFXO or ULFRCO. Unfortunately the Happy Gecko doesn't have this functionality so it can't be implemented in this case.</p>
@@ -199,7 +205,7 @@ Bits, bytes, nibbles and unsigned/signed integer value ranges</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon May 6 2019 13:41:37 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Wed May 8 2019 00:45:07 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

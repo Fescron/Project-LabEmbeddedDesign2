@@ -64,78 +64,77 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <div class="contents">
 <div class="textblock"><dl class="reflist">
 <dt><a class="anchor" id="_todo000001"></a>File <a class="el" href="ADXL362_8c.html">ADXL362.c</a>  </dt>
-<dd><ul>
-<li>Check initialization (settings)<ul>
-<li>Check configurations by reading the registers again?</li>
-<li>Check difference absolute/referenced mode</li>
-</ul>
-</li>
-<li>Enable wake-up mode?<ul>
-<li><code>writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit</code></li>
-</ul>
-</li>
-<li>Enable loop mode (interrupts don't need to be acknowledged by host)<ul>
-<li><code>writeADXL(ADXL_REG_ACT_INACT_CTL, 0b00110000);</code> </li>
-</ul>
-</li>
+<dd><b>Future improvements:</b><br />
+<ul>
+<li>Check configurations by reading the registers again and return true/false when the registers have/don't have the correct values.</li>
+<li>Enable wake-up mode (<code>writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit</code>)</li>
+<li>Enable loop mode (with act/inact time registers?) so interrupts don't need to be acknowledged by host (<code>writeADXL(ADXL_REG_ACT_INACT_CTL, 0b00110000);</code>) </li>
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000002"></a>File <a class="el" href="cable_8c.html">cable.c</a>  </dt>
-<dd><ul>
-<li>Also send measurements on cable breaking? </li>
+<dd><b>Future improvements:</b><br />
+<ul>
+<li>Use two parallel lines who normally aren't connected and use an interrupt to detect if they broke and get connected through the water. </li>
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="delay_8c.html">delay.c</a>  </dt>
-<dd><ul>
-<li>Split definition to use the ULFRCO for the delay and sleep method?<ul>
-<li>Try to fix sleep/wakeup functions for LoRaWAN functionality?</li>
-<li>If so, also update documentation! </li>
+<dd><b>Future improvements:</b><br />
+<ul>
+<li>Split definition to use the <code>ULFRCO</code> for the <em>delay</em> and <em>sleep</em> method separately.<ul>
+<li>This isn't that easy because of the common INIT method.</li>
+<li>Don't forget to update <code><a class="el" href="documentation_8h.html" title="This file contains useful documentation about the project. ">documentation.h</a></code> if this functionality is changed.</li>
 </ul>
 </li>
+<li>Enable/disable clock functionality? (see comments using <code>//</code>) </li>
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="lora__wrappers_8c.html">lora_wrappers.c</a>  </dt>
-<dd><ul>
-<li>Save LoRaWAN settings before calling <code>disableLoRaWAN</code>?<ul>
+<dd><b>Future improvements:</b><br />
+<ul>
+<li>Save LoRaWAN settings during INIT before calling <code>disableLoRaWAN</code>?<ul>
 <li>Should be possible in ABP (saving to EEPROM? <code>saveMAC</code>?) See reference manual!</li>
+<li>Update code where <code>initLoRaWAN</code> and other methods are called.</li>
 </ul>
 </li>
-<li>Fix <code>sleepLoRaWAN</code> and <code>wakeLoRaWAN</code> methods. </li>
+<li>Fix <code>sleepLoRaWAN</code> and <code>wakeLoRaWAN</code> methods.<ul>
+<li>First separate <code>ULFRCO</code> definition in <code><a class="el" href="delay_8c.html" title="Delay functionality. ">delay.c</a></code> </li>
+</ul>
+</li>
 </ul>
 </dd>
 <dt><a class="anchor" id="_todo000005"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
-<dd><p class="startdd">IMPORTANT:</p><ul>
-<li><p class="startli">On INT1-PD7, go to sleep for somehow the remaining RTC time on wakeup?</p><ul>
-<li>On ADXL interrupt the RTC doesn't get disabled!</li>
-<li>Loop mode &amp; timer @ ADXL? (act/inact time registers)</li>
-</ul>
-<p class="startli">EXTRA THINGS:</p>
-</li>
-<li>Add information about WDOG in <code><a class="el" href="documentation_8h.html" title="This file contains useful documentation about the project. ">documentation.h</a></code><ul>
-<li>Check all <code>while</code> loops (wait for register flags, ...) and add <em>exit counters</em> if necessary! (for loops don't pose problems)</li>
-<li>see <em>powertest</em> example, <code>getResetCause</code>(<code>system.c</code> in Dramco example) and <em>Embedded Muse 365</em>)</li>
-<li>Due to <em>short</em> interval: Only when awake? 9 - 256k cycles, ~ max 256 sec?</li>
+<dd><p class="startdd"><b>Optimalisations:</b><br />
+</p><ul>
+<li>Change <em>mode</em> to release (also see Reference Manual @ <em>6.3.2 Debug and EM2/EM3</em>).<ul>
+<li>Also see <em>AN0007: 2.8 Optimizing Code</em>.</li>
 </ul>
 </li>
-<li>Test negative temperatures by putting the module in it's case in the freezer ?</li>
-<li>ADC temperature 2-3 degree's off external one?</li>
-<li>Add DBPRINT as files instead of global includes.</li>
+<li>Change LoRaWAN Spreading Factor and send power, and check the effect on the power usage.</li>
+<li>Add some time to the <code>while</code> increment escape counters?</li>
+<li>Check difference between absolute/referenced mode for the accelerometer and <em>calibrate</em> the g value.</li>
 </ul>
-<p class="enddd">OPTIMALISATIONS:</p><ul>
-<li>Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).<ul>
-<li>Also see <em>AN0007: 2.8 Optimizing Code</em></li>
+<p class="enddd"><b>Future improvements:</b><br />
+</p><ul>
+<li>Sleep for some time in <em>while</em> loops instead of just incrementing the <em>escape-counter</em>.<ul>
+<li>First separate <code>ULFRCO</code> definition in `delay.c</li>
 </ul>
 </li>
-<li>Change LoRaWAN Spreading Factor and send power.</li>
-<li>Use EM4 wakeup? See <code>deepsleep</code> (<code>system.c</code> in Dramco example)</li>
-<li>Try to shorten delays? (for example: 40 ms power-up time for RN2483) </li>
+<li>Try to shorten delays (for example: 40 ms power-up time for the RN2483...)</li>
+<li>Fix <code>sleepLoRaWAN</code> and <code>wakeLoRaWAN</code> functionality (also see <code><a class="el" href="lora__wrappers_8c.html" title="LoRa wrapper methods. ">lora_wrappers.c</a></code>). </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000008"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
-<dd><ul>
-<li>Check the placement of errors and see (if they get send using LoRaWAN) that they don't break clock functionality.</li>
-<li>Go back to INIT state?</li>
-<li>Update used LoRaWAN functionality if necessary.</li>
+<dt><a class="anchor" id="_todo000007"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
+<dd><b>Future improvements:</b><br />
+<ul>
+<li>Only send a maximum amount of errors to the could using LoRaWAN according to a defined value.<ul>
+<li>Reset the counter in the MEASURE/SEND state?</li>
+</ul>
+</li>
+<li>Go back to INIT state on an error call?<ul>
+<li><code>GOTO</code> is supported in C but is dangerous to use (nested loops, ...)</li>
+<li>Check if the clock functionality doesn't break when this is implemented ...</li>
+</ul>
+</li>
 </ul>
 </dd>
 </dl>
@@ -144,7 +143,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon May 6 2019 13:41:37 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Wed May 8 2019 00:45:07 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

@@ -5,5 +5,6 @@ var delay_8h =
     [ "delay", "delay_8h.html#adb46f4276f5ddf111153701858f85df6", null ],
     [ "RTC_checkWakeup", "delay_8h.html#a7bfbeaf084abaa0fc6baf77a1640b598", null ],
     [ "RTC_clearWakeup", "delay_8h.html#a072ccec54e047acce2566984c28b0232", null ],
+    [ "RTC_getPassedSleeptime", "delay_8h.html#a3e274aac5f6eaff85d00c25c6edff5a3", null ],
     [ "sleep", "delay_8h.html#aae86f940455b5957441f4331cdc0828d", null ]
 ];

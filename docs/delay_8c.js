@@ -8,6 +8,7 @@ var delay_8c =
     [ "initRTC", "delay_8c.html#aecf4672ef62001664f5ebc953755da1d", null ],
     [ "RTC_checkWakeup", "delay_8c.html#a7bfbeaf084abaa0fc6baf77a1640b598", null ],
     [ "RTC_clearWakeup", "delay_8c.html#a072ccec54e047acce2566984c28b0232", null ],
+    [ "RTC_getPassedSleeptime", "delay_8c.html#a3e274aac5f6eaff85d00c25c6edff5a3", null ],
     [ "RTC_IRQHandler", "delay_8c.html#ab86b9dd0d7b4eacfe38086e1fa4c2312", null ],
     [ "sleep", "delay_8c.html#aae86f940455b5957441f4331cdc0828d", null ],
     [ "SysTick_Handler", "delay_8c.html#ab5e09814056d617c521549e542639b7e", null ],
