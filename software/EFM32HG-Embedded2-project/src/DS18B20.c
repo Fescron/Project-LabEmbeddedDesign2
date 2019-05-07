@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 2.6
+ * @version 3.0
  * @author
  *   Alec Vanderhaegen & Sarah Goossens@n
  *   Modified by Brecht Van Eeckhoudt
@@ -29,6 +29,34 @@
  *   @li v2.4: Fixed temperature measurement and refined timeout functionality.
  *   @li v2.5: Updated documentation.
  *   @li v2.6: Updated code to don't execute code further if the first initialization failed.
+ *   @li v3.0: Disabled initialized functionality before entering an `error` function, added
+ *             functionality to exit methods after `error` call and updated version number.
+ *
+ * ******************************************************************************
+ *
+ * @section License
+ *
+ *   **Copyright (C) 2019 - Brecht Van Eeckhoudt**
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the **GNU General Public License** as published by
+ *   the Free Software Foundation, either **version 3** of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   *A copy of the GNU General Public License can be found in the `LICENSE`
+ *   file along with this source code.*
+ *
+ *   @n
+ *
+ *   Some methods also use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
+ *   These sections are licensed under the Silabs License Agreement. See the file
+ *   "Silabs_License_Agreement.txt" for details. Before using this software for
+ *   any purpose, you must agree to the terms of that agreement.
  *
  ******************************************************************************/
 
@@ -75,7 +103,8 @@ static int32_t convertTempData (uint8_t tempLS, uint8_t tempMS);
  *   USTimer gets initialized, the sensor gets powered, the data-transmission
  *   takes place, the timer gets de-initialized to disable the clocks and interrupts,
  *   the data and power pin get disabled and finally the read values are converted
- *   to an `int32_t` value.
+ *   to an `int32_t` value.@n
+ *   **Negative temperatures work fine.**
  *
  * @return
  *   The read temperature data.
@@ -127,8 +156,18 @@ int32_t readTempDS18B20 (void)
 			dbcrit("Waiting time for DS18B20 conversion reached!");
 #endif /* DEBUG_DBPRINT */
 
+			/* Disable interrupts and turn off the clock to the underlying hardware timer. */
+			USTIMER_DeInit();
+
+			/* Disable data pin (otherwise we got a "sleep" current of about 330 µA due to the on-board 10k pull-up) */
+			GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeDisabled, 0);
+
+			/* Disable the VDD pin */
+			powerDS18B20(false);
+
 			error(29);
 
+			/* Exit function */
 			return (0);
 
 		}
@@ -164,9 +203,18 @@ int32_t readTempDS18B20 (void)
 	}
 	else
 	{
+		/* Disable interrupts and turn off the clock to the underlying hardware timer. */
+		USTIMER_DeInit();
+
+		/* Disable data pin (otherwise we got a "sleep" current of about 330 µA due to the on-board 10k pull-up) */
+		GPIO_PinModeSet(TEMP_DATA_PORT, TEMP_DATA_PIN, gpioModeDisabled, 0);
+
+		/* Disable the VDD pin */
+		powerDS18B20(false);
+
+		/* Exit function */
 		return (0);
 	}
-
 }
 
 

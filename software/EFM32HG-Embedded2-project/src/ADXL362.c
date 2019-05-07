@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 2.5
+ * @version 3.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -26,19 +26,36 @@
  *   @li v2.3: Updated documentation.
  *   @li v2.4: Changed error numbering.
  *   @li v2.5: Updated ODR enum and changed masking logic for register settings.
+ *   @li v3.0: Added functionality to exit methods after `error` call and updated version number.
  *
- *   @todo
- *     - Check initialization (settings)
- *         - Check configurations by reading the registers again?
- *         - Check difference absolute/referenced mode
- *     - Enable wake-up mode?
- *         - `writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit`
- *     - Enable loop mode (interrupts don't need to be acknowledged by host)
- *         - `writeADXL(ADXL_REG_ACT_INACT_CTL, 0b00110000);`
+ * ******************************************************************************
+ *
+ * @todo
+ *   **Future improvements:**@n
+ *     - Check configurations by reading the registers again and return true/false when the registers have/don't have the correct values.
+ *     - Enable wake-up mode (`writeADXL(ADXL_REG_POWER_CTL, 0b00001000); // 5th bit`)
+ *     - Enable loop mode (with act/inact time registers?) so interrupts don't need to be acknowledged by host (`writeADXL(ADXL_REG_ACT_INACT_CTL, 0b00110000);`)
  *
  * ******************************************************************************
  *
  * @section License
+ *
+ *   **Copyright (C) 2019 - Brecht Van Eeckhoudt**
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the **GNU General Public License** as published by
+ *   the Free Software Foundation, either **version 3** of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   *A copy of the GNU General Public License can be found in the `LICENSE`
+ *   file along with this source code.*
+ *
+ *   @n
  *
  *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
  *   These sections are licensed under the Silabs License Agreement. See the file
@@ -133,8 +150,13 @@ void initADXL (void)
 		dbcrit("Wrong peripheral selected!");
 #endif /* DEBUG_DBPRINT */
 
+		/* Disable power to the VDD pin */
+		powerADXL(false);
+
 		error(21);
 
+		/* Exit function */
+		return;
 	}
 
 	/* Initialize USART0/1 as SPI slave (also initialize CS pin) */
@@ -235,7 +257,10 @@ void ADXL_enableSPI (bool enabled)
 
 			error(22);
 
+			/* Exit function */
+			return;
 		}
+
 		USART_Enable(ADXL_SPI, usartEnable);
 
 		/* In the case of gpioModePushPull", the last argument directly sets the pin state */
@@ -258,7 +283,10 @@ void ADXL_enableSPI (bool enabled)
 
 			error(23);
 
+			/* Exit function */
+			return;
 		}
+
 		USART_Enable(ADXL_SPI, usartDisable);
 
 		/* gpioModeDisabled: Pull-up if DOUT is set. */
@@ -358,6 +386,9 @@ void ADXL_configRange (ADXL_Range_t givenRange)
 #endif /* DEBUG_DBPRINT */
 
 		error(24);
+
+		/* Exit function */
+		return;
 	}
 
 #if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
@@ -399,6 +430,9 @@ void ADXL_configODR (ADXL_ODR_t givenODR)
 #endif /* DEBUG_DBPRINT */
 
 		error(25);
+
+		/* Exit function */
+		return;
 	}
 
 #if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
@@ -453,6 +487,9 @@ void ADXL_configActivity (uint8_t gThreshold)
 #endif /* DEBUG_DBPRINT */
 
 		error(26);
+
+		/* Exit function */
+		return;
 	}
 
 	/* Isolate bits using masks and shifting */
@@ -462,9 +499,6 @@ void ADXL_configActivity (uint8_t gThreshold)
 	/* Set threshold register values (total: 11bit unsigned) */
 	writeADXL(ADXL_REG_THRESH_ACT_L, low);  /* 7:0 bits used */
 	writeADXL(ADXL_REG_THRESH_ACT_H, high); /* 2:0 bits used */
-
-	/* Enable loop mode (interrupts don't need to be acknowledged by host) */
-	// writeADXL(ADXL_REG_ACT_INACT_CTL, 0b00110000); TODO: not working...
 
 #if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 	dbinfoInt("ADXL362: Activity configured: ", gThreshold, "g");
@@ -714,6 +748,9 @@ static void resetHandlerADXL (void)
 #endif /* DEBUG_DBPRINT */
 
 					error(20);
+
+					/* Exit function */
+					return;
 				}
 			}
 		}
@@ -917,6 +954,7 @@ static int32_t convertGRangeToGValue (int8_t sensorValue)
 
 		error(27);
 
+		/* Exit function */
 		return (0);
 	}
 }

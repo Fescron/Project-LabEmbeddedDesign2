@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.h
  * @brief All code for the DS18B20 temperature sensor.
- * @version 2.6
+ * @version 3.0
  * @author
  *   Alec Vanderhaegen & Sarah Goossens@n
  *   Modified by Brecht Van Eeckhoudt

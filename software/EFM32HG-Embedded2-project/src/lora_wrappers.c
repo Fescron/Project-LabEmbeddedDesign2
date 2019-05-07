@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lora_wrappers.c
  * @brief LoRa wrapper methods
- * @version 1.6
+ * @version 2.0
  * @author
  *   Benjamin Van der Smissen@n
  *   Heavily modified by Brecht Van Eeckhoudt
@@ -17,11 +17,43 @@
  *   @li v1.4: Changed error numbering and removed unnecessary variables and definitions.
  *   @li v1.5: Moved `data.index` reset to LoRaWAN sending functionality.
  *   @li v1.6: Moved `data.index` reset back to `main.c` because it doesn't affect the correct variable here.
+ *   @li v2.0: Added functionality to exit methods after `error` call and updated version number.
  *
- *   @todo
- *     - Save LoRaWAN settings before calling `disableLoRaWAN`?
+ * ******************************************************************************
+ *
+ * @todo
+ *   **Future improvements:**@n
+ *     - Save LoRaWAN settings during INIT before calling `disableLoRaWAN`?
  *         - Should be possible in ABP (saving to EEPROM? `saveMAC`?) See reference manual!
+ *         - Update code where `initLoRaWAN` and other methods are called.
  *     - Fix `sleepLoRaWAN` and `wakeLoRaWAN` methods.
+ *         - First separate `ULFRCO` definition in `delay.c`
+ *
+ * ******************************************************************************
+ *
+ * @section License
+ *
+ *   **Copyright (C) 2019 - Brecht Van Eeckhoudt**
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the **GNU General Public License** as published by
+ *   the Free Software Foundation, either **version 3** of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   *A copy of the GNU General Public License can be found in the `LICENSE`
+ *   file along with this source code.*
+ *
+ *   @n
+ *
+ *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
+ *   These sections are licensed under the Silabs License Agreement. See the file
+ *   "Silabs_License_Agreement.txt" for details. Before using this software for
+ *   any purpose, you must agree to the terms of that agreement.
  *
  ******************************************************************************/
 
@@ -88,7 +120,6 @@ void sleepLoRaWAN (uint32_t sSleep)
 {
 	bool wakeUp = false;
 	LoRa_Sleep((1000*sSleep), &wakeUp); /* "wakeUp" is not used in underlying method */
-
 }
 
 
@@ -118,13 +149,26 @@ void sendMeasurements (MeasurementData_t data)
 {
 	/* Initialize LPP-formatted payload
 	 * For 6 measurements we need a max amount of 43 bytes (see `LPP_AddMeasurements` method documentation for the calculation) */
-	if (!LPP_InitBuffer(&appData, 43)) error(31);
+	if (!LPP_InitBuffer(&appData, 43))
+	{
+		error(31);
+		return; /* Exit function */
+	}
+
 
 	/* Add measurements to the LPP packet using the custom convention to save bytes send */
-	if (!LPP_AddMeasurements(&appData, data)) error(32);
+	if (!LPP_AddMeasurements(&appData, data))
+	{
+		error(32);
+		return; /* Exit function */
+	}
 
 	/* Send custom LPP-like-formatted payload */
-	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(33);
+	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS)
+	{
+		error(33);
+		return; /* Exit function */
+	}
 }
 
 
@@ -142,13 +186,25 @@ void sendMeasurements (MeasurementData_t data)
 void sendStormDetected (bool stormDetected)
 {
 	/* Initialize LPP-formatted payload - We need 4 bytes */
-	if (!LPP_InitBuffer(&appData, 4)) error(34);
+	if (!LPP_InitBuffer(&appData, 4))
+	{
+		error(34);
+		return; /* Exit function */
+	}
 
 	/* Add value to the LPP packet using the custom convention */
-	if (!LPP_AddStormDetected(&appData, stormDetected)) error(35);
+	if (!LPP_AddStormDetected(&appData, stormDetected))
+	{
+		error(35);
+		return; /* Exit function */
+	}
 
 	/* Send custom LPP-like-formatted payload */
-	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(36);
+	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS)
+	{
+		error(36);
+		return; /* Exit function */
+	}
 }
 
 
@@ -166,13 +222,26 @@ void sendStormDetected (bool stormDetected)
 void sendCableBroken (bool cableBroken)
 {
 	/* Initialize LPP-formatted payload - We need 4 bytes */
-	if (!LPP_InitBuffer(&appData, 4)) error(37);
+	if (!LPP_InitBuffer(&appData, 4))
+	{
+		error(37);
+		return; /* Exit function */
+	}
 
 	/* Add value to the LPP packet using the custom convention */
-	if (!LPP_AddCableBroken(&appData, cableBroken)) error(38);
+	if (!LPP_AddCableBroken(&appData, cableBroken))
+	{
+		error(38);
+		return; /* Exit function */
+	}
+
 
 	/* Send custom LPP-like-formatted payload */
-	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(39);
+	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS)
+	{
+		error(39);
+		return; /* Exit function */
+	}
 }
 
 
@@ -186,13 +255,25 @@ void sendCableBroken (bool cableBroken)
 void sendStatus (uint8_t status)
 {
 	/* Initialize LPP-formatted payload - We need 4 bytes */
-	if (!LPP_InitBuffer(&appData, 4)) error(40);
+	if (!LPP_InitBuffer(&appData, 4))
+	{
+		error(40);
+		return; /* Exit function */
+	}
 
 	/* Add value to the LPP packet using the custom convention */
-	if (!LPP_AddStatus(&appData, status)) error(41);
+	if (!LPP_AddStatus(&appData, status))
+	{
+		error(41);
+		return; /* Exit function */
+	}
 
 	/* Send custom LPP-like-formatted payload */
-	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(42);
+	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS)
+	{
+		error(42);
+		return; /* Exit function */
+	}
 }
 
 
@@ -209,22 +290,56 @@ void sendStatus (uint8_t status)
 void sendTest (MeasurementData_t data)
 {
 	/* Initialize LPP-formatted payload - We need 21 bytes */
-	if (!LPP_InitBuffer(&appData, 21)) error(43);
+	if (!LPP_InitBuffer(&appData, 21))
+	{
+		error(43);
+		return; /* Exit function */
+	}
 
 	/* Add measurements to the LPP packet */
 	int16_t batteryLPP = (int16_t)(round((float)data.voltage[0]/10));
-	if (!LPP_deprecated_AddVBAT(&appData, batteryLPP)) error(44);
+	if (!LPP_deprecated_AddVBAT(&appData, batteryLPP))
+	{
+		error(44);
+		return; /* Exit function */
+	}
 
 	int16_t intTempLPP = (int16_t)(round((float)data.intTemp[0]/100));
-	if (!LPP_deprecated_AddIntTemp(&appData, intTempLPP)) error(45);
+	if (!LPP_deprecated_AddIntTemp(&appData, intTempLPP))
+	{
+		error(45);
+		return; /* Exit function */
+	}
 
 	int16_t extTempLPP = (int16_t)(round((float)data.extTemp[0]/100));
-	if (!LPP_deprecated_AddExtTemp(&appData, extTempLPP)) error(46);
+	if (!LPP_deprecated_AddExtTemp(&appData, extTempLPP))
+	{
+		error(46);
+		return; /* Exit function */
+	}
 
-	if (!LPP_deprecated_AddStormDetected(&appData, true)) error(47);
-	if (!LPP_deprecated_AddCableBroken(&appData, true)) error(48);
-	if (!LPP_deprecated_AddStatus(&appData, 9)) error(49);
+	if (!LPP_deprecated_AddStormDetected(&appData, true))
+	{
+		error(47);
+		return; /* Exit function */
+	}
+
+	if (!LPP_deprecated_AddCableBroken(&appData, true))
+	{
+		error(48);
+		return; /* Exit function */
+	}
+
+	if (!LPP_deprecated_AddStatus(&appData, 9))
+	{
+		error(49);
+		return; /* Exit function */
+	}
 
 	/* Send LPP-formatted payload */
-	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS) error(50);
+	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS)
+	{
+		error(50);
+		return; /* Exit function */
+	}
 }

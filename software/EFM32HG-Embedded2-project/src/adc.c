@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file adc.c
  * @brief ADC functionality for reading the (battery) voltage and internal temperature.
- * @version 1.5
+ * @version 2.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -14,10 +14,29 @@
  *   @li v1.3: Changed error numbering.
  *   @li v1.4: Added timeout to `while` loop and changed types to `int32_t`.
  *   @li v1.5: Refined timout functionality.
+ *   @li v2.0: Disabled peripheral clock before entering an `error` function, added
+ *             functionality to exit methods after `error` call and updated version number.
  *
  * ******************************************************************************
  *
  * @section License
+ *
+ *   **Copyright (C) 2019 - Brecht Van Eeckhoudt**
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the **GNU General Public License** as published by
+ *   the Free Software Foundation, either **version 3** of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   *A copy of the GNU General Public License can be found in the `LICENSE`
+ *   file along with this source code.*
+ *
+ *   @n
  *
  *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
  *   These sections are licensed under the Silabs License Agreement. See the file
@@ -95,7 +114,13 @@ void initADC (ADC_Measurement_t peripheral)
 		dbcrit("Unknown ADC peripheral selected!");
 #endif /* DEBUG_DBPRINT */
 
+		/* Disable used clock */
+		CMU_ClockEnable(cmuClock_ADC0, false);
+
 		error(11);
+
+		/* Exit function */
+		return;
 	}
 
 	ADC_InitSingle(ADC0, &initSingle);
@@ -126,7 +151,8 @@ void initADC (ADC_Measurement_t peripheral)
  *   Method to read the battery voltage or internal temperature.
  *
  * @details
- *   This method re-initializes the ADC settings if necessary.
+ *   This method re-initializes the ADC settings if necessary.@n
+ *   **Negative internal temperatures work fine.**
  *
  * @param[in] peripheral
  *   Select the ADC peripheral to read from.
@@ -166,8 +192,12 @@ int32_t readADC (ADC_Measurement_t peripheral)
 		dbcrit("Unknown ADC peripheral selected!");
 #endif /* DEBUG_DBPRINT */
 
+		/* Disable used clock */
+		CMU_ClockEnable(cmuClock_ADC0, false);
+
 		error(12);
 
+		/* Exit function */
 		return (0);
 	}
 
@@ -188,8 +218,12 @@ int32_t readADC (ADC_Measurement_t peripheral)
 		dbcrit("Waiting time for ADC conversion reached!");
 #endif /* DEBUG_DBPRINT */
 
+		/* Disable used clock */
+		CMU_ClockEnable(cmuClock_ADC0, false);
+
 		error(13);
 
+		/* Exit function */
 		return (0);
 	}
 #if DBPRINT_TIMEOUT == 1 /* DBPRINT_TIMEOUT */
