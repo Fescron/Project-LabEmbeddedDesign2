@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 3.3
+ * @version 3.6
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -34,41 +34,51 @@
  *   @li v2.9: Started adding LoRaWAN functionality, added more wake-up/sleep functionality.
  *   @li v3.0: Started using updated LoRaWAN send methods.
  *   @li v3.1: Added functionality to enable/disable the LED blinking when measuring/sending data.
- *   @li v3.2: Fixed button wakeup when sleeping for WAKE_UP_PERIOD_S/2.
+ *   @li v3.2: Fixed button wake-up when sleeping for WAKE_UP_PERIOD_S/2.
  *   @li v3.3: Moved `data.index` reset to LoRaWAN sending functionality and updated documentation.
  *   @li v3.4: Moved `data.index` reset back to `main.c`.
+ *   @li v3.5: Added functionality to go back to the remaining sleep time on an accelerometer wake-up.
+ *   @li v3.6: Updated code to handle underlying changes.
  *
  * ******************************************************************************
  *
  * @todo
- *   IMPORTANT:
- *     - On INT1-PD7, go to sleep for somehow the remaining RTC time on wakeup?
- *         - On ADXL interrupt the RTC doesn't get disabled!
- *         - Loop mode & timer @ ADXL? (act/inact time registers)
+ *   **Optimalisations:**@n
+ *     - Change *mode* to release (also see Reference Manual @ *6.3.2 Debug and EM2/EM3*).
+ *         - Also see *AN0007: 2.8 Optimizing Code*.
+ *     - Change LoRaWAN Spreading Factor and send power, and check the effect on the power usage.
+ *     - Add some time to the `while` increment escape counters?
+ *     - Check difference between absolute/referenced mode for the accelerometer and *calibrate* the g value.
  *
  * @todo
- *   EXTRA THINGS:
- *     - Add information about WDOG in `documentation.h`
- *         - Check all `while` loops (wait for register flags, ...) and add *exit counters* if necessary! (for loops don't pose problems)
- *         - see *powertest* example, `getResetCause`(`system.c` in Dramco example) and *Embedded Muse 365*)
- *         - Due to *short* interval: Only when awake? 9 - 256k cycles, ~ max 256 sec?
- *     - Test negative temperatures by putting the module in it's case in the freezer ?
- *     - ADC temperature 2-3 degree's off external one?
- *     - Add DBPRINT as files instead of global includes.
- *
- * @todo
- *   OPTIMALISATIONS:
- *     - Change "mode" to release (also see Reference Manual @ 6.3.2 Debug and EM2/EM3).
- *         - Also see *AN0007: 2.8 Optimizing Code*
- *     - Change LoRaWAN Spreading Factor and send power.
- *     - Use EM4 wakeup? See `deepsleep` (`system.c` in Dramco example)
- *     - Try to shorten delays? (for example: 40 ms power-up time for RN2483)
+ *   **Future improvements:**@n
+ *     - Sleep for some time in *while* loops instead of just incrementing the *escape-counter*.
+ *         - First separate `ULFRCO` definition in `delay.c
+ *     - Try to shorten delays (for example: 40 ms power-up time for the RN2483...)
+ *     - Fix `sleepLoRaWAN` and `wakeLoRaWAN` functionality (also see `lora_wrappers.c`).
  *
  * ******************************************************************************
  *
  * @section License
  *
- *   Some methods use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
+ *   **Copyright (C) 2019 - Brecht Van Eeckhoudt**
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the **GNU General Public License** as published by
+ *   the Free Software Foundation, either **version 3** of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   *A copy of the GNU General Public License can be found in the `LICENSE`
+ *   file along with this source code.*
+ *
+ *   @n
+ *
+ *   Some methods also use code obtained from examples from [Silicon Labs' GitHub](https://github.com/SiliconLabs/peripheral_examples).
  *   These sections are licensed under the Silabs License Agreement. See the file
  *   "Silabs_License_Agreement.txt" for details. Before using this software for
  *   any purpose, you must agree to the terms of that agreement.
@@ -143,7 +153,7 @@
 /** Time between each wake-up in seconds
  *    @li max 500 seconds when using LFXO delay
  *    @li 3600 seconds (one hour) works fine when using ULFRCO delay */
-#define WAKE_UP_PERIOD_S 3600 // 600 = every 10 minutes
+#define WAKE_UP_PERIOD_S 3600 /* 600 = every 10 minutes */
 
 /** Amount of PIN interrupt wakeups (before a RTC wakeup) to be considered as a *storm* */
 #define STORM_INTERRUPTS 6
@@ -212,8 +222,11 @@ int main (void)
 	/* Keep a value if a storm has been detected */
 	bool stormDetected = false;
 
-	/* Keep a value to send one test LoRaWAN message after booting */
+	/* Value used to send one test LoRaWAN message after booting */
 	bool firstBoot = true;
+
+	/* Value to keep the remaining sleep time for odd ADXL_triggercounter values (due to up-down movement...) */
+	uint32_t oddRemainingSleeptime = 0;
 
 	/* Set the index to put the measurements in */
 	data.index = 0;
@@ -233,7 +246,6 @@ int main (void)
 #else /* Regular Happy Gecko pinout */
 				dbprint_INIT(USART1, 4, true, false); /* VCOM */
 				dbwarn("REGULAR board pinout selected");
-				//dbprint_INIT(USART1, 0, false, false); /* US1_TX = PC0 */
 #endif /* Board pinout selection */
 #endif  /* DEBUG_DBPRINT */
 
@@ -248,17 +260,11 @@ int main (void)
 
 				initADC(BATTERY_VOLTAGE); /* Initialize ADC to read battery voltage */
 
-				/* Initialize pin and disable RN2483 */
+				/* Initialize pin and disable power to RN2483 */
 				GPIO_PinModeSet(PM_RN2483_PORT, PM_RN2483_PIN, gpioModePushPull, 0);
-				//GPIO_PinModeSet(RN2483_RESET_PORT, RN2483_RESET_PIN, gpioModePushPull, 0);
-				//GPIO_PinModeSet(RN2483_RX_PORT, RN2483_RX_PIN, gpioModePushPull, 0);
-				//GPIO_PinModeSet(RN2483_TX_PORT, RN2483_TX_PIN, gpioModePushPull, 0);
 
 				/* Initialize pin and disable external sensor power on DRAMCO shield */
 				GPIO_PinModeSet(PM_SENS_EXT_PORT, PM_SENS_EXT_PIN, gpioModePushPull, 0); // TODO: check power usage effect?
-
-				//initLoRaWAN(); /* Initialize LoRaWAN functionality */
-				//sleepLoRaWAN(WAKE_UP_PERIOD_S); /* Put the LoRaWAN module to sleep */
 
 				/* Initialize accelerometer */
 				if (true)
@@ -279,7 +285,7 @@ int main (void)
 
 					//ADXL_readValues(); /* Read and display values forever */
 
-					ADXL_configActivity(6); /* Configure activity detection on INT1 [g] */
+					ADXL_configActivity(6); /* Configure (referenced) activity threshold mode on INT1 [g] */
 
 					ADXL_enableMeasure(true); /* Enable measurements */
 
@@ -328,11 +334,13 @@ int main (void)
 				dbinfoInt("Internal temperature: ", data.intTemp[data.index], "");
 #endif /* DEBUG_DBPRINT */
 
-				checkCable(); /* Check if the cable is intact and send LoRaWAN message if necessary */
+				/* Increase the index to put the next measurements in */
+				data.index++;
 
-				data.index++; /* Increase the index to put the next measurements in */
+				/* Check if the cable is intact and send LoRaWAN data if necessary */
+				if (checkCable(data)) data.index = 0; /* If measurements have been send, reset the index */
 
-				if (firstBoot)
+				if (firstBoot && (data.index > 0))
 				{
 
 #if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
@@ -370,8 +378,6 @@ int main (void)
 				dbwarnInt("Sending ", data.index, " measurements ...");
 #endif /* DEBUG_DBPRINT */
 
-				//wakeLoRaWAN(); /* Wake up the LoRaWAN module */
-
 				initLoRaWAN(); /* Initialize LoRaWAN functionality */
 
 				sendMeasurements(data); /* Send the measurements */
@@ -379,8 +385,6 @@ int main (void)
 				data.index = 0; /* Reset the index to put the measurements in (needs to be here for the correct data to be affected) */
 
 				disableLoRaWAN(); /* Disable RN2483 */
-
-				//sleepLoRaWAN(WAKE_UP_PERIOD_S); /* Put the LoRaWAN module back to sleep */
 
 #if LED_ENABLED == 1 /* LED_ENABLED */
 				led(false); /* Disable LED */
@@ -400,8 +404,6 @@ int main (void)
 				dbwarnInt("STORM DETECTED! Sending ", data.index, " measurement(s) ...");
 #endif /* DEBUG_DBPRINT */
 
-				//wakeLoRaWAN(); /* Wake up the LoRaWAN module */
-
 				initLoRaWAN(); /* Initialize LoRaWAN functionality */
 
 				sendStormDetected(true); /* Send a message to indicate that a storm has been detected */
@@ -414,8 +416,6 @@ int main (void)
 				}
 
 				disableLoRaWAN(); /* Disable RN2483 */
-
-				//sleepLoRaWAN(WAKE_UP_PERIOD_S); /* Put the LoRaWAN module back to sleep */
 
 				stormDetected = true; /* Indicate that a storm has been detected */
 
@@ -456,6 +456,8 @@ int main (void)
 				if (checkBTNinterrupts())
 				{
 					ADXL_clearCounter(); /* Clear the trigger counter */
+					oddRemainingSleeptime = 0; /* Reset passed sleeping time */
+
 					MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
 				}
 
@@ -465,6 +467,7 @@ int main (void)
 					RTC_clearWakeup(); /* Clear static variable */
 
 					ADXL_clearCounter(); /* Clear the trigger counter because we woke up "normally" */
+					oddRemainingSleeptime = 0; /* Reset passed sleeping time since it's an RTC wakeup */
 
 					MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
 				}
@@ -498,8 +501,25 @@ int main (void)
 						}
 						else
 						{
-							/* Go back to sleep, we only take measurements on RTC/button wakeup */
-							MCUstate = SLEEP; /* TODO: go to sleep for somehow the remaining RTC time on wakeup? */
+							/* Check if we have an ODD amount of wake-ups from the accelerometer
+							 *   Due to up-down movements two interrupts happen almost exactly after another
+							 *   so only the first "passed sleep time" is the real time spend sleeping.
+							 */
+							if ((ADXL_getCounter() % 2) > 0)
+							{
+								/* Add the time spend sleeping to the variable */
+								oddRemainingSleeptime += RTC_getPassedSleeptime();
+							}
+							else
+							{
+								/* Disable the counter manually because it normally gets disabled in the method "RTC_getPassedSleeptime" */
+								RTC_Enable(false);
+							}
+
+							/* Go back to sleep for the remaining time until another measurement (we only take measurements on RTC/button wake-up) */
+							sleep(WAKE_UP_PERIOD_S - oddRemainingSleeptime);
+
+							MCUstate = WAKEUP; /* Go back to this case if we wake-up */
 						}
 					}
 				}
