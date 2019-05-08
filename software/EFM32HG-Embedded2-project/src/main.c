@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 3.6
+ * @version 4.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -39,19 +39,20 @@
  *   @li v3.4: Moved `data.index` reset back to `main.c`.
  *   @li v3.5: Added functionality to go back to the remaining sleep time on an accelerometer wake-up.
  *   @li v3.6: Updated code to handle underlying changes.
+ *   @li v4.0: Updated documentation and version number.
  *
  * ******************************************************************************
  *
  * @todo
  *   **Optimalisations:**@n
- *     - Change *mode* to release (also see Reference Manual @ *6.3.2 Debug and EM2/EM3*).
- *         - Also see *AN0007: 2.8 Optimizing Code*.
  *     - Change LoRaWAN Spreading Factor and send power, and check the effect on the power usage.
  *     - Add some time to the `while` increment escape counters?
  *     - Check difference between absolute/referenced mode for the accelerometer and *calibrate* the g value.
+ *     - Change *mode* to release
  *
  * @todo
  *   **Future improvements:**@n
+ *     - Use *IAR toolchain* instead of *GCC*, see section **Optimizing code** in `documentation.h`
  *     - Sleep for some time in *while* loops instead of just incrementing the *escape-counter*.
  *         - First separate `ULFRCO` definition in `delay.c
  *     - Try to shorten delays (for example: 40 ms power-up time for the RN2483...)
@@ -102,6 +103,8 @@
  *
  *   When calling an `error` method, the following things were kept in mind:
  *     - **Values 0 - 9:** Reserved for reset and other critical functionality.
+ *         - **1:** Send once after a reset (`firstBoot == true` in `main.c`)
+ *         - **9:** Used in `sendTest(data);` method (`lora_wrappers.c`)
  *     - **Values 10 - ... :** Available to use for anything else.
  *
  *   Below is a list of values which correspond to certain functionality:
@@ -252,9 +255,9 @@ int main (void)
 				led(true); /* Enable (and initialize) LED */
 
 				delay(4000); /* 4 second delay to notice initialization */
-				led(false); /* Disable LED */
+				led(false);
 				delay(100);
-				led(true); /* Enable LED */
+				led(true);
 
 				initGPIOwakeup(); /* Initialize GPIO wake-up */
 
@@ -269,21 +272,23 @@ int main (void)
 				/* Initialize accelerometer */
 				if (true)
 				{
-					initADXL(); /* Initialize the accelerometer */
-
 					/* Go through all of the accelerometer ODR settings to see the influence they have on power usage. */
 					if (false)
 					{
+						initADXL(); /* Initialize the accelerometer */
+
 						led(false);
 						testADXL();
 						led(true);
 					}
 
+					initADXL(); /* Initialize the accelerometer */
+
 					ADXL_configRange(ADXL_RANGE_8G); /* Set the measurement range */
 
 					ADXL_configODR(ADXL_ODR_12_5_HZ); /* Configure ODR */
 
-					//ADXL_readValues(); /* Read and display values forever */
+					if (false) ADXL_readValues(); /* Read and display values forever */
 
 					ADXL_configActivity(6); /* Configure (referenced) activity threshold mode on INT1 [g] */
 
@@ -297,10 +302,6 @@ int main (void)
 
 					ADXL_clearCounter(); /* Clear the trigger counter */
 				}
-
-				//GPIO_PinModeSet(gpioPortC, 0, gpioModePushPull, 0); /* Debug pin */
-				//GPIO_PinOutSet(gpioPortC, 0); /* Debug pin */
-				//GPIO_PinOutClear(gpioPortC, 0); /* Debug pin */
 
 #if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
 				dbprintln("");
@@ -348,6 +349,8 @@ int main (void)
 #endif /* DEBUG_DBPRINT */
 
 					initLoRaWAN(); /* Initialize LoRaWAN functionality */
+
+					sendStatus(1); /* Send the status data */
 
 					sendMeasurements(data); /* Send the measurements */
 
@@ -428,12 +431,7 @@ int main (void)
 
 			case SLEEP:
 			{
-				// TODO These statements don't seem to have any effect on current consumption ...
-				//GPIO_PinModeSet(DBG_RXD_PORT, DBG_RXD_PIN, gpioModeDisabled, 0); /* Disable RXD pin (has 10k pullup resistor) */
-
 				sleep(WAKE_UP_PERIOD_S); /* Go to sleep for xx seconds */
-
-				//GPIO_PinModeSet(DBG_RXD_PORT, DBG_RXD_PIN, gpioModeInput, 0); /* Enable RXD pin */
 
 				MCUstate = WAKEUP;
 			} break;
