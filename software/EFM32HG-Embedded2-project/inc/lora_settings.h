@@ -28,7 +28,7 @@
  * 	- set to 1 to use the Over-the-Air activation procedure
  * 	- set to 0 to use the Personalization activation procedure
  */
-#define OVER_THE_AIR_ACTIVATION		0
+#define OVER_THE_AIR_ACTIVATION     0
 
 /*
  * SET default data rate
@@ -39,36 +39,36 @@
  * SF12_BW125
  * SF11_BW125
  * SF10_BW125
- * SF7_BW125
+ * SF9_BW125
  * SF8_BW125
  * SF7_BW125
  *
  * Try changing the SF to see its impact on the energy consumption
  */
-#define DEFAULT_DATA_RATE			SF10_BW125
+#define DEFAULT_DATA_RATE           SF10_BW125
 
 
 #if OVER_THE_AIR_ACTIVATION == 1
 // Copy your settings here
 /* 64-bit device ID */
-#define LORAWAN_DEVICE_EUI			"YOUR_DEVICE_EUI_"
+#define LORAWAN_DEVICE_EUI          "YOUR_DEVICE_EUI_"
 /* 64-bit application ID */
 #define LORAWAN_APPLICATION_EUI     "YOUR_APP_EUI____"
 /* 128-bit AES key */
 #define LORAWAN_APPLICATION_KEY     "YOUR_SECRET_AES_APPLICATION_KEY_"
 // Don't change
-#define JOIN_MECHANISM				OTAA
+#define JOIN_MECHANISM              OTAA
 
 #elif OVER_THE_AIR_ACTIVATION == 0
 // Copy your settings here
 /* 32-bit device address */
-#define LORAWAN_DEVICE_ADDRESS     	"DEV_ADDR"
+#define LORAWAN_DEVICE_ADDRESS      "DEV_ADDR"
 /* 128-bit AES key */
 #define LORAWAN_NWKSKEY             "YOUR_SECRET_AES_NWK_SESSION_KEY_"
 /* 128-bit AES key */
 #define LORAWAN_APPSKEY             "YOUR_SECRET_AES_APP_SESSION_KEY_"
 // Don't change
-#define JOIN_MECHANISM				ABP
+#define JOIN_MECHANISM              ABP
 #else
 #error "OVER_THE_AIR_ACTIVATION has the wrong value"
 #endif
@@ -85,25 +85,25 @@
  *****************************************************************************************/
 #if OVER_THE_AIR_ACTIVATION == 1
 #define LORA_INIT_MY_DEVICE                                         \
-{	JOIN_MECHANISM,						/* Activation mechanism */	\
-	DEFAULT_DATA_RATE,					/* Data Rate on start-up */ \
-	LORAWAN_DEVICE_EUI,					/* Device EUI */            \
-	LORAWAN_APPLICATION_EUI,			/* Application EUI */       \
-	LORAWAN_APPLICATION_KEY,			/* Application key */       \
-	"",									/* Device address */ 		\
-	"",									/* Network session key*/ 	\
-	"",									/* App session key*/ 		\
+{	JOIN_MECHANISM,                     /* Activation mechanism */  \
+	DEFAULT_DATA_RATE,                  /* Data Rate on start-up */ \
+	LORAWAN_DEVICE_EUI,                 /* Device EUI */            \
+	LORAWAN_APPLICATION_EUI,            /* Application EUI */       \
+	LORAWAN_APPLICATION_KEY,            /* Application key */       \
+	"",                                 /* Device address */        \
+	"",                                 /* Network session key*/    \
+	"",                                 /* App session key*/        \
 }
 #else
 #define LORA_INIT_MY_DEVICE                                         \
-{	JOIN_MECHANISM,						/* Activation mechanism */	\
-	DEFAULT_DATA_RATE,					/* Data Rate on start-up */ \
-	"",                 				/* Device EUI */            \
-	"",                					/* Application EUI */       \
-	"",									/* Application key */       \
-	LORAWAN_DEVICE_ADDRESS,				/* Device address */ 		\
-	LORAWAN_NWKSKEY, 					/* Network session key*/ 	\
-	LORAWAN_APPSKEY, 					/* App session key*/ 		\
+{	JOIN_MECHANISM,                     /* Activation mechanism */  \
+	DEFAULT_DATA_RATE,                  /* Data Rate on start-up */ \
+	"",                                 /* Device EUI */            \
+	"",                                 /* Application EUI */       \
+	"",                                 /* Application key */       \
+	LORAWAN_DEVICE_ADDRESS,             /* Device address */        \
+	LORAWAN_NWKSKEY,                    /* Network session key*/    \
+	LORAWAN_APPSKEY,                    /* App session key*/        \
 }
 #endif
 

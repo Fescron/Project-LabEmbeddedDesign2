@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file documentation.h
  * @brief This file contains useful documentation about the project.
- * @version 2.0
+ * @version 3.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -45,6 +45,16 @@
  *
  *   @note Check the section @ref CLOCKS1 "Crystals and RC oscillators" for more info about this.
  *
+ *   In the file `util.h` one can **enable or disable error forwarding to the cloud using
+ *   LoRaWAN**. This can be selected with the definition `#define ERROR_FORWARDING`. If
+ *   it's value is `0`, the MCU will display a UART debug message (if enabled, see
+ *   `debug_dbprint.h`) and enter a `while(true)` loop if the `error` method is called
+ *   where the LED will flash indicating that an error has occurred. If it's value is `1`,
+ *   a UART debug message will be displayed (if enabled) and the error number (if not
+ *   corresponding to an error call in LoRaWAN functionality) will be forwarded to the
+ *   cloud using LoRaWAN. After this, the code execution will be resumed. The MCU doesn't
+ *   get put in a `while(true)` loop.
+ *
  * ******************************************************************************
  *
  * @section Initializations
@@ -57,11 +67,19 @@
  *
  * @section DEBUG Debug mode, Energy monitor and VCOM
  *
- *   @warning When in debug mode, the MCU will not go below EM1. This can cause
+ *   @warning When in debug mode, the MCU will not really go below EM1. This can cause
  *   some weird behavior. Exit debug mode and reset the MCU after flashing it for it
  *   to go in the correct sleep modes and consume the "expected" power. The Energy
  *   profiler can also be used to program the MCU but it's also necessary to reset
  *   the MCU after flashing it.
+ *
+ *   Leaving the debugger connected when issuing a `WFI` or `WFE` to enter EM2 or
+ *   EM3 will make the system enter a special EM2. This mode differs from regular
+ *   EM2 and EM3 in that the high frequency clocks are still enabled, and certain
+ *   core functionality is still powered in order to maintain debug-functionality.
+ *   Because of this, the current consumption in this mode is closer to EM1 and
+ *   it is therefore important to disconnect the debugger before doing current
+ *   consumption measurements.
  *
  *   The Energy profiler in Simplicity Studio seems to use VCOM (on-board UART
  *   to USB converter) somehow, change to using an external UART adapter if both
@@ -153,6 +171,34 @@
  *   @warning `While` loops can pose problems if for some reason the thing they are waiting
  *   for doesn't happen (for example a bit doesn't get set). Because of this it's necessary
  *   to also implement another way to exit them. `For` loops don't have this possible problem.
+ *
+ * ******************************************************************************
+ *
+ * @section OPTIMALISATIONS Optimizing code
+ *
+ *   @note The following info was found in *AN0007: 2.8 Optimizing Code*.
+ *
+ *   Optimizing code usually leads to lower energy consumption by increasing the program speed and
+ *   efficiency. A faster program spends less time in active mode, and each task in a more efficient
+ *   program takes fewer instructions to execute.
+ *
+ *   A simple way to optimize your code is to **build it with the highest optimization settings**
+ *   in release mode** rather than in debug mode. In the [Development Perspective] of Simplicity Studio,
+ *   go to [Project]>[Build Configurations]>[Set Active] and select [Release] for your compiler.
+ *
+ *   Compiler selection can also have an impact on energy efficiency. For example, the **IAR compiler
+ *   tends to generate more efficient code than GCC**. To use the IAR toolchain in Simplicity Studio,
+ *   make sure IAR Embedded Workbench is installed on your computer. In the [Development Perspective] of
+ *   Simplicity Studio, go to [Project]>[Properties]>[C/C++ Build]>[Settings]. Under the [Configuration:]
+ *   drop down menu, select [IAR ARM - Release]. If you do not see this option, click
+ *   [Manage Configurations...]>[New...], select the [IAR ARM - Release], and click [OK] twice.
+ *   Next, increase IAR's optimization settings, under [Tool Settings]>[IAR C/C++ Compiler for ARM]>[Optimizations],
+ *   select [High, Balance] for the [Optimization level:]. Under [IAR Linker for ARM]>[Optimizations],
+ *   check all options ([Inline..., Merge..., Perform..., Even...]), and then click [OK].
+ *
+ *   @note As a starting point, this should lower energy consumption, but it may not be the most optimized
+ *   setting for a given project. Try different optimization settings such as [High, Speed], [High, Balance],
+ *   other optimization option combinations, even other compilers, and compare the results.
  *
  * ******************************************************************************
  *
