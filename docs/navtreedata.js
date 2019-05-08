@@ -10,6 +10,7 @@ var NAVTREE =
       [ "Crystals and RC oscillators (delay.c)", "index.html#CLOCKS1", null ],
       [ "GPIO clock (cmuClock_GPIO)", "index.html#CLOCKS2", null ],
       [ "Watchdog and while loops", "index.html#WATCHDOG", null ],
+      [ "Optimizing code", "index.html#OPTIMALISATIONS", null ],
       [ "RTCC (RTC calendar)", "index.html#RTCC", null ],
       [ "Energy modes (EM1 and EM3)", "index.html#EM", null ],
       [ "Alternate UART Functionality Pinout", "index.html#UART", null ],
@@ -48,8 +49,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "ADXL362_8c.html",
-"leuart_8c.html#a26d9ae913936b29818237a12cff73893",
-"pm_8h.html#a489f71a7c65f81d917ffc0e45fb709c1"
+"leuart_8c.html#a2501ce39f8ce778957dee84f3886f857",
+"pm_8h.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

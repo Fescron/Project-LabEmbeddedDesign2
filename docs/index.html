@@ -74,6 +74,7 @@ Settings using definitions in dbprint and delay functionality</h1>
 <p>In the file <code><a class="el" href="delay_8h.html" title="Delay functionality. ">delay.h</a></code> one can <b>choose between SysTicks or RTC sleep functionality</b> for delays. This can be selected with the definition <code>#define SYSTICKDELAY</code>. If it's value is <code>0</code>, the RTC compare sleep functionality is used. if it's value is <code>1</code>, delays are generated using SysTicks.</p>
 <p>In the file <code><a class="el" href="delay_8h.html" title="Delay functionality. ">delay.h</a></code> one can also <b>choose between the use of the ultra low-frequency RC oscillator (ULFRCO) or the low-frequency crystal oscillator (LFXO)</b> when being in a delay or sleeping. If the ULFRCO is selected, the MCU sleeps in EM3 and if the LFXO is selected the MCU sleeps in EM2. This can be selected with the definition <code>#define ULFRCO</code>. If it's value is <code>0</code>, the LFXO is used as the clock source. If it's value is <code>1</code> the ULFRCO is used.</p>
 <dl class="section note"><dt>Note</dt><dd>Check the section <a class="el" href="index.html#CLOCKS1">Crystals and RC oscillators</a> for more info about this.</dd></dl>
+<p>In the file <code><a class="el" href="util_8h.html" title="Utility functionality. ">util.h</a></code> one can <b>enable or disable error forwarding to the cloud using LoRaWAN</b>. This can be selected with the definition <code>#define ERROR_FORWARDING</code>. If it's value is <code>0</code>, the MCU will display a UART debug message (if enabled, see <code><a class="el" href="debug__dbprint_8h.html" title="Enable or disable printing to UART. ">debug_dbprint.h</a></code>) and enter a <code>while(true)</code> loop if the <code>error</code> method is called where the LED will flash indicating that an error has occurred. If it's value is <code>1</code>, a UART debug message will be displayed (if enabled) and the error number (if not corresponding to an error call in LoRaWAN functionality) will be forwarded to the cloud using LoRaWAN. After this, the code execution will be resumed. The MCU doesn't get put in a <code>while(true)</code> loop.</p>
 <hr/>
 <h1><a class="anchor" id="Initializations"></a>
 Initializations</h1>
@@ -81,7 +82,8 @@ Initializations</h1>
 <hr/>
 <h1><a class="anchor" id="DEBUG"></a>
 Debug mode, Energy monitor and VCOM</h1>
-<dl class="section warning"><dt>Warning</dt><dd>When in debug mode, the MCU will not go below EM1. This can cause some weird behavior. Exit debug mode and reset the MCU after flashing it for it to go in the correct sleep modes and consume the "expected" power. The Energy profiler can also be used to program the MCU but it's also necessary to reset the MCU after flashing it.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>When in debug mode, the MCU will not really go below EM1. This can cause some weird behavior. Exit debug mode and reset the MCU after flashing it for it to go in the correct sleep modes and consume the "expected" power. The Energy profiler can also be used to program the MCU but it's also necessary to reset the MCU after flashing it.</dd></dl>
+<p>Leaving the debugger connected when issuing a <code>WFI</code> or <code>WFE</code> to enter EM2 or EM3 will make the system enter a special EM2. This mode differs from regular EM2 and EM3 in that the high frequency clocks are still enabled, and certain core functionality is still powered in order to maintain debug-functionality. Because of this, the current consumption in this mode is closer to EM1 and it is therefore important to disconnect the debugger before doing current consumption measurements.</p>
 <p>The Energy profiler in Simplicity Studio seems to use VCOM (on-board UART to USB converter) somehow, change to using an external UART adapter if both the energy profiler and UART debugging are necessary at the same time!</p>
 <p>If the energy profiler was used and the code functionality was switched, physically re-plug the board to make sure VCOM UART starts working again!</p>
 <hr/>
@@ -111,6 +113,14 @@ Watchdog and while loops</h1>
 <p>At the start of this project it was the plan to also implement a <em>watchdog</em> timer to make sure the MCU wouldn't get stuck in some logic and waste unnecessary power. <code>RMU_ResetCauseGet</code> and <code>RMU_ResetCauseClear</code> also seemed interesting methods to use. However, because of the relatively short time this watchdog can handle (9 - 256 000 cycles, max 256 seconds) it would only be able to be active when the MCU was awake, and because implementing this would take extra time it was opted to just focus on writing code which couldn't get stuck anywhere.</p>
 <p>This was done by carefully <b>making sure that the MCU couldn't get stuck in a WHILE loop anywhere</b>, by also <b>incrementing a counter and checking it's value against a <em>timeout</em> value</b>, defined at the top of each file.</p>
 <dl class="section warning"><dt>Warning</dt><dd><code>While</code> loops can pose problems if for some reason the thing they are waiting for doesn't happen (for example a bit doesn't get set). Because of this it's necessary to also implement another way to exit them. <code>For</code> loops don't have this possible problem.</dd></dl>
+<hr/>
+<h1><a class="anchor" id="OPTIMALISATIONS"></a>
+Optimizing code</h1>
+<dl class="section note"><dt>Note</dt><dd>The following info was found in <em>AN0007: 2.8 Optimizing Code</em>.</dd></dl>
+<p>Optimizing code usually leads to lower energy consumption by increasing the program speed and efficiency. A faster program spends less time in active mode, and each task in a more efficient program takes fewer instructions to execute.</p>
+<p>A simple way to optimize your code is to <b>build it with the highest optimization settings</b> in release mode** rather than in debug mode. In the [Development Perspective] of Simplicity Studio, go to [Project]&gt;[Build Configurations]&gt;[Set Active] and select [Release] for your compiler.</p>
+<p>Compiler selection can also have an impact on energy efficiency. For example, the <b>IAR compiler tends to generate more efficient code than GCC</b>. To use the IAR toolchain in Simplicity Studio, make sure IAR Embedded Workbench is installed on your computer. In the [Development Perspective] of Simplicity Studio, go to [Project]&gt;[Properties]&gt;[C/C++ Build]&gt;[Settings]. Under the [Configuration:] drop down menu, select [IAR ARM - Release]. If you do not see this option, click [Manage Configurations...]&gt;[New...], select the [IAR ARM - Release], and click [OK] twice. Next, increase IAR's optimization settings, under [Tool Settings]&gt;[IAR C/C++ Compiler for ARM]&gt;[Optimizations], select [High, Balance] for the [Optimization level:]. Under [IAR Linker for ARM]&gt;[Optimizations], check all options ([Inline..., Merge..., Perform..., Even...]), and then click [OK].</p>
+<dl class="section note"><dt>Note</dt><dd>As a starting point, this should lower energy consumption, but it may not be the most optimized setting for a given project. Try different optimization settings such as [High, Speed], [High, Balance], other optimization option combinations, even other compilers, and compare the results.</dd></dl>
 <hr/>
 <h1><a class="anchor" id="RTCC"></a>
 RTCC (RTC calendar)</h1>
@@ -205,7 +215,7 @@ Bits, bytes, nibbles and unsigned/signed integer value ranges</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed May 8 2019 00:45:07 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Wed May 8 2019 18:39:54 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

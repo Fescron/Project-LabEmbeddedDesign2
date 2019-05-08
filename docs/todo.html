@@ -105,16 +105,14 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <dt><a class="anchor" id="_todo000005"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
 <dd><p class="startdd"><b>Optimalisations:</b><br />
 </p><ul>
-<li>Change <em>mode</em> to release (also see Reference Manual @ <em>6.3.2 Debug and EM2/EM3</em>).<ul>
-<li>Also see <em>AN0007: 2.8 Optimizing Code</em>.</li>
-</ul>
-</li>
 <li>Change LoRaWAN Spreading Factor and send power, and check the effect on the power usage.</li>
 <li>Add some time to the <code>while</code> increment escape counters?</li>
 <li>Check difference between absolute/referenced mode for the accelerometer and <em>calibrate</em> the g value.</li>
+<li>Change <em>mode</em> to release</li>
 </ul>
 <p class="enddd"><b>Future improvements:</b><br />
 </p><ul>
+<li>Use <em>IAR toolchain</em> instead of <em>GCC</em>, see section <b>Optimizing code</b> in <code><a class="el" href="documentation_8h.html" title="This file contains useful documentation about the project. ">documentation.h</a></code></li>
 <li>Sleep for some time in <em>while</em> loops instead of just incrementing the <em>escape-counter</em>.<ul>
 <li>First separate <code>ULFRCO</code> definition in `delay.c</li>
 </ul>
@@ -143,7 +141,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed May 8 2019 00:45:07 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Wed May 8 2019 18:39:54 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
