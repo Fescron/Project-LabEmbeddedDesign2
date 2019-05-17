@@ -9,8 +9,7 @@
 
 <br/>
 
-This repository contains the **presentation**, **reports** and **code** for the project constructed for **Embedded System Design 2 - Lab**. <br/>
-The code is developed using `Simplicity Studio v4` on `Ubuntu 18.04 LTS`. The code also needs **dbprint** functionality, which needs to be added alongside the code on this repository for it to compile again. See [dbprint GIT repo](https://github.com/Fescron/dbprint) for more info regarding this.
+This repository contains the **presentation**, **reports** and **code** for the project constructed for **Embedded System Design 2 - Lab**.
 
 <img src="documentation/figures/testing3.png" height="300" alt="Project"> <img src="documentation/figures/testing4.png" height="300" alt="Project">
 
@@ -24,10 +23,7 @@ The code is developed using `Simplicity Studio v4` on `Ubuntu 18.04 LTS`. The co
 - [Schematic of custom PCB](documentation/schematics/project-embeddedSystemDesign2.pdf)
 - [Schematic of DRAMCO LoRaWAN shield](documentation/schematics/dramco-LoRa-addon-schematic-v4-0.pdf)
 - [Picture with PCB dimensions](https://raw.githubusercontent.com/Fescron/Project-LabEmbeddedDesign2/master/hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-pcb-dimensions.png)
-
-<br/>
-
-- [The Things Network - Applications (Register LoRaWAN device)](https://console.thethingsnetwork.org/applications/)
+- [The Things Network - Applications](https://console.thethingsnetwork.org/applications/)
 - [Cayenne Dashboard](https://cayenne.mydevices.com/cayenne/dashboard/start)
 
 <br/>
@@ -57,6 +53,8 @@ The code is developed using `Simplicity Studio v4` on `Ubuntu 18.04 LTS`. The co
 <br/>
 
 ## 2 - Code flow
+
+**Note:** The code is developed using `Simplicity Studio v4` on `Ubuntu 18.04 LTS`. The code also needs **dbprint** functionality, which needs to be added alongside the code on this repository for it to compile again. See [dbprint GIT repo](https://github.com/Fescron/dbprint) for more info regarding this.
 
 ![Flowchart](/documentation/figures/flowchart-full.png?raw=true "Flowchart")
 
