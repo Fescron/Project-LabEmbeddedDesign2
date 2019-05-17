@@ -22,7 +22,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 - [Doxygen code documentation of individual files and methods](https://fescron.github.io/Project-LabEmbeddedDesign2/files.html)
 - [Schematic of custom PCB](documentation/schematics/project-embeddedSystemDesign2.pdf)
 - [Schematic of DRAMCO LoRaWAN shield](documentation/schematics/dramco-LoRa-addon-schematic-v4-0.pdf)
-- [Picture with PCB dimensions](https://raw.githubusercontent.com/Fescron/Project-LabEmbeddedDesign2/master/hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-pcb-dimensions.png)
+- [Picture with PCB dimensions](hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-pcb-dimensions.png)
 - [The Things Network - Applications](https://console.thethingsnetwork.org/applications/)
 - [Cayenne Dashboard](https://cayenne.mydevices.com/cayenne/dashboard/start)
 
@@ -35,7 +35,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 | [/docs/](https://fescron.github.io/Project-LabEmbeddedDesign2/index.html) | **[Doxygen](http://www.doxygen.org) code documentation.** |
 | <br/>      |           |
 | [/documentation/current measurements/](documentation/current%20measurements) | Documents containing current measurements. |
-| [/documentation/current measurements/measurements-SF/](documentation/current%20measurements/measurements-SF) | Pictures depicting current profiles for sending 6 measurements at full gain with different LoRaWAN *Spreading Factors*. More information can be found in section *"3 - LoRaWAN spreading factor (RN2483)"* in [this](documentation/current%20measurements/currents-2-projectEmbeddedDesign2.pdf) file . |
+| [/documentation/current measurements/measurements-SF/](documentation/current%20measurements/measurements-SF) | Pictures depicting current profiles for sending 6 measurements at full gain with different LoraWAN *Spreading Factors*. More information can be found in section *"3 - LoRaWAN spreading factor (RN2483)"* in [this](documentation/current%20measurements/currents-2-projectEmbeddedDesign2.pdf) file . |
 | <br/>      |           |
 | [/documentation/datasheets/](documentation/datasheets) | General datasheets regarding the used items. |
 | [/documentation/datasheets/hardware-design/](documentation/datasheets/hardware-design) | Documents regarding hardware design for the `EFM32HG` microcontroller. |
@@ -46,7 +46,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 | [/documentation/schematics/](documentation/schematics) | Schematics. <br/>  See [this](documentation/schematics/project-embeddedSystemDesign2.pdf) file for the schematic of the *self designed PCB* and [this](documentation/schematics/dramco-LoRa-addon-schematic-v4-0.pdf) file for the schematic of the *DRAMCO LoRaWAN shield*.
 | <br/>      |           |
 | [/hardware/project-embeddedSystemDesign2/](hardware/project-embeddedSystemDesign2) | [KiCad](http://kicad-pcb.org/) PCB design files. <br/> See [this](hardware/project-embeddedSystemDesign2/pdf/project-embeddedSystemDesign2.pdf) file for the *schematic* and [this](hardware/project-embeddedSystemDesign2/bom/bom-custom-gecko-v1-0.pdf) file for the *BOM*. |
-| [/hardware/project-embeddedSystemDesign2/3d-renders/](hardware/project-embeddedSystemDesign2/3d-renders) | Pictures of 3D renders of the *self designed PCB*. <br/> On [this](https://raw.githubusercontent.com/Fescron/Project-LabEmbeddedDesign2/master/hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-pcb-dimensions.png) picture the *dimensions* are displayed. <br/>  [This](https://raw.githubusercontent.com/Fescron/Project-LabEmbeddedDesign2/master/hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2.png) is a render of the *front* and [this](https://raw.githubusercontent.com/Fescron/Project-LabEmbeddedDesign2/master/hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-back.png) is a render of the *back*. |
+| [/hardware/project-embeddedSystemDesign2/3d-renders/](hardware/project-embeddedSystemDesign2/3d-renders) | Pictures of 3D renders of the *self designed PCB*. <br/> On [this](hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-pcb-dimensions.png) picture the *dimensions* are displayed. <br/>  [This](hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2.png) is a render of the *front* and [this](hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-back.png) is a render of the *back*. |
 | <br/>      |           |
 | [/software/EFM32HG-Embedded2-project/](software/EFM32HG-Embedded2-project) | **Code for the project.** <br/> See [this](https://fescron.github.io/Project-LabEmbeddedDesign2/index.html) page for *general important documentation* and [this](https://fescron.github.io/Project-LabEmbeddedDesign2/files.html) page for information regarding *individual files and their methods*. |
 
