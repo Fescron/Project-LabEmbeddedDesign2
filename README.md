@@ -17,7 +17,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 
 ## 0 - Quick links
 
-- [Reports and presentation](documentation/reports)
+- [**Reports and presentation**](documentation/reports)
 - [General important Doxygen documentation](https://fescron.github.io/Project-LabEmbeddedDesign2/index.html)
 - [Doxygen code documentation of individual files and methods](https://fescron.github.io/Project-LabEmbeddedDesign2/files.html)
 - [Schematic of custom PCB](documentation/schematics/project-embeddedSystemDesign2.pdf)
