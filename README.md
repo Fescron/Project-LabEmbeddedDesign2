@@ -11,7 +11,7 @@
 
 This repository contains the **presentation**, **reports** and **code** for the project constructed for **Embedded System Design 2 - Lab**.
 
-<img src="hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2.png" height="300" alt="Project"> <img src="documentation/figures/testing4.png" height="300" alt="Project">
+<img src="hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2.png" height="400" alt="Project"> <img src="documentation/figures/testing4.png" height="400" alt="Project">
 
 <br/>
 
