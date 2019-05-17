@@ -1,18 +1,15 @@
 # Project-LabEmbeddedDesign2
 
 ![License](https://img.shields.io/badge/license-GNU%20GPL%20v3.0-blue.svg)
-![GitHub Release Date](https://img.shields.io/github/release-date/Fescron/Project-LabEmbeddedDesign2.svg)
-![GitHub release](https://img.shields.io/github/release/Fescron/Project-LabEmbeddedDesign2.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Fescron/Project-LabEmbeddedDesign2.svg)
 ![Target device](https://img.shields.io/badge/target%20device-EFM32HG322F64G-yellow.svg)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Fescron/Project-LabEmbeddedDesign2.svg)
+<!-- ![GitHub Release Date](https://img.shields.io/github/release-date/Fescron/Project-LabEmbeddedDesign2.svg) -->
+<!-- ![GitHub release](https://img.shields.io/github/release/Fescron/Project-LabEmbeddedDesign2.svg) -->
 
 <br/>
 
-This repository contains the **presentation**, **reports** and **code** for the project constructed for **Embedded System Design 2 - Lab**.
-
-<br/>
-
+This repository contains the **presentation**, **reports** and **code** for the project constructed for **Embedded System Design 2 - Lab**. <br/>
 The code is developed using `Simplicity Studio v4` on `Ubuntu 18.04 LTS`. The code also needs **dbprint** functionality, which needs to be added alongside the code on this repository for it to compile again. See [dbprint GIT repo](https://github.com/Fescron/dbprint) for more info regarding this.
 
 <img src="documentation/figures/testing3.png" height="300" alt="Project"> <img src="documentation/figures/testing4.png" height="300" alt="Project">
