@@ -15,7 +15,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 
 <br/>
 
-## 0 - Quick links
+## 1 - Quick links
 
 - [**Reports and presentation**](documentation/reports)
 - [General important Doxygen documentation](https://fescron.github.io/Project-LabEmbeddedDesign2/index.html)
@@ -28,7 +28,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 
 <br/>
 
-## 1 - GIT repo structure
+## 2 - GIT repo structure
 
 |  Location  |  Content  |
 | ---------- | --------- |
@@ -52,7 +52,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 
 <br/>
 
-## 2 - Code flow
+## 3 - Code flow
 
 **Note:** The code is developed using `Simplicity Studio v4` on `Ubuntu 18.04 LTS`. The code also needs **dbprint** functionality, which needs to be added alongside the code on this repository for it to compile again. See [dbprint GIT repo](https://github.com/Fescron/dbprint) for more info regarding this.
 
@@ -69,7 +69,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 - **(\*2):** On every external temperature measurement the VDD and DATA pin get re-configured. The oneWire protocol is achieved using *bit-banging*.
 - **(\*3):** The RN2483 module gets enabled and configured before sending the data. Afterwards it gets disabled again. The **status** message is always send, measurements only if there are any recorded.
 - **(\*4):** Only one set of measurements are send along with the status message.
-- **(\*5):** The value of **X** depends on a configurd setting.
+- **(\*5):** The value of **X** depends on a configured setting.
 - **(\*6):** A status message is send along with any recorded measurements.
 
 <br/>
