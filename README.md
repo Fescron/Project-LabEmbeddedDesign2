@@ -48,7 +48,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 | [/hardware/project-embeddedSystemDesign2/](hardware/project-embeddedSystemDesign2) | [KiCad](http://kicad-pcb.org/) PCB design files. <br/> See [this](hardware/project-embeddedSystemDesign2/pdf/project-embeddedSystemDesign2.pdf) file for the *schematic* and [this](hardware/project-embeddedSystemDesign2/bom/bom-custom-gecko-v1-0.pdf) file for the *BOM*. |
 | [/hardware/project-embeddedSystemDesign2/3d-renders/](hardware/project-embeddedSystemDesign2/3d-renders) | Pictures of 3D renders of the *self designed PCB*. <br/> On [this](hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-pcb-dimensions.png) picture the *dimensions* are displayed. <br/>  [This](hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2.png) is a render of the *front* and [this](hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-back.png) is a render of the *back*. |
 | <br/>      |           |
-| [/software/EFM32HG-Embedded2-project/](software/EFM32HG-Embedded2-project) | **Code for the project.** <br/> See [this](https://fescron.github.io/Project-LabEmbeddedDesign2/index.html) page for *general important documentation* and [this](https://fescron.github.io/Project-LabEmbeddedDesign2/files.html) page for information regarding *individual files and their methods*. |
+| [/software/EFM32HG-Embedded2-project/](software/EFM32HG-Embedded2-project) | **Code for the project.** <br/> See [this](https://fescron.github.io/Project-LabEmbeddedDesign2/index.html) page for *general important documentation* and [this](https://fescron.github.io/Project-LabEmbeddedDesign2/files.html) page for information regarding *individual files and their methods*. [This](software/decoder.js) is the *decoder* for use on The *Things Network*. |
 
 <br/>
 
@@ -79,3 +79,15 @@ This repository contains the **presentation**, **reports** and **code** for the 
 - If an **error** occures this gets **forwarded to the cloud using a LoRaWAN status message**.
 - To conserve sended bytes a **custom data-format** was used (along with a *decoder*).
 - Negative internal and external temperatures were successfully send and displayed. The internal temperature seems to be 2 - 3 °C off.
+
+<br/>
+
+## 4 - Extra hardware changes
+
+The [schematic](hardware/project-embeddedSystemDesign2/pdf/project-embeddedSystemDesign2.pdf) for the custom PCB **misses two resistors**. A surface mount `10 kΩ` resistor was added between the *data* and *power* pin for the DS18B20 temperature sensor. A `3,3 kΩ` resistor with wires was added between the `BREAK_1`pin and `VDD`. These added resistors can be seen on the bottom right on the left most picture below.
+
+<img src="documentation/figures/modifications-pcb.png" height="400" alt="Added resistors"> <img src="documentation/figures/modifications-shield.png" height="400" alt="Shield modifications">
+
+An **SMA connector for an external antenna** was also added to the DRAMCO LoRaWAN shield. This was done by **removing** the `chip-antenna`, capacitors `C3` and `C4` and inductor `L1` and replacing it with an SMA connector directly connected to the signal pin of the *RN2483* module. This modification can be seen on the right on the right most picture above.
+
+<br/>
