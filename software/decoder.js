@@ -18,23 +18,23 @@
 
 
  /**
-	* Function that does the decoding, calls other functions if necessary.
-	* @param {*} bytes The received "raw" bytes.
-	* @param {*} port The port the bytes were received on (not used...)
-	*/
+  * Function that does the decoding, calls other functions if necessary.
+  * @param {*} bytes The received "raw" bytes.
+  * @param {*} port The port the bytes were received on (not used...)
+  */
 function Decoder (bytes, port) {
-  var decoded = {};
-  decoded.BatteryVoltage = [];
-  decoded.InternalTemperature = [];
-  decoded.ExternalTemperature = [];
-  decoded.StormDetected = [];
-  decoded.CableBroken = [];
+	var decoded = {};
+	decoded.BatteryVoltage = [];
+	decoded.InternalTemperature = [];
+	decoded.ExternalTemperature = [];
+	decoded.StormDetected = [];
+	decoded.CableBroken = [];
 	decoded.Status = [];
-	
+
 	var count = 0; 
-  var NR_of_Meas = bytes[0];
-  var type;
-  count++;
+	var NR_of_Meas = bytes[0];
+	var type;
+	count++;
  
 	while (count < bytes.length) {
 		switch (bytes[count]) {
@@ -116,22 +116,22 @@ function Decoder (bytes, port) {
  * @param {*} type The Cayenne LPP datatype.
  */
 function bytesToArray2(bytes, NR_of_Meas, count, type) {
-  var data_size = 2;
-  var num_byte_el = bytes.length;
-  var readings = [];
+	var data_size = 2;
+	var num_byte_el = bytes.length;
+	var readings = [];
 
-  for (var reading_id = 0; reading_id < NR_of_Meas; reading_id++) {
-    var value = ( ( (bytes[reading_id+count] << 8) | bytes[reading_id+count+1]) << 16) >> 16;
+	for (var reading_id = 0; reading_id < NR_of_Meas; reading_id++) {
+		var value = ( ( (bytes[reading_id+count] << 8) | bytes[reading_id+count+1]) << 16) >> 16;
 
-    // Send float values are multiplied by 1000 (24.6 = 24600)
-    if (type === 0x67) readings.push(parseFloat(value)/10.0);
+		// Send float values are multiplied by 1000 (24.6 = 24600)
+		if (type === 0x67) readings.push(parseFloat(value)/10.0);
 		else readings.push(parseFloat(value)/100.0);
 		
-    count += 1;
-  }
+		count += 1;
+	}
 
-  console.log(readings);
-  return readings;
+	console.log(readings);
+	return readings;
 }
 
 
@@ -142,18 +142,18 @@ function bytesToArray2(bytes, NR_of_Meas, count, type) {
  * @param {*} count Counter value.
  */
 function bytesToArray1(bytes, NR_of_Meas, count) {
-  var data_size = 1;
-  var num_byte_el = bytes.length;
-  var readings = [];
+	var data_size = 1;
+	var num_byte_el = bytes.length;
+	var readings = [];
 
-  for (var reading_id = 0; reading_id < NR_of_Meas; reading_id++) {
+	for (var reading_id = 0; reading_id < NR_of_Meas; reading_id++) {
 		var value = bytes[reading_id+count];
 
 		readings.push(parseInt(value));
 		
-    count += 0;
-  }
+		count += 0;
+	}
 
-  console.log(readings);
-  return readings;
+	console.log(readings);
+	return readings;
 }
