@@ -50,7 +50,7 @@ var NAVTREEINDEX =
 [
 "ADXL362_8c.html",
 "leuart_8c.html#a2501ce39f8ce778957dee84f3886f857",
-"pm_8h.html"
+"pm_8c.html#a9d8613db8dabd35cb97bdb476fb6a360"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

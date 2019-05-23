@@ -1,5 +1,8 @@
 var main_8c =
 [
+    [ "ADXL_ODR", "main_8c.html#a1821a5c04025bd239a25558b271aa6c2", null ],
+    [ "ADXL_RANGE", "main_8c.html#ab40fc0ba415a81e5bc1f27bea0d991f8", null ],
+    [ "ADXL_THRESHOLD", "main_8c.html#aa78130813203b34499e74b5e40e8320c", null ],
     [ "LED_ENABLED", "main_8c.html#a2ee109ad948cb91914bc161a8fabdb3f", null ],
     [ "STORM_INTERRUPTS", "main_8c.html#a0f0eb9c2fcd0551bc741bb80081a6e2e", null ],
     [ "WAKE_UP_PERIOD_S", "main_8c.html#ae1c1201a004beb35d405fd396f53f86c", null ],
