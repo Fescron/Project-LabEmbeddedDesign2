@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 4.0
+ * @version 5.0
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -40,6 +40,8 @@
  *   @li v3.5: Added functionality to go back to the remaining sleep time on an accelerometer wake-up.
  *   @li v3.6: Updated code to handle underlying changes.
  *   @li v4.0: Updated documentation and version number.
+ *   @li v4.1: Added definitions to easily change the accelerometer's configuration settings.
+ *   @li v5.0: Updated sleep logic when waking up using the accelerometer.
  *
  * ******************************************************************************
  *
@@ -47,8 +49,9 @@
  *   **Optimalisations:**@n
  *     - Change LoRaWAN Spreading Factor and send power, and check the effect on the power usage.
  *     - Add some time to the `while` increment escape counters?
- *     - Check difference between absolute/referenced mode for the accelerometer and *calibrate* the g value.
- *     - Change *mode* to release
+ *     - Check power usage effect of disabling `PM_SENS_EXT`.
+ *     - Check difference between absolute/referenced mode for the accelerometer.
+ *     - Change *mode* to release.
  *
  * @todo
  *   **Future improvements:**@n
@@ -156,15 +159,24 @@
 /** Time between each wake-up in seconds
  *    @li max 500 seconds when using LFXO delay
  *    @li 3600 seconds (one hour) works fine when using ULFRCO delay */
-#define WAKE_UP_PERIOD_S 3600 /* 600 = every 10 minutes */
+#define WAKE_UP_PERIOD_S   600 /* 600 = every 10 minutes */
 
-/** Amount of PIN interrupt wakeups (before a RTC wakeup) to be considered as a *storm* */
-#define STORM_INTERRUPTS 6
+/** Amount of PIN interrupt wakeups (before a RTC wake-up) to be considered as a *storm* */
+#define STORM_INTERRUPTS   8
+
+/** The threshold value [g] for the accelerometer to detect and send an interrupt to wake-up the MCU */
+#define ADXL_THRESHOLD     7
+
+/** The *g* range to configure the accelerometer with */
+#define ADXL_RANGE         ADXL_RANGE_8G
+
+/** The ODR setting to configure the accelerometer with */
+#define ADXL_ODR           ADXL_ODR_12_5_HZ
 
 /** Public definition to select if the LED is turned on while measuring or sending data
  *    @li `1` - Enable the LED when while measuring or sending data.
  *    @li `0` - Don't enable the LED while measuring or sending data. */
-#define LED_ENABLED 0
+#define LED_ENABLED        0
 
 
 /* Local variables */
@@ -228,8 +240,8 @@ int main (void)
 	/* Value used to send one test LoRaWAN message after booting */
 	bool firstBoot = true;
 
-	/* Value to keep the remaining sleep time for odd ADXL_triggercounter values (due to up-down movement...) */
-	uint32_t oddRemainingSleeptime = 0;
+	/* Value to keep the remaining sleep time when waking up using the accelerometer */
+	uint32_t remainingSleeptime = 0;
 
 	/* Set the index to put the measurements in */
 	data.index = 0;
@@ -284,13 +296,13 @@ int main (void)
 
 					initADXL(); /* Initialize the accelerometer */
 
-					ADXL_configRange(ADXL_RANGE_8G); /* Set the measurement range */
+					ADXL_configRange(ADXL_RANGE); /* Set the measurement range */
 
-					ADXL_configODR(ADXL_ODR_12_5_HZ); /* Configure ODR */
+					ADXL_configODR(ADXL_ODR); /* Configure ODR */
 
 					if (false) ADXL_readValues(); /* Read and display values forever */
 
-					ADXL_configActivity(6); /* Configure (referenced) activity threshold mode on INT1 [g] */
+					ADXL_configActivity(ADXL_THRESHOLD); /* Configure (referenced) activity threshold mode on INT1 [g] */
 
 					ADXL_enableMeasure(true); /* Enable measurements */
 
@@ -354,9 +366,9 @@ int main (void)
 
 					sendMeasurements(data); /* Send the measurements */
 
-					data.index = 0; /* Reset the index to put the measurements in (needs to be here for the correct data to be affected) */
-
 					disableLoRaWAN(); /* Disable RN2483 */
+
+					data.index = 0; /* Reset the index to put the measurements in (needs to be here for the correct data to be affected) */
 
 					firstBoot = false;
 				}
@@ -385,9 +397,9 @@ int main (void)
 
 				sendMeasurements(data); /* Send the measurements */
 
-				data.index = 0; /* Reset the index to put the measurements in (needs to be here for the correct data to be affected) */
-
 				disableLoRaWAN(); /* Disable RN2483 */
+
+				data.index = 0; /* Reset the index to put the measurements in (needs to be here for the correct data to be affected) */
 
 #if LED_ENABLED == 1 /* LED_ENABLED */
 				led(false); /* Disable LED */
@@ -454,7 +466,7 @@ int main (void)
 				if (checkBTNinterrupts())
 				{
 					ADXL_clearCounter(); /* Clear the trigger counter */
-					oddRemainingSleeptime = 0; /* Reset passed sleeping time */
+					remainingSleeptime = 0; /* Reset passed sleeping time */
 
 					MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
 				}
@@ -465,7 +477,7 @@ int main (void)
 					RTC_clearWakeup(); /* Clear static variable */
 
 					ADXL_clearCounter(); /* Clear the trigger counter because we woke up "normally" */
-					oddRemainingSleeptime = 0; /* Reset passed sleeping time since it's an RTC wakeup */
+					remainingSleeptime = 0; /* Reset passed sleeping time since it's an RTC wakeup */
 
 					MCUstate = MEASURE; /* Take measurements on "case WAKEUP" exit */
 				}
@@ -499,23 +511,14 @@ int main (void)
 						}
 						else
 						{
-							/* Check if we have an ODD amount of wake-ups from the accelerometer
-							 *   Due to up-down movements two interrupts happen almost exactly after another
-							 *   so only the first "passed sleep time" is the real time spend sleeping.
-							 */
-							if ((ADXL_getCounter() % 2) > 0)
-							{
-								/* Add the time spend sleeping to the variable */
-								oddRemainingSleeptime += RTC_getPassedSleeptime();
-							}
-							else
-							{
-								/* Disable the counter manually because it normally gets disabled in the method "RTC_getPassedSleeptime" */
-								RTC_Enable(false);
-							}
+							remainingSleeptime += RTC_getPassedSleeptime(); /* Add the time spend sleeping to the variable */
+
+#if LED_ENABLED == 1 /* LED_ENABLED */
+							led(false); /* Disable LED */
+#endif /* LED_ENABLED */
 
 							/* Go back to sleep for the remaining time until another measurement (we only take measurements on RTC/button wake-up) */
-							sleep(WAKE_UP_PERIOD_S - oddRemainingSleeptime);
+							sleep(WAKE_UP_PERIOD_S - remainingSleeptime);
 
 							MCUstate = WAKEUP; /* Go back to this case if we wake-up */
 						}
