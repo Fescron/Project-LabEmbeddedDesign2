@@ -42,7 +42,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 | [/documentation/datasheets/timers-energy-rtc/](documentation/datasheets/timers-energy-rtc) | Documents regarding `timers`, the `RTC` and `energy modes` on the `EFM32HG` microcontroller. |
 | <br/>      |           |
 | [/documentation/figures/](documentation/figures) | Figures used in reports and the README. |
-| [/documentation/figures/installation/](documentation/figures/installation) | Figures taken during the project installation. |
+| [/documentation/figures/installation/](documentation/figures/installation) | **Pictures taken during the project installation.** |
 | [/documentation/reports/](documentation/reports) | **Reports and presentation.** |
 | [/documentation/schematics/](documentation/schematics) | Schematics. <br/>  See [this](documentation/schematics/project-embeddedSystemDesign2.pdf) file for the schematic of the *self designed PCB* and [this](documentation/schematics/dramco-LoRa-addon-schematic-v4-0.pdf) file for the schematic of the *DRAMCO LoRaWAN shield*.
 | <br/>      |           |
