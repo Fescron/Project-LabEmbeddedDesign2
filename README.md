@@ -20,6 +20,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 - [**Reports and presentation**](documentation/reports)
 - [General important Doxygen documentation](https://fescron.github.io/Project-LabEmbeddedDesign2/index.html)
 - [Doxygen code documentation of individual files and methods](https://fescron.github.io/Project-LabEmbeddedDesign2/files.html)
+- [Code for the custom TTN decoder](software/decoder.js)
 - [Schematic of custom PCB](documentation/schematics/project-embeddedSystemDesign2.pdf)
 - [Schematic of DRAMCO LoRaWAN shield](documentation/schematics/dramco-LoRa-addon-schematic-v4-0.pdf)
 - [Picture with PCB dimensions](hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2-pcb-dimensions.png)
