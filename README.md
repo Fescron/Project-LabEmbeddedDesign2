@@ -11,7 +11,7 @@
 
 This repository contains the **presentation**, **reports** and **code** for the project constructed for **Embedded System Design 2 - Lab**.
 
-<img src="hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2.png" height="400" alt="Project"> <img src="documentation/figures/testing4.png" height="400" alt="Project">
+<img src="hardware/project-embeddedSystemDesign2/3d-renders/project-embeddedSystemDesign2.png" height="400" alt="Project"> <img src="documentation/figures/project.png" height="400" alt="Project">
 
 <br/>
 
@@ -42,6 +42,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 | [/documentation/datasheets/timers-energy-rtc/](documentation/datasheets/timers-energy-rtc) | Documents regarding `timers`, the `RTC` and `energy modes` on the `EFM32HG` microcontroller. |
 | <br/>      |           |
 | [/documentation/figures/](documentation/figures) | Figures used in reports and the README. |
+| [/documentation/figures/installation/](documentation/figures/installation) | Figures taken during the project installation. |
 | [/documentation/reports/](documentation/reports) | **Reports and presentation.** |
 | [/documentation/schematics/](documentation/schematics) | Schematics. <br/>  See [this](documentation/schematics/project-embeddedSystemDesign2.pdf) file for the schematic of the *self designed PCB* and [this](documentation/schematics/dramco-LoRa-addon-schematic-v4-0.pdf) file for the schematic of the *DRAMCO LoRaWAN shield*.
 | <br/>      |           |
@@ -89,5 +90,9 @@ The [schematic](hardware/project-embeddedSystemDesign2/pdf/project-embeddedSyste
 <img src="documentation/figures/modifications-pcb.png" height="400" alt="Added resistors"> <img src="documentation/figures/modifications-shield.png" height="400" alt="Shield modifications">
 
 An **SMA connector for an external antenna** was also added to the DRAMCO LoRaWAN shield. This was done by **removing** the `chip-antenna`, capacitors `C3` and `C4` and inductor `L1` and replacing it with an SMA connector directly connected to the signal pin of the *RN2483* module. This modification can be seen on the right on the right most picture above.
+
+To protect the PCB's from moisture and other contaminants, they were given 2 coats of `PLASTIK 70`.
+
+<img src="documentation/figures/coating1.png" height="400" alt="Protection during coating"> <img src="documentation/figures/coating2.png" height="400" alt="Coating process">
 
 <br/>
