@@ -159,7 +159,7 @@
 /** Time between each wake-up in seconds
  *    @li max 500 seconds when using LFXO delay
  *    @li 3600 seconds (one hour) works fine when using ULFRCO delay */
-#define WAKE_UP_PERIOD_S   600 /* 600 = every 10 minutes */
+#define WAKE_UP_PERIOD_S   1800 /* 600 = every 10 minutes */
 
 /** Amount of PIN interrupt wakeups (before a RTC wake-up) to be considered as a *storm* */
 #define STORM_INTERRUPTS   8
