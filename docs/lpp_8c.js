@@ -41,5 +41,6 @@ var lpp_8c =
     [ "LPP_deprecated_AddStatus", "lpp_8c.html#a2950e929fe2fe5a27f985e3c5220f705", null ],
     [ "LPP_deprecated_AddStormDetected", "lpp_8c.html#aff60f0a4fb63a8cc0fe6056e64f6d97e", null ],
     [ "LPP_deprecated_AddVBAT", "lpp_8c.html#a168a1f12fff09200b30a15acc105f16d", null ],
+    [ "LPP_FreeBuffer", "lpp_8c.html#a54a743257a71a1ea48a38abc48d72129", null ],
     [ "LPP_InitBuffer", "lpp_8c.html#a9a60ae8261926e1d437334fd6ae03d05", null ]
 ];

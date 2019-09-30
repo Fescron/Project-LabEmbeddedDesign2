@@ -1,20 +1,12 @@
 var NAVTREE =
 [
   [ "Embedded System Design 2 - Project", "index.html", [
-    [ "Important documentation", "index.html", [
+    [ "DeBugPrint", "index.html", [
       [ "Doxygen", "index.html#Doxygen", null ],
-      [ "Settings using definitions in dbprint and delay functionality", "index.html#SETTINGS", null ],
-      [ "Initializations", "index.html#Initializations", null ],
-      [ "Debug mode, Energy monitor and VCOM", "index.html#DEBUG", null ],
-      [ "GPIO/DATA/BUS pins and sleep mode", "index.html#GPIO", null ],
-      [ "Crystals and RC oscillators (delay.c)", "index.html#CLOCKS1", null ],
-      [ "GPIO clock (cmuClock_GPIO)", "index.html#CLOCKS2", null ],
-      [ "Watchdog and while loops", "index.html#WATCHDOG", null ],
-      [ "Optimizing code", "index.html#OPTIMALISATIONS", null ],
-      [ "RTCC (RTC calendar)", "index.html#RTCC", null ],
-      [ "Energy modes (EM1 and EM3)", "index.html#EM", null ],
+      [ "Enable/disable dbprint using definition in `debug_dbprint.h`", "index.html#ENABLE", null ],
+      [ "More info about dbprint and VCOM", "index.html#DBPRINT", null ],
+      [ "Energy profiler and dbprint", "index.html#ENERGY", null ],
       [ "Alternate UART Functionality Pinout", "index.html#UART", null ],
-      [ "More info about `dbprint`", "index.html#DBPRINT", null ],
       [ "Keywords", "index.html#Keywords", [
         [ "Volatile", "index.html#Volatile", null ],
         [ "Extern", "index.html#Extern", null ],
@@ -49,8 +41,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "ADXL362_8c.html",
-"leuart_8c.html#a2501ce39f8ce778957dee84f3886f857",
-"pm_8c.html#a9d8613db8dabd35cb97bdb476fb6a360"
+"dir_952e9747e32fbb216a31eb66ba91adc1.html",
+"lpp_8h.html#a5d23d042c9c93bf5be29100485a7f40e"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

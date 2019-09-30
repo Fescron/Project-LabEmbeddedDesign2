@@ -4,7 +4,6 @@ var dir_31e826753cc480a7c26d573a9f44399d =
     [ "ADXL362.h", "ADXL362_8h.html", "ADXL362_8h" ],
     [ "cable.h", "cable_8h.html", "cable_8h" ],
     [ "datatypes.h", "datatypes_8h.html", "datatypes_8h" ],
-    [ "debug_dbprint.h", "debug__dbprint_8h.html", "debug__dbprint_8h" ],
     [ "delay.h", "delay_8h.html", "delay_8h" ],
     [ "documentation.h", "documentation_8h.html", null ],
     [ "DS18B20.h", "DS18B20_8h.html", "DS18B20_8h" ],

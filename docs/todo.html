@@ -63,7 +63,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><dl class="reflist">
-<dt><a class="anchor" id="_todo000001"></a>File <a class="el" href="ADXL362_8c.html">ADXL362.c</a>  </dt>
+<dt><a class="anchor" id="_todo000002"></a>File <a class="el" href="ADXL362_8c.html">ADXL362.c</a>  </dt>
 <dd><b>Future improvements:</b><br />
 <ul>
 <li>Check configurations by reading the registers again and return true/false when the registers have/don't have the correct values.</li>
@@ -71,13 +71,20 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Enable loop mode (with act/inact time registers?) so interrupts don't need to be acknowledged by host (<code>writeADXL(ADXL_REG_ACT_INACT_CTL, 0b00110000);</code>) </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000002"></a>File <a class="el" href="cable_8c.html">cable.c</a>  </dt>
+<dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="cable_8c.html">cable.c</a>  </dt>
 <dd><b>Future improvements:</b><br />
 <ul>
 <li>Use two parallel lines who normally aren't connected and use an interrupt to detect if they broke and get connected through the water. </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000003"></a>File <a class="el" href="delay_8c.html">delay.c</a>  </dt>
+<dt><a class="anchor" id="_todo000001"></a>File <a class="el" href="dbprint_8c.html">dbprint.c</a>  </dt>
+<dd><b>Future improvements:</b><br />
+<ul>
+<li>Fix <code>dbSet_TXbuffer</code> and also add more functionality to print numbers, ...</li>
+<li>Separate back-end &lt;-&gt; MCU specific code </li>
+</ul>
+</dd>
+<dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="delay_8c.html">delay.c</a>  </dt>
 <dd><b>Future improvements:</b><br />
 <ul>
 <li>Split definition to use the <code>ULFRCO</code> for the <em>delay</em> and <em>sleep</em> method separately.<ul>
@@ -88,7 +95,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Enable/disable clock functionality? (see comments using <code>//</code>) </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000004"></a>File <a class="el" href="lora__wrappers_8c.html">lora_wrappers.c</a>  </dt>
+<dt><a class="anchor" id="_todo000005"></a>File <a class="el" href="lora__wrappers_8c.html">lora_wrappers.c</a>  </dt>
 <dd><b>Future improvements:</b><br />
 <ul>
 <li>Save LoRaWAN settings during INIT before calling <code>disableLoRaWAN</code>?<ul>
@@ -102,7 +109,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000005"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
+<dt><a class="anchor" id="_todo000006"></a>File <a class="el" href="main_8c.html">main.c</a>  </dt>
 <dd><p class="startdd"><b>Optimalisations:</b><br />
 </p><ul>
 <li>Change LoRaWAN Spreading Factor and send power, and check the effect on the power usage.</li>
@@ -122,7 +129,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <li>Fix <code>sleepLoRaWAN</code> and <code>wakeLoRaWAN</code> functionality (also see <code><a class="el" href="lora__wrappers_8c.html" title="LoRa wrapper methods. ">lora_wrappers.c</a></code>). </li>
 </ul>
 </dd>
-<dt><a class="anchor" id="_todo000007"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
+<dt><a class="anchor" id="_todo000008"></a>File <a class="el" href="util_8c.html">util.c</a>  </dt>
 <dd><b>Future improvements:</b><br />
 <ul>
 <li>Only send a maximum amount of errors to the could using LoRaWAN according to a defined value.<ul>
@@ -142,7 +149,7 @@ $(document).ready(function(){initNavTree('todo.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri May 31 2019 22:29:56 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Mon Sep 30 2019 22:30:40 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
