@@ -56,7 +56,7 @@ This repository contains the **presentation**, **reports** and **code** for the 
 
 ## 3 - Code flow
 
-**Note:** The code is developed using `Simplicity Studio v4` on `Ubuntu 18.04 LTS`. The code also needs **dbprint** functionality, which needs to be added alongside the code on this repository for it to compile again. See [dbprint GIT repo](https://github.com/Fescron/dbprint) for more info regarding this.
+**Note:** The code is developed using `Simplicity Studio v4` on `Ubuntu 18.04 LTS`. The code also has [dbprint](https://github.com/Fescron/dbprint) functionality.
 
 ![Flowchart](/documentation/figures/flowchart-full.png?raw=true "Flowchart")
 
