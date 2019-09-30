@@ -26,11 +26,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>dbprint-scr</name>
-			<type>2</type>
-			<location>/home/brecht/Qsync/Documents/1-Github-Repositories/dbprint/dbprint-scr</location>
-		</link>
-		<link>
 			<name>drivers/dmactrl.c</name>
 			<type>1</type>
 			<location>/home/brecht/Programs/SimplicityStudio_v4/developer/sdks/gecko_sdk_suite/v2.4/hardware/kit/common/drivers/dmactrl.c</location>
