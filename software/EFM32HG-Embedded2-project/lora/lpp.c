@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lpp.c
  * @brief Basic Low Power Payload (LPP) functionality.
- * @version 2.0
+ * @version 2.3
  * @author
  *   Geoffrey Ottoy@n
  *   Modified by Brecht Van Eeckhoudt
@@ -15,6 +15,9 @@
  *   @li v1.2: Merged methods to use less bytes when sending the data.
  *   @li v1.3: Updated documentation.
  *   @li v2.0: Updated version number.
+ *   @li v2.1: Added extra dbprint debugging statements.
+ *   @li v2.2: Fixed suboptimal buffer logic causing lockups after some runtime.
+ *   @li v2.3: Chanced logic to clear the buffer before going to sleep.
  *
  ******************************************************************************/
 
@@ -44,6 +47,7 @@
 
 #include "lpp.h"       /* Corresponding header file */
 #include "datatypes.h" /* Definitions of the custom data-types */
+#include "debug_dbprint.h" /* Enable or disable printing to UART for debugging */
 
 /* LPP types */
 #define LPP_DIGITAL_INPUT			0x00
@@ -79,23 +83,57 @@
 
 bool LPP_InitBuffer(LPP_Buffer_t *b, uint8_t size)
 {
-	LPP_ClearBuffer(b);
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+	dbinfo("Started initializing LPP buffer...");
+#endif /* DEBUG_DBPRINT */
+
+	// LPP_FreeBuffer(b); // Before: LPP_ClearBuffer(b);
 
 	b->buffer = (uint8_t *) malloc(sizeof(uint8_t) * size);
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+	dbinfo("> Memory allocated.");
+#endif /* DEBUG_DBPRINT */
 
 	if(b->buffer != NULL)
 	{
 		b->fill = 0;
 		b->length = size;
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+		dbinfo("LPP Buffer initialized (returned true).");
+#endif /* DEBUG_DBPRINT */
+
 		return (true);
 	}
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+	dbwarn("LPP Buffer initialized (returned false).");
+#endif /* DEBUG_DBPRINT */
 
 	return (false);
 }
 
 void LPP_ClearBuffer(LPP_Buffer_t *b)
 {
-	if(b->buffer != NULL) free(b->buffer);
+    memset(b->buffer, 0, b->length);
+    b->fill = 0;
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+	dbinfo("> LPP buffer cleared.");
+#endif /* DEBUG_DBPRINT */
+
+}
+
+void LPP_FreeBuffer(LPP_Buffer_t *b)
+{
+    if (b->buffer != NULL) free(b->buffer); /* This logic was previously in `LPP_ClearBuffer` */
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+	dbinfo("> LPP buffer freed.");
+#endif /* DEBUG_DBPRINT */
+
 }
 
 /**************************************************************************//**
@@ -143,6 +181,10 @@ void LPP_ClearBuffer(LPP_Buffer_t *b)
  *****************************************************************************/
 bool LPP_AddMeasurements (LPP_Buffer_t *b, MeasurementData_t data)
 {
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+	dbinfo("Started adding measurements...");
+#endif /* DEBUG_DBPRINT */
+
 	/* Calculate free space in the buffer */
 	uint8_t space = b->length - b->fill;
 
@@ -197,6 +239,10 @@ bool LPP_AddMeasurements (LPP_Buffer_t *b, MeasurementData_t data)
 		b->buffer[b->fill++] = (uint8_t)((0xFF00 & extTempLPP) >> 8);
 		b->buffer[b->fill++] = (uint8_t)(0x00FF & extTempLPP);
 	}
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+	dbinfo("Measurements successfully added.");
+#endif /* DEBUG_DBPRINT */
 
 	return (true);
 }

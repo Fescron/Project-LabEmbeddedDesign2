@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lpp.h
  * @brief Basic Low Power Payload (LPP) functionality.
- * @version 2.0
+ * @version 2.3
  * @author
  *   Geoffrey Ottoy@n
  *   Modified by Brecht Van Eeckhoudt
@@ -43,7 +43,8 @@ typedef struct lpp_buffer
 } LPP_Buffer_t;
 
 bool LPP_InitBuffer(LPP_Buffer_t * b, uint8_t size);
-void LPP_ClearBuffer(LPP_Buffer_t * b);
+void LPP_ClearBuffer(LPP_Buffer_t *b);
+void LPP_FreeBuffer(LPP_Buffer_t *b);
 
 bool LPP_AddMeasurements (LPP_Buffer_t *b, MeasurementData_t data);
 bool LPP_AddStormDetected (LPP_Buffer_t *b, uint8_t stormDetected);

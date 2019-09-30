@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lora_wrappers.c
  * @brief LoRa wrapper methods
- * @version 2.0
+ * @version 2.3
  * @author
  *   Benjamin Van der Smissen@n
  *   Heavily modified by Brecht Van Eeckhoudt
@@ -18,6 +18,9 @@
  *   @li v1.5: Moved `data.index` reset to LoRaWAN sending functionality.
  *   @li v1.6: Moved `data.index` reset back to `main.c` because it doesn't affect the correct variable here.
  *   @li v2.0: Added functionality to exit methods after `error` call and updated version number.
+ *   @li v2.1: Added extra dbprint debugging statements.
+ *   @li v2.2: Fixed suboptimal buffer logic causing lockups after some runtime.
+ *   @li v2.3: Chanced logic to clear the buffer before going to sleep.
  *
  * ******************************************************************************
  *
@@ -70,6 +73,7 @@
 
 #include "lora_wrappers.h" /* Corresponding header file */
 #include "pin_mapping.h"   /* PORT and PIN definitions */
+#include "debug_dbprint.h" /* Enable or disable printing to UART for debugging */
 #include "datatypes.h"     /* Definitions of the custom data-types */
 #include "util.h"          /* Utility functionality */
 
@@ -86,12 +90,20 @@ static LPP_Buffer_t appData;
  *****************************************************************************/
 void initLoRaWAN (void)
 {
-	memset(&appData, 0, sizeof(appData));
+	// Before: memset(&appData, 0, sizeof(appData));
+	appData.length = 0;
+	appData.fill = 0;
+	appData.buffer = NULL;
 
 	/* Initialize LoRaWAN communication */
 	loraStatus = LoRa_Init(loraSettings);
 
 	if (loraStatus != JOINED) error(30);
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+	else dbinfo("LoRaWAN initialized.");
+#endif /* DEBUG_DBPRINT */
+
 }
 
 
@@ -106,6 +118,11 @@ void disableLoRaWAN (void)
 	GPIO_PinOutClear(RN2483_RESET_PORT, RN2483_RESET_PIN);
 	GPIO_PinOutClear(RN2483_RX_PORT, RN2483_RX_PIN);
 	GPIO_PinOutClear(RN2483_TX_PORT, RN2483_TX_PIN);
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+	dbinfo("LoRaWAN disabled.");
+#endif /* DEBUG_DBPRINT */
+
 }
 
 
@@ -155,7 +172,6 @@ void sendMeasurements (MeasurementData_t data)
 		return; /* Exit function */
 	}
 
-
 	/* Add measurements to the LPP packet using the custom convention to save bytes send */
 	if (!LPP_AddMeasurements(&appData, data))
 	{
@@ -163,12 +179,22 @@ void sendMeasurements (MeasurementData_t data)
 		return; /* Exit function */
 	}
 
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+	dbinfo("Started sending LPP buffer...");
+#endif /* DEBUG_DBPRINT */
+
 	/* Send custom LPP-like-formatted payload */
 	if (LoRa_SendLppBuffer(appData, LORA_UNCONFIMED) != SUCCESS)
 	{
 		error(33);
 		return; /* Exit function */
 	}
+
+#if DEBUG_DBPRINT == 1 /* DEBUG_DBPRINT */
+	dbinfo("LPP buffer send.");
+#endif /* DEBUG_DBPRINT */
+
+	LPP_FreeBuffer(&appData); // Clear buffer before going to sleep
 }
 
 
@@ -205,6 +231,8 @@ void sendStormDetected (bool stormDetected)
 		error(36);
 		return; /* Exit function */
 	}
+
+	LPP_FreeBuffer(&appData); // Clear buffer before going to sleep
 }
 
 
@@ -242,6 +270,8 @@ void sendCableBroken (bool cableBroken)
 		error(39);
 		return; /* Exit function */
 	}
+
+	LPP_FreeBuffer(&appData); // Clear buffer before going to sleep
 }
 
 
@@ -274,6 +304,8 @@ void sendStatus (uint8_t status)
 		error(42);
 		return; /* Exit function */
 	}
+
+	LPP_FreeBuffer(&appData); // Clear buffer before going to sleep
 }
 
 
@@ -342,4 +374,6 @@ void sendTest (MeasurementData_t data)
 		error(50);
 		return; /* Exit function */
 	}
+
+	LPP_FreeBuffer(&appData); // Clear buffer before going to sleep
 }
