@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Embedded System Design 2 - Project: DeBugPrint</title>
+<title>Embedded System Design 2 - Project: Important documentation</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -59,45 +59,85 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div id="doc-content">
 <div class="header">
   <div class="headertitle">
-<div class="title">DeBugPrint </div>  </div>
+<div class="title">Important documentation </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>DeBugPrint is a homebrew minimal low-level println/printf replacement. It can be used to to print text/values to uart without a lot of external libraries. The end goal was to use no external libraries (with methods like <code>itoa</code>) apart from the ones specific to the microcontroller.</p>
+<div class="textblock"><p>In the following sections you can find some important warnings, notes and overall documentation gathered during the creation of this project. This includes, for example, info about settings done with <code>#define</code> statements or certain things found out during debugging. <em>Please read them!</em></p>
 <hr/>
 <h1><a class="anchor" id="Doxygen"></a>
 Doxygen</h1>
-<p>These files have been made with <a href="www.doxygen.org"><b>Doxygen</b></a> comments above all methods to generate documentation. A combination of <b>Doxygen-specific tags</b> (preceded with an <code>@</code> symbol) and <b>markdown syntax</b> are supported to generate, for example, HTML-files.</p>
+<p>This C-project has been made with <a href="www.doxygen.org"><b>Doxygen</b></a> comments above all methods to generate documentation. A combination of <b>Doxygen-specific tags</b> (preceded with an <code>@</code> symbol) and <b>markdown syntax</b> are supported to generate, for example, HTML-files.</p>
 <hr/>
-<h1><a class="anchor" id="ENABLE"></a>
-Enable/disable dbprint using definition in `debug_dbprint.h`</h1>
-<p>In the file <code><a class="el" href="debug__dbprint_8h.html" title="Enable or disable printing to UART with dbprint. ">debug_dbprint.h</a></code> <b>dbprint UART functionality can be enabled/disabled</b> with the definition <code>#define DEBUG_DBPRINT</code>. If it's value is <code>0</code>, all dbprint functionality is disabled.</p>
-<dl class="section note"><dt>Note</dt><dd>This means that the <b>only header file to include in your projects</b> for dbprint to work is<br />
- <code>#include <a class="el" href="debug__dbprint_8h.html" title="Enable or disable printing to UART with dbprint. ">debug_dbprint.h</a></code></dd>
-<dd>
-If you also want to use this definition to enable/disable dbprint statements in your code, please use the following convention:<br />
- <code>#if DEBUG_DBPRINT == 1 // DEBUG_DBPRINT</code><br />
- <code>&lt;your source code dbprint statements go here&gt;</code><br />
- <code>#endif // DEBUG_DBPRINT</code></dd></dl>
+<h1><a class="anchor" id="SETTINGS"></a>
+Settings using definitions in dbprint and delay functionality</h1>
+<p>In the file <code><a class="el" href="debug__dbprint_8h.html" title="Enable or disable printing to UART with dbprint. ">debug_dbprint.h</a></code> <b>dbprint UART functionality can be enabled/disabled</b> with the definition <code>#define DEBUG_DBPRINT</code>. If it's value is <code>0</code>, all dbprint statements are disabled throughout the source code because they're all surrounded with <code>#if DEBUG_DBPRINT == 1 ... #endif</code> checks.</p>
+<p>In the file <code><a class="el" href="delay_8h.html" title="Delay functionality. ">delay.h</a></code> one can <b>choose between SysTicks or RTC sleep functionality</b> for delays. This can be selected with the definition <code>#define SYSTICKDELAY</code>. If it's value is <code>0</code>, the RTC compare sleep functionality is used. if it's value is <code>1</code>, delays are generated using SysTicks.</p>
+<p>In the file <code><a class="el" href="delay_8h.html" title="Delay functionality. ">delay.h</a></code> one can also <b>choose between the use of the ultra low-frequency RC oscillator (ULFRCO) or the low-frequency crystal oscillator (LFXO)</b> when being in a delay or sleeping. If the ULFRCO is selected, the MCU sleeps in EM3 and if the LFXO is selected the MCU sleeps in EM2. This can be selected with the definition <code>#define ULFRCO</code>. If it's value is <code>0</code>, the LFXO is used as the clock source. If it's value is <code>1</code> the ULFRCO is used.</p>
+<dl class="section note"><dt>Note</dt><dd>Check the section <a class="el" href="index.html#CLOCKS1">Crystals and RC oscillators</a> for more info about this.</dd></dl>
+<p>In the file <code><a class="el" href="util_8h.html" title="Utility functionality. ">util.h</a></code> one can <b>enable or disable error forwarding to the cloud using LoRaWAN</b>. This can be selected with the definition <code>#define ERROR_FORWARDING</code>. If it's value is <code>0</code>, the MCU will display a UART debug message (if enabled, see <code><a class="el" href="debug__dbprint_8h.html" title="Enable or disable printing to UART with dbprint. ">debug_dbprint.h</a></code>) and enter a <code>while(true)</code> loop if the <code>error</code> method is called where the LED will flash indicating that an error has occurred. If it's value is <code>1</code>, a UART debug message will be displayed (if enabled) and the error number (if not corresponding to an error call in LoRaWAN functionality) will be forwarded to the cloud using LoRaWAN. After this, the code execution will be resumed. The MCU doesn't get put in a <code>while(true)</code> loop.</p>
 <hr/>
-<h1><a class="anchor" id="DBPRINT"></a>
-More info about dbprint and VCOM</h1>
-<p>VCOM is an on-board (SLSTK3400A) UART to USB converter alongside the Segger J-Link debugger, connected with microcontroller pins <code>PA0</code> (RX) and <code>PF2</code> (TX). This converter can then be used with Putty or another serial port program.</p>
-<dl class="section note"><dt>Note</dt><dd>When you want to debug using VCOM with interrupt functionality disabled, you can use the following initialization settings:<br />
- <code>dbprint_INIT(USART1, 4, true, false);</code></dd>
-<dd>
-When using <code>dbprint</code> functionality, the following settings are used:<br />
-<ul>
-<li>Baudrate = 115200</li>
-<li>8 databits</li>
-<li>1 stopbit</li>
-<li>No parity</li>
-</ul>
-</dd></dl>
+<h1><a class="anchor" id="Initializations"></a>
+Initializations</h1>
+<dl class="section warning"><dt>Warning</dt><dd>Initializations for the methods <code><a class="el" href="util_8c.html#ae4f2649524bfb723543f0dc939cd0ddd" title="Enable or disable the LED. ">led(bool enabled)</a></code>, <code><a class="el" href="delay_8c.html#adb46f4276f5ddf111153701858f85df6" title="Wait for a certain amount of milliseconds in EM2/3. ">delay(uint32_t msDelay)</a></code> and <code><a class="el" href="delay_8c.html#aae86f940455b5957441f4331cdc0828d" title="Sleep for a certain amount of seconds in EM2/3. ">sleep(uint32_t sSleep)</a></code> happen automatically. This is why their first call sometimes takes longer to finish than later ones.</dd></dl>
 <hr/>
-<h1><a class="anchor" id="ENERGY"></a>
-Energy profiler and dbprint</h1>
-<p>The Energy profiler in Simplicity Studio seems to use VCOM somehow, change to using an external UART adapter if both the energy profiler and UART debugging are necessary at the same time!</p>
+<h1><a class="anchor" id="DEBUG"></a>
+Debug mode, Energy monitor and VCOM</h1>
+<dl class="section warning"><dt>Warning</dt><dd>When in debug mode, the MCU will not really go below EM1. This can cause some weird behavior. Exit debug mode and reset the MCU after flashing it for it to go in the correct sleep modes and consume the "expected" power. The Energy profiler can also be used to program the MCU but it's also necessary to reset the MCU after flashing it.</dd></dl>
+<p>Leaving the debugger connected when issuing a <code>WFI</code> or <code>WFE</code> to enter EM2 or EM3 will make the system enter a special EM2. This mode differs from regular EM2 and EM3 in that the high frequency clocks are still enabled, and certain core functionality is still powered in order to maintain debug-functionality. Because of this, the current consumption in this mode is closer to EM1 and it is therefore important to disconnect the debugger before doing current consumption measurements.</p>
+<p>The Energy profiler in Simplicity Studio seems to use VCOM (on-board UART to USB converter) somehow, change to using an external UART adapter if both the energy profiler and UART debugging are necessary at the same time!</p>
 <p>If the energy profiler was used and the code functionality was switched, physically re-plug the board to make sure VCOM UART starts working again!</p>
+<hr/>
+<h1><a class="anchor" id="GPIO"></a>
+GPIO/DATA/BUS pins and sleep mode</h1>
+<dl class="section warning"><dt>Warning</dt><dd>It's necessary to disable the GPIO pins of, for example, an SPI bus before going to sleep to get the <em>correct</em> sleep currents.</dd></dl>
+<p>Otherwise, some unwanted currents might flow out of these pins even though the data bus isn't active. This behavior caused confusion multiple times during the development phase. It was observed that for example that a 10k pull-up resistor pulled about 320 µA of unwanted current if the corresponding MCU pins weren't disabled.</p>
+<dl class="section warning"><dt>Warning</dt><dd>It's also necessary to disable the GPIO pins for data pins (like for example in the case of the SPI bus) if an external sensor should be powered down.</dd></dl>
+<p>Because of the low current usage of these energy-efficient sensors, it's possible they can still be parasitically powered through the data bus even though it's supply pins are powered off using GPIO pins of the MCU. This also caused confusion bugs during the development phase.</p>
+<hr/>
+<h1><a class="anchor" id="CLOCKS1"></a>
+Crystals and RC oscillators (delay.c)</h1>
+<p>Normally using an external oscillator/crystal uses less energy than the internal one. This external oscillator/crystal can however be omitted if the design goal is to reduce the BOM count as much as possible.</p>
+<p>In the delay logic, it's possible to select the use of the ultra low-frequency RC oscillator (ULFRCO) or the low-frequency crystal oscillator (LFXO) when being in a delay or sleeping. If the ULFRCO is selected, the MCU sleeps in EM3 and if the LFXO is selected the MCU sleeps in EM2.</p>
+<dl class="section warning"><dt>Warning</dt><dd>After testing it was noted that the ULFRCO uses less power than the LFXO but was less precise for the wake-up times. Take not of this when selecting the necessary logic!</dd></dl>
+<p>For the development of the code for the RN2483 shield from DRAMCO, it's possible they chose to use the LFXO instead of the ULFRCO in sleep because the crystal was more stable for high baudrate communication using the LEUART peripheral.</p>
+<dl class="section note"><dt>Note</dt><dd>For low-power development it's advised to consistently enable peripherals and oscillators/clocks when needed and disable them afterwards. For some methods it can be useful to provide a boolean argument so that in the case of sending more bytes the clock can be disabled only after sending the latest one. Perhaps this can be used in combination with static variables in the method so they keep their value between calls and recursion can be used.</dd></dl>
+<hr/>
+<h1><a class="anchor" id="CLOCKS2"></a>
+GPIO clock (cmuClock_GPIO)</h1>
+<p>At one point in the development phase the clock to the GPIO peripheral was always enabled when necessary and disabled afterwards. Because the GPIO clock needs to be enabled for almost everything, even during EM2 so the MCU can react (and not only log) pin interrupts, this behavior was later scrapped.</p>
+<p><code>cmuClock_GPIO</code> is however just in case enabled in INIT methods where GPIO functionality is necessary.</p>
+<dl class="section note"><dt>Note</dt><dd>Alongside this peripheral clock, <code>cmuClock_HFPER</code> is also always enabled since GPIO is a High Frequency Peripheral.</dd></dl>
+<hr/>
+<h1><a class="anchor" id="WATCHDOG"></a>
+Watchdog and while loops</h1>
+<p>At the start of this project it was the plan to also implement a <em>watchdog</em> timer to make sure the MCU wouldn't get stuck in some logic and waste unnecessary power. <code>RMU_ResetCauseGet</code> and <code>RMU_ResetCauseClear</code> also seemed interesting methods to use. However, because of the relatively short time this watchdog can handle (9 - 256 000 cycles, max 256 seconds) it would only be able to be active when the MCU was awake, and because implementing this would take extra time it was opted to just focus on writing code which couldn't get stuck anywhere.</p>
+<p>This was done by carefully <b>making sure that the MCU couldn't get stuck in a WHILE loop anywhere</b>, by also <b>incrementing a counter and checking it's value against a <em>timeout</em> value</b>, defined at the top of each file.</p>
+<dl class="section warning"><dt>Warning</dt><dd><code>While</code> loops can pose problems if for some reason the thing they are waiting for doesn't happen (for example a bit doesn't get set). Because of this it's necessary to also implement another way to exit them. <code>For</code> loops don't have this possible problem.</dd></dl>
+<hr/>
+<h1><a class="anchor" id="OPTIMALISATIONS"></a>
+Optimizing code</h1>
+<dl class="section note"><dt>Note</dt><dd>The following info was found in <em>AN0007: 2.8 Optimizing Code</em>.</dd></dl>
+<p>Optimizing code usually leads to lower energy consumption by increasing the program speed and efficiency. A faster program spends less time in active mode, and each task in a more efficient program takes fewer instructions to execute.</p>
+<p>A simple way to optimize your code is to <b>build it with the highest optimization settings</b> in release mode** rather than in debug mode. In the [Development Perspective] of Simplicity Studio, go to [Project]&gt;[Build Configurations]&gt;[Set Active] and select [Release] for your compiler.</p>
+<p>Compiler selection can also have an impact on energy efficiency. For example, the <b>IAR compiler tends to generate more efficient code than GCC</b>. To use the IAR toolchain in Simplicity Studio, make sure IAR Embedded Workbench is installed on your computer. In the [Development Perspective] of Simplicity Studio, go to [Project]&gt;[Properties]&gt;[C/C++ Build]&gt;[Settings]. Under the [Configuration:] drop down menu, select [IAR ARM - Release]. If you do not see this option, click [Manage Configurations...]&gt;[New...], select the [IAR ARM - Release], and click [OK] twice. Next, increase IAR's optimization settings, under [Tool Settings]&gt;[IAR C/C++ Compiler for ARM]&gt;[Optimizations], select [High, Balance] for the [Optimization level:]. Under [IAR Linker for ARM]&gt;[Optimizations], check all options ([Inline..., Merge..., Perform..., Even...]), and then click [OK].</p>
+<dl class="section note"><dt>Note</dt><dd>As a starting point, this should lower energy consumption, but it may not be the most optimized setting for a given project. Try different optimization settings such as [High, Speed], [High, Balance], other optimization option combinations, even other compilers, and compare the results.</dd></dl>
+<hr/>
+<h1><a class="anchor" id="RTCC"></a>
+RTCC (RTC calendar)</h1>
+<p>At another point in the development phase there was looked into using the RTCC (RTC calendar) to wake up the MCU every hour. This peripheral can run down to EM4H when using LFRCO, LFXO or ULFRCO. Unfortunately the Happy Gecko doesn't have this functionality so it can't be implemented in this case.</p>
+<hr/>
+<h1><a class="anchor" id="EM"></a>
+Energy modes (EM1 and EM3)</h1>
+<p>At one point a method was developed to go in EM1 when waiting in a delay. This however didn't seem to work as intended and EM2 would also be fine. Because of this, development for this EM1 delay method was halted. EM1 is sometimes used when waiting on bits to be set.</p>
+<p>When the MCU is in EM1, the clock to the CPU is disabled. All peripherals, as well as RAM and flash, are available.</p>
+<dl class="section attention"><dt>Attention</dt><dd>In EM3, high and low frequency clocks are disabled. No oscillator (except the ULFRCO) is running. Furthermore, all unwanted oscillators are disabled in EM3. <b>This means that nothing needs to be manually disabled before the statement <code>EMU_EnterEM3(true);</code>.</b></dd></dl>
+<p>The following modules/functions are are generally still available in EM3: </p><ul>
+<li>I2C address check </li>
+<li>Watchdog </li>
+<li>Asynchronous pin interrupt </li>
+<li>Analog comparator (ACMP) </li>
+<li>Voltage comparator (VCMP)</li>
+</ul>
 <hr/>
 <h1><a class="anchor" id="UART"></a>
 Alternate UART Functionality Pinout</h1>
@@ -120,6 +160,16 @@ Alternate UART Functionality Pinout</h1>
 <li>RX - <code>PA0</code></li>
 <li>TX - <code>PF2</code></li>
 </ul>
+<hr/>
+<h1><a class="anchor" id="DBPRINT"></a>
+More info about dbprint and VCOM</h1>
+<p>When using <code>dbprint</code> functionality, the following settings are used:</p><ul>
+<li>Baudrate = 115200</li>
+<li>8 databits</li>
+<li>1 stopbit</li>
+<li>No parity</li>
+</ul>
+<p>When you want to debug using VCOM with interrupt functionality disabled, you can use the following initialization settings: <code>dbprint_INIT(USART1, 4, true, false);</code></p>
 <hr/>
 <h1><a class="anchor" id="Keywords"></a>
 Keywords</h1>
@@ -165,7 +215,7 @@ Bits, bytes, nibbles and unsigned/signed integer value ranges</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon Sep 30 2019 22:30:40 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Tue Oct 1 2019 14:39:10 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

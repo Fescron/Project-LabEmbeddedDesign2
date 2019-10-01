@@ -72,6 +72,106 @@ $(document).ready(function(){initNavTree('dbprint__documentation_8h.html','');})
 <dl class="section version"><dt>Version</dt><dd>6.0 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Brecht Van Eeckhoudt</dd></dl>
 <hr/>
+<h1><a class="anchor" id="DeBugPrint"></a>
+DeBugPrint</h1>
+<p>DeBugPrint is a homebrew minimal low-level println/printf replacement. It can be used to to print text/values to uart without a lot of external libraries. The end goal was to use no external libraries (with methods like <code>itoa</code>) apart from the ones specific to the microcontroller.</p>
+<hr/>
+<h1><a class="anchor" id="Doxygen"></a>
+Doxygen</h1>
+<p>These files have been made with <a href="www.doxygen.org"><b>Doxygen</b></a> comments above all methods to generate documentation. A combination of <b>Doxygen-specific tags</b> (preceded with an <code>@</code> symbol) and <b>markdown syntax</b> are supported to generate, for example, HTML-files.</p>
+<hr/>
+<h1><a class="anchor" id="ENABLE"></a>
+Enable/disable dbprint using definition in `debug_dbprint.h`</h1>
+<p>In the file <code><a class="el" href="debug__dbprint_8h.html" title="Enable or disable printing to UART with dbprint. ">debug_dbprint.h</a></code> <b>dbprint UART functionality can be enabled/disabled</b> with the definition <code>#define DEBUG_DBPRINT</code>. If it's value is <code>0</code>, all dbprint functionality is disabled.</p>
+<dl class="section note"><dt>Note</dt><dd>This means that the <b>only header file to include in your projects</b> for dbprint to work is<br />
+ <code>#include <a class="el" href="debug__dbprint_8h.html" title="Enable or disable printing to UART with dbprint. ">debug_dbprint.h</a></code></dd>
+<dd>
+If you also want to use this definition to enable/disable dbprint statements in your code, please use the following convention:<br />
+ <code>#if DEBUG_DBPRINT == 1 // DEBUG_DBPRINT</code><br />
+ <code>&lt;your source code dbprint statements go here&gt;</code><br />
+ <code>#endif // DEBUG_DBPRINT</code></dd></dl>
+<hr/>
+<h1><a class="anchor" id="DBPRINT"></a>
+More info about dbprint and VCOM</h1>
+<p>VCOM is an on-board (SLSTK3400A) UART to USB converter alongside the Segger J-Link debugger, connected with microcontroller pins <code>PA0</code> (RX) and <code>PF2</code> (TX). This converter can then be used with Putty or another serial port program.</p>
+<dl class="section note"><dt>Note</dt><dd>When you want to debug using VCOM with interrupt functionality disabled, you can use the following initialization settings:<br />
+ <code>dbprint_INIT(USART1, 4, true, false);</code></dd>
+<dd>
+When using <code>dbprint</code> functionality, the following settings are used:<br />
+<ul>
+<li>Baudrate = 115200</li>
+<li>8 databits</li>
+<li>1 stopbit</li>
+<li>No parity</li>
+</ul>
+</dd></dl>
+<hr/>
+<h1><a class="anchor" id="ENERGY"></a>
+Energy profiler and dbprint</h1>
+<p>The Energy profiler in Simplicity Studio seems to use VCOM somehow, change to using an external UART adapter if both the energy profiler and UART debugging are necessary at the same time!</p>
+<p>If the energy profiler was used and the code functionality was switched, physically re-plug the board to make sure VCOM UART starts working again!</p>
+<hr/>
+<h1><a class="anchor" id="UART"></a>
+Alternate UART Functionality Pinout</h1>
+<table class="doxtable">
+<tr>
+<th>Location </th><th><code>#0</code> </th><th><code>#1</code> </th><th><code>#2</code> </th><th><code>#3</code> </th><th><code>#4</code> </th><th><code>#5</code> </th><th><code>#6</code>  </th></tr>
+<tr>
+<td><code>US0_RX</code> </td><td><code>PE11</code> </td><td></td><td><code>PC10</code> </td><td><code>PE12</code> </td><td><code>PB08</code> </td><td><code>PC01</code> </td><td><code>PC01</code> </td></tr>
+<tr>
+<td><code>US0_TX</code> </td><td><code>PE10</code> </td><td></td><td></td><td><code>PE13</code> </td><td><code>PB07</code> </td><td><code>PC00</code> </td><td><code>PC00</code> </td></tr>
+<tr>
+<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr>
+<td><code>US1_RX</code> </td><td><code>PC01</code> </td><td></td><td><code>PD06</code> </td><td><code>PD06</code> </td><td><code>PA00</code> </td><td><code>PC02</code> </td><td></td></tr>
+<tr>
+<td><code>US1_TX</code> </td><td><code>PC00</code> </td><td></td><td><code>PD07</code> </td><td><code>PD07</code> </td><td><code>PF02</code> </td><td><code>PC01</code> </td><td></td></tr>
+</table>
+<p>VCOM:</p><ul>
+<li>USART1 #4 (USART0 can't be used)</li>
+<li>RX - <code>PA0</code></li>
+<li>TX - <code>PF2</code></li>
+</ul>
+<hr/>
+<h1><a class="anchor" id="Keywords"></a>
+Keywords</h1>
+<h2><a class="anchor" id="Volatile"></a>
+Volatile</h2>
+<p>The <code>volatile</code> type indicates to the compiler that the data is not normal memory, and could change at unexpected times. Hardware registers are often volatile, and so are variables which get changed in interrupts.</p>
+<h2><a class="anchor" id="Extern"></a>
+Extern</h2>
+<p>Declare the global variables in headers (and use the <code>extern</code> keyword there) and actually define them in the appropriate source file.</p>
+<h2><a class="anchor" id="Static"></a>
+Static</h2>
+<ul>
+<li><b>Static variable inside a function:</b> The variable keeps its value between invocations.</li>
+<li><b>Static global variable or function:</b> The variable or function is only "seen" in the file it's declared in.</li>
+</ul>
+<hr/>
+<h1><a class="anchor" id="DATA"></a>
+Bits, bytes, nibbles and unsigned/signed integer value ranges</h1>
+<ul>
+<li>1 nibble = 4 bits (<code>0b1111</code> = <code>0xF</code> )</li>
+<li>1 byte = 8 bits (<code>0b1111 1111</code> = <code>0xFF</code>)</li>
+</ul>
+<table class="doxtable">
+<tr>
+<th>Type </th><th>Alias </th><th>Size </th><th>Minimum value </th><th>Maximum value  </th></tr>
+<tr>
+<td><code>uint8_t</code> </td><td><code>unsigned char</code> </td><td>1 byte </td><td>0 </td><td>255 (<code>0xFF</code>) </td></tr>
+<tr>
+<td><code>uint16_t</code> </td><td><code>unsigned short</code> </td><td>2 bytes </td><td>0 </td><td>65 535 (<code>0xFFFF</code>) </td></tr>
+<tr>
+<td><code>uint32_t</code> </td><td><code>unsigned int</code> </td><td>4 bytes </td><td>0 </td><td>4 294 967 295 (<code>0xFFFF FFFF</code>) </td></tr>
+<tr>
+<td></td><td></td><td></td><td></td><td></td></tr>
+<tr>
+<td><code>int8_t</code> </td><td><code>signed char</code> </td><td>1 byte </td><td>-128 </td><td>127 </td></tr>
+<tr>
+<td><code>int16_t</code> </td><td><code>signed short</code> </td><td>2 bytes </td><td>-32 768 </td><td>32 767 </td></tr>
+<tr>
+<td><code>int32_t</code> </td><td><code>signed int</code> </td><td>4 bytes </td><td>-2 147 483 648 </td><td>2 147 483 647 </td></tr>
+</table>
 
 <p class="definition">Definition in file <a class="el" href="dbprint__documentation_8h_source.html">dbprint_documentation.h</a>.</p>
 </div></div><!-- contents -->
@@ -80,7 +180,7 @@ $(document).ready(function(){initNavTree('dbprint__documentation_8h.html','');})
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_952e9747e32fbb216a31eb66ba91adc1.html">EFM32HG-Embedded2-project</a></li><li class="navelem"><a class="el" href="dir_35c0cd9e3f89d3c6bf981826886b530e.html">dbprint</a></li><li class="navelem"><a class="el" href="dbprint__documentation_8h.html">dbprint_documentation.h</a></li>
-    <li class="footer">Generated on Mon Sep 30 2019 22:30:40 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Tue Oct 1 2019 14:39:10 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

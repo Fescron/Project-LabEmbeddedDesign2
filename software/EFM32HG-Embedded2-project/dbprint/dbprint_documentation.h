@@ -6,7 +6,7 @@
  *
  * ******************************************************************************
  *
- * @mainpage DeBugPrint
+ * @section DeBugPrint
  *
  *   DeBugPrint is a homebrew minimal low-level println/printf replacement.
  *   It can be used to to print text/values to uart without a lot of external

@@ -1,18 +1,17 @@
 var NAVTREE =
 [
   [ "Embedded System Design 2 - Project", "index.html", [
-    [ "DeBugPrint", "index.html", [
-      [ "Doxygen", "index.html#Doxygen", null ],
-      [ "Enable/disable dbprint using definition in `debug_dbprint.h`", "index.html#ENABLE", null ],
-      [ "More info about dbprint and VCOM", "index.html#DBPRINT", null ],
-      [ "Energy profiler and dbprint", "index.html#ENERGY", null ],
-      [ "Alternate UART Functionality Pinout", "index.html#UART", null ],
-      [ "Keywords", "index.html#Keywords", [
-        [ "Volatile", "index.html#Volatile", null ],
-        [ "Extern", "index.html#Extern", null ],
-        [ "Static", "index.html#Static", null ]
-      ] ],
-      [ "Bits, bytes, nibbles and unsigned/signed integer value ranges", "index.html#DATA", null ]
+    [ "Important documentation", "index.html", [
+      [ "Settings using definitions in dbprint and delay functionality", "index.html#SETTINGS", null ],
+      [ "Initializations", "index.html#Initializations", null ],
+      [ "Debug mode, Energy monitor and VCOM", "index.html#DEBUG", null ],
+      [ "GPIO/DATA/BUS pins and sleep mode", "index.html#GPIO", null ],
+      [ "Crystals and RC oscillators (delay.c)", "index.html#CLOCKS1", null ],
+      [ "GPIO clock (cmuClock_GPIO)", "index.html#CLOCKS2", null ],
+      [ "Watchdog and while loops", "index.html#WATCHDOG", null ],
+      [ "Optimizing code", "index.html#OPTIMALISATIONS", null ],
+      [ "RTCC (RTC calendar)", "index.html#RTCC", null ],
+      [ "Energy modes (EM1 and EM3)", "index.html#EM", null ]
     ] ],
     [ "Todo List", "todo.html", null ],
     [ "Deprecated List", "deprecated.html", null ],
