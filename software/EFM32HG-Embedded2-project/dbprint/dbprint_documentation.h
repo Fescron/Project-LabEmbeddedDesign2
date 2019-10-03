@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file dbprint_documentation.h
  * @brief This file contains useful documentation closely related to dbprint.
- * @version 6.0
+ * @version 6.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -99,11 +99,6 @@
  *   The `volatile` type indicates to the compiler that the data is not normal memory,
  *   and could change at unexpected times. Hardware registers are often volatile,
  *   and so are variables which get changed in interrupts.
- *
- *   @subsection Extern
- *
- *   Declare the global variables in headers (and use the `extern` keyword there)
- *   and actually define them in the appropriate source file.
  *
  *   @subsection Static
  *

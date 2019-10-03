@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file dbprint.h
  * @brief Homebrew println/printf replacement "DeBugPrint".
- * @version 6.0
+ * @version 6.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -59,10 +59,6 @@ typedef enum dbprint_colors
 	YELLOW,
 	DEFAULT_COLOR
 } dbprint_color_t;
-
-
-/** Public (`extern`) variable to store the settings (pointer). */
-extern USART_TypeDef* dbpointer;
 
 
 /* Public prototypes */

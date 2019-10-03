@@ -5,7 +5,7 @@
  *   **This header file should be called in every other file where there are UART
  *   dbprint debugging statements. Depending on the value of `DEBUG_DBPRINT`,
  *   UART statements are enabled or disabled.**
- * @version 6.0
+ * @version 6.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
