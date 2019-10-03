@@ -538,3 +538,56 @@ int main (void)
 		}
 	}
 }
+
+
+/**************************************************************************//**
+ * @brief
+ *   NMI interrupt service routine.
+ *
+ * @note
+ *   The *weak* definition for this method is located in `startup_gcc_efm32hg.h`.
+ *****************************************************************************/
+void NMI_Handler(void)
+{
+	while(1);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   HardFault interrupt service routine.
+ *
+ * @note
+ *   The *weak* definition for this method is located in `startup_gcc_efm32hg.h`.
+ *****************************************************************************/
+void HardFault_Handler(void)
+{
+	while(1);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   SVC interrupt service routine.
+ *
+ * @note
+ *   The *weak* definition for this method is located in `startup_gcc_efm32hg.h`.
+ *****************************************************************************/
+void SVC_Handler(void)
+{
+	while(1);
+}
+
+
+/**************************************************************************//**
+ * @brief
+ *   PendSV interrupt service routine.
+ *
+ * @note
+ *   The *weak* definition for this method is located in `startup_gcc_efm32hg.h`.
+ *****************************************************************************/
+void PendSV_Handler(void)
+{
+	while(1);
+}
+
