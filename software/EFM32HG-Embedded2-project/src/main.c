@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 5.0
+ * @version 5.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -42,6 +42,7 @@
  *   @li v4.0: Updated documentation and version number.
  *   @li v4.1: Added definitions to easily change the accelerometer's configuration settings.
  *   @li v5.0: Updated sleep logic when waking up using the accelerometer.
+ *   @li v5.1: Added extra ISR handlers.
  *
  * ******************************************************************************
  *
