@@ -342,7 +342,7 @@ RN2483_Status_t RN2483_TransmitUnconfirmed(uint8_t * data, uint8_t payloadSize, 
 		return (MAC_ERR);
 	}
 	//StringToHexString(data, payloadSize/2, &decodedPayload);
-	sprintf(commandBuffer, "mac tx uncnf 1 %s\r\n", encodedPayload);
+	sprintf(commandBuffer, "mac tx uncnf 1 %s\r\n", encodedPayload); // TODO: this seemed to cause the "dbpointer" problem?
 	free(encodedPayload);
 	return (RN2483_ProcessMacCommand(receiveBuffer, bufferSize, true));
 }
