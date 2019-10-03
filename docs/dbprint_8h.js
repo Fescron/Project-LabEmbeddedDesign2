@@ -35,6 +35,5 @@ var dbprint_8h =
     [ "dbReadLine", "dbprint_8h.html#a82b12a746031f077dd36e7b3777631a4", null ],
     [ "dbwarn", "dbprint_8h.html#a73de59bf0a689a086681070783a82df3", null ],
     [ "dbwarnInt", "dbprint_8h.html#ada27783fef89d9c9af4976baab87c477", null ],
-    [ "dbwarnInt_hex", "dbprint_8h.html#ab404cefa28fc63ac33567c5de1e0c5e1", null ],
-    [ "dbpointer", "dbprint_8h.html#a17cb68175234053c0b4f7356b6b20e18", null ]
+    [ "dbwarnInt_hex", "dbprint_8h.html#ab404cefa28fc63ac33567c5de1e0c5e1", null ]
 ];

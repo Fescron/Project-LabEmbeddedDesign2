@@ -1,6 +1,5 @@
 var NAVTREEINDEX1 =
 {
-"dir_952e9747e32fbb216a31eb66ba91adc1.html":[4,0,0],
 "dir_d5d08f7ba2dd58682eb7b63819384a2c.html":[4,0,0,2],
 "documentation_8h.html":[4,0,0,1,5],
 "documentation_8h_source.html":[4,0,0,1,5],
@@ -28,12 +27,13 @@ var NAVTREEINDEX1 =
 "globals_func_i.html":[4,1,1,7],
 "globals_func_l.html":[4,1,1,8],
 "globals_func_m.html":[4,1,1,9],
-"globals_func_p.html":[4,1,1,10],
-"globals_func_r.html":[4,1,1,11],
-"globals_func_s.html":[4,1,1,12],
-"globals_func_t.html":[4,1,1,13],
-"globals_func_u.html":[4,1,1,14],
-"globals_func_w.html":[4,1,1,15],
+"globals_func_n.html":[4,1,1,10],
+"globals_func_p.html":[4,1,1,11],
+"globals_func_r.html":[4,1,1,12],
+"globals_func_s.html":[4,1,1,13],
+"globals_func_t.html":[4,1,1,14],
+"globals_func_u.html":[4,1,1,15],
+"globals_func_w.html":[4,1,1,16],
 "globals_g.html":[4,1,0,6],
 "globals_h.html":[4,1,0,7],
 "globals_i.html":[4,1,0,8],
@@ -58,6 +58,7 @@ var NAVTREEINDEX1 =
 "index.html#CLOCKS2":[0,5],
 "index.html#DEBUG":[0,2],
 "index.html#EM":[0,9],
+"index.html#Extern":[0,9,0],
 "index.html#GPIO":[0,3],
 "index.html#Initializations":[0,1],
 "index.html#OPTIMALISATIONS":[0,7],
@@ -248,6 +249,5 @@ var NAVTREEINDEX1 =
 "lpp_8h.html#a2950e929fe2fe5a27f985e3c5220f705":[4,0,0,2,5,16],
 "lpp_8h.html#a4047f0d7724d471aad3e804b29ef5575":[4,0,0,2,5,10],
 "lpp_8h.html#a460ba387c9800150aa7af821581a34fa":[4,0,0,2,5,1],
-"lpp_8h.html#a47d1a4a37a59e68e6545282bd3455c2a":[4,0,0,2,5,9],
-"lpp_8h.html#a54a743257a71a1ea48a38abc48d72129":[4,0,0,2,5,19]
+"lpp_8h.html#a47d1a4a37a59e68e6545282bd3455c2a":[4,0,0,2,5,9]
 };

@@ -113,6 +113,18 @@ Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main function.  <a href="#a840291bc02cba5474a4cb46a9b9566fe">More...</a><br /></td></tr>
 <tr class="separator:a840291bc02cba5474a4cb46a9b9566fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ad7a5e3ee69cb6db6a6b9111ba898bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8c.html#a6ad7a5e3ee69cb6db6a6b9111ba898bc">NMI_Handler</a> (void)</td></tr>
+<tr class="memdesc:a6ad7a5e3ee69cb6db6a6b9111ba898bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">NMI interrupt service routine.  <a href="#a6ad7a5e3ee69cb6db6a6b9111ba898bc">More...</a><br /></td></tr>
+<tr class="separator:a6ad7a5e3ee69cb6db6a6b9111ba898bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bffc10d5bd4106753b7c30e86903bea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8c.html#a2bffc10d5bd4106753b7c30e86903bea">HardFault_Handler</a> (void)</td></tr>
+<tr class="memdesc:a2bffc10d5bd4106753b7c30e86903bea"><td class="mdescLeft">&#160;</td><td class="mdescRight">HardFault interrupt service routine.  <a href="#a2bffc10d5bd4106753b7c30e86903bea">More...</a><br /></td></tr>
+<tr class="separator:a2bffc10d5bd4106753b7c30e86903bea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e5ddb3df0d62f2dc357e64a3f04a6ce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8c.html#a3e5ddb3df0d62f2dc357e64a3f04a6ce">SVC_Handler</a> (void)</td></tr>
+<tr class="memdesc:a3e5ddb3df0d62f2dc357e64a3f04a6ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">SVC interrupt service routine.  <a href="#a3e5ddb3df0d62f2dc357e64a3f04a6ce">More...</a><br /></td></tr>
+<tr class="separator:a3e5ddb3df0d62f2dc357e64a3f04a6ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6303e1f258cbdc1f970ce579cc015623"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8c.html#a6303e1f258cbdc1f970ce579cc015623">PendSV_Handler</a> (void)</td></tr>
+<tr class="memdesc:a6303e1f258cbdc1f970ce579cc015623"><td class="mdescLeft">&#160;</td><td class="mdescRight">PendSV interrupt service routine.  <a href="#a6303e1f258cbdc1f970ce579cc015623">More...</a><br /></td></tr>
+<tr class="separator:a6303e1f258cbdc1f970ce579cc015623"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -364,8 +376,31 @@ LoRaWAN sensor channels</h1>
 <p class="definition">Definition at line <a class="el" href="main_8c_source.html#l00198">198</a> of file <a class="el" href="main_8c_source.html">main.c</a>.</p>
 <div class="fragment"><div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;{</div><div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordtype">bool</span> value = <span class="keyword">false</span>;</div><div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;</div><div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="interrupt_8h.html#ab21b930d7d49ab29917b54408373414a">BTN_getTriggered</a>(0))</div><div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    {</div><div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;</div><div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;<span class="preprocessor">#if DEBUG_DBPRINT == 1 </span><span class="comment">/* DEBUG_DBPRINT */</span><span class="preprocessor"></span></div><div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        <a class="code" href="dbprint_8c.html#aeac6ad47896a658b0753fa0ef8040e6c">dbprintln_color</a>(<span class="stringliteral">&quot;PB0 pushed!&quot;</span>, 4);</div><div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DEBUG_DBPRINT */</span><span class="preprocessor"></span></div><div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;</div><div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        value = <span class="keyword">true</span>;</div><div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;</div><div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <a class="code" href="interrupt_8h.html#abb85f76e16c270396851fad940339a4b">BTN_setTriggered</a>(0, <span class="keyword">false</span>); <span class="comment">/* Clear static variable */</span></div><div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    }</div><div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;</div><div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;</div><div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="interrupt_8h.html#ab21b930d7d49ab29917b54408373414a">BTN_getTriggered</a>(1))</div><div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    {</div><div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;</div><div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;<span class="preprocessor">#if DEBUG_DBPRINT == 1 </span><span class="comment">/* DEBUG_DBPRINT */</span><span class="preprocessor"></span></div><div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        <a class="code" href="dbprint_8c.html#aeac6ad47896a658b0753fa0ef8040e6c">dbprintln_color</a>(<span class="stringliteral">&quot;PB1 pushed!&quot;</span>, 4);</div><div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* DEBUG_DBPRINT */</span><span class="preprocessor"></span></div><div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;</div><div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;        value = <span class="keyword">true</span>;</div><div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;</div><div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        <a class="code" href="interrupt_8h.html#abb85f76e16c270396851fad940339a4b">BTN_setTriggered</a>(1, <span class="keyword">false</span>); <span class="comment">/* Clear static variable */</span></div><div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    }</div><div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;</div><div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordflow">return</span> (value);</div><div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;}</div><div class="ttc" id="interrupt_8h_html_abb85f76e16c270396851fad940339a4b"><div class="ttname"><a href="interrupt_8h.html#abb85f76e16c270396851fad940339a4b">BTN_setTriggered</a></div><div class="ttdeci">void BTN_setTriggered(uint8_t number, bool value)</div><div class="ttdoc">Setter for the PB0_triggered and PB1_triggered static variable. </div><div class="ttdef"><b>Definition:</b> <a href="interrupt_8c_source.html#l00174">interrupt.c:174</a></div></div>
 <div class="ttc" id="interrupt_8h_html_ab21b930d7d49ab29917b54408373414a"><div class="ttname"><a href="interrupt_8h.html#ab21b930d7d49ab29917b54408373414a">BTN_getTriggered</a></div><div class="ttdeci">bool BTN_getTriggered(uint8_t number)</div><div class="ttdoc">Getter for the PB0_triggered and PB1_triggered static variables. </div><div class="ttdef"><b>Definition:</b> <a href="interrupt_8c_source.html#l00145">interrupt.c:145</a></div></div>
-<div class="ttc" id="dbprint_8c_html_aeac6ad47896a658b0753fa0ef8040e6c"><div class="ttname"><a href="dbprint_8c.html#aeac6ad47896a658b0753fa0ef8040e6c">dbprintln_color</a></div><div class="ttdeci">void dbprintln_color(char *message, dbprint_color_t color)</div><div class="ttdoc">Print a string (char array) to USARTx in a given color and go to the next line. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00478">dbprint.c:478</a></div></div>
+<div class="ttc" id="dbprint_8c_html_aeac6ad47896a658b0753fa0ef8040e6c"><div class="ttname"><a href="dbprint_8c.html#aeac6ad47896a658b0753fa0ef8040e6c">dbprintln_color</a></div><div class="ttdeci">void dbprintln_color(char *message, dbprint_color_t color)</div><div class="ttdoc">Print a string (char array) to USARTx in a given color and go to the next line. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00479">dbprint.c:479</a></div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a2bffc10d5bd4106753b7c30e86903bea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bffc10d5bd4106753b7c30e86903bea">&#9670;&nbsp;</a></span>HardFault_Handler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void HardFault_Handler </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>HardFault interrupt service routine. </p>
+<dl class="section note"><dt>Note</dt><dd>The <em>weak</em> definition for this method is located in <code>startup_gcc_efm32hg.h</code>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="main_8c_source.html#l00563">563</a> of file <a class="el" href="main_8c_source.html">main.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;{</div><div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    <span class="keywordflow">while</span>(1);</div><div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a840291bc02cba5474a4cb46a9b9566fe"></a>
@@ -393,8 +428,8 @@ LoRaWAN sensor channels</h1>
 <div class="ttc" id="adc_8h_html_ab8a50016236d402e27a7e1b7f0f4cf52"><div class="ttname"><a href="adc_8h.html#ab8a50016236d402e27a7e1b7f0f4cf52">initADC</a></div><div class="ttdeci">void initADC(ADC_Measurement_t peripheral)</div><div class="ttdoc">Method to initialize the ADC to later check the battery voltage or internal temperature. </div><div class="ttdef"><b>Definition:</b> <a href="adc_8c_source.html#l00085">adc.c:85</a></div></div>
 <div class="ttc" id="pin__mapping_8h_html_a4262e551c4909be86ca4e2c37e3085c5"><div class="ttname"><a href="pin__mapping_8h.html#a4262e551c4909be86ca4e2c37e3085c5">DBG_UART</a></div><div class="ttdeci">#define DBG_UART</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00095">pin_mapping.h:95</a></div></div>
 <div class="ttc" id="structMeasurementData__t_html_abb6211ec098e8d1817456a9758f083d1"><div class="ttname"><a href="structMeasurementData__t.html#abb6211ec098e8d1817456a9758f083d1">MeasurementData_t::index</a></div><div class="ttdeci">uint8_t index</div><div class="ttdef"><b>Definition:</b> <a href="datatypes_8h_source.html#l00071">datatypes.h:71</a></div></div>
-<div class="ttc" id="dbprint_8c_html_a5e059a469cca8341eb0a84e5c352f518"><div class="ttname"><a href="dbprint_8c.html#a5e059a469cca8341eb0a84e5c352f518">dbprintln</a></div><div class="ttdeci">void dbprintln(char *message)</div><div class="ttdoc">Print a string (char array) to USARTx and go to the next line. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00393">dbprint.c:393</a></div></div>
-<div class="ttc" id="dbprint_8c_html_a0511ddad2e00a8187d5449b15de7eb4f"><div class="ttname"><a href="dbprint_8c.html#a0511ddad2e00a8187d5449b15de7eb4f">dbinfoInt</a></div><div class="ttdeci">void dbinfoInt(char *message1, int32_t value, char *message2)</div><div class="ttdoc">Print an info value surrounded by two strings (char array) to USARTx. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00565">dbprint.c:565</a></div></div>
+<div class="ttc" id="dbprint_8c_html_a5e059a469cca8341eb0a84e5c352f518"><div class="ttname"><a href="dbprint_8c.html#a5e059a469cca8341eb0a84e5c352f518">dbprintln</a></div><div class="ttdeci">void dbprintln(char *message)</div><div class="ttdoc">Print a string (char array) to USARTx and go to the next line. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00394">dbprint.c:394</a></div></div>
+<div class="ttc" id="dbprint_8c_html_a0511ddad2e00a8187d5449b15de7eb4f"><div class="ttname"><a href="dbprint_8c.html#a0511ddad2e00a8187d5449b15de7eb4f">dbinfoInt</a></div><div class="ttdeci">void dbinfoInt(char *message1, int32_t value, char *message2)</div><div class="ttdoc">Print an info value surrounded by two strings (char array) to USARTx. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00566">dbprint.c:566</a></div></div>
 <div class="ttc" id="datatypes_8h_html_a68d90e0eaaa236e9664bbfc691bbd4d4aa40e10b1b38eea53354adb9aba78506c"><div class="ttname"><a href="datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4aa40e10b1b38eea53354adb9aba78506c">SLEEP_HALFTIME</a></div><div class="ttdef"><b>Definition:</b> <a href="datatypes_8h_source.html#l00063">datatypes.h:63</a></div></div>
 <div class="ttc" id="cable_8h_html_aac2085432f8a1f7136cadda0acc986b2"><div class="ttname"><a href="cable_8h.html#aac2085432f8a1f7136cadda0acc986b2">checkCable</a></div><div class="ttdeci">bool checkCable(MeasurementData_t data)</div><div class="ttdoc">Method to check if the wire is broken. </div><div class="ttdef"><b>Definition:</b> <a href="cable_8c_source.html#l00091">cable.c:91</a></div></div>
 <div class="ttc" id="ADXL362_8h_html_afbd87e7e6ad43d370fc0a4860004c087"><div class="ttname"><a href="ADXL362_8h.html#afbd87e7e6ad43d370fc0a4860004c087">ADXL_readValues</a></div><div class="ttdeci">void ADXL_readValues(void)</div><div class="ttdoc">Read and display &quot;g&quot; values forever with a 100ms interval. </div><div class="ttdef"><b>Definition:</b> <a href="ADXL362_8c_source.html#l00514">ADXL362.c:514</a></div></div>
@@ -403,11 +438,11 @@ LoRaWAN sensor channels</h1>
 <div class="ttc" id="ADXL362_8h_html_a5471fd7a8d4fd02ecdcafd54b9132e73"><div class="ttname"><a href="ADXL362_8h.html#a5471fd7a8d4fd02ecdcafd54b9132e73">ADXL_configODR</a></div><div class="ttdeci">void ADXL_configODR(ADXL_ODR_t givenODR)</div><div class="ttdoc">Configure the Output Data Rate (ODR). </div><div class="ttdef"><b>Definition:</b> <a href="ADXL362_8c_source.html#l00410">ADXL362.c:410</a></div></div>
 <div class="ttc" id="main_8c_html_ad2c9072e6e6a5758dfc647e1a08a9509"><div class="ttname"><a href="main_8c.html#ad2c9072e6e6a5758dfc647e1a08a9509">data</a></div><div class="ttdeci">static MeasurementData_t data</div><div class="ttdef"><b>Definition:</b> <a href="main_8c_source.html#l00187">main.c:187</a></div></div>
 <div class="ttc" id="pin__mapping_8h_html_a123ccd79d2ee0a5cd12968e0805e9ce3"><div class="ttname"><a href="pin__mapping_8h.html#a123ccd79d2ee0a5cd12968e0805e9ce3">DBG_UART_LOC</a></div><div class="ttdeci">#define DBG_UART_LOC</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00096">pin_mapping.h:96</a></div></div>
-<div class="ttc" id="dbprint_8c_html_a73de59bf0a689a086681070783a82df3"><div class="ttname"><a href="dbprint_8c.html#a73de59bf0a689a086681070783a82df3">dbwarn</a></div><div class="ttdeci">void dbwarn(char *message)</div><div class="ttdoc">Print a warning string (char array) in yellow to USARTx and go to the next line. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00519">dbprint.c:519</a></div></div>
+<div class="ttc" id="dbprint_8c_html_a73de59bf0a689a086681070783a82df3"><div class="ttname"><a href="dbprint_8c.html#a73de59bf0a689a086681070783a82df3">dbwarn</a></div><div class="ttdeci">void dbwarn(char *message)</div><div class="ttdoc">Print a warning string (char array) in yellow to USARTx and go to the next line. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00520">dbprint.c:520</a></div></div>
 <div class="ttc" id="ADXL362_8h_html_a082ac236e02b38591a21e89de3609dc5"><div class="ttname"><a href="ADXL362_8h.html#a082ac236e02b38591a21e89de3609dc5">ADXL_clearCounter</a></div><div class="ttdeci">void ADXL_clearCounter(void)</div><div class="ttdoc">Method to set the ADXL_triggercounter static variable back to zero. </div><div class="ttdef"><b>Definition:</b> <a href="ADXL362_8c_source.html#l00187">ADXL362.c:187</a></div></div>
 <div class="ttc" id="pin__mapping_8h_html_a72c2ec1ff29c64c102892ecd0a9d1087"><div class="ttname"><a href="pin__mapping_8h.html#a72c2ec1ff29c64c102892ecd0a9d1087">PM_RN2483_PIN</a></div><div class="ttdeci">#define PM_RN2483_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00134">pin_mapping.h:134</a></div></div>
 <div class="ttc" id="pin__mapping_8h_html_a73a4329f7f36b5b0cb41a39300e35b7f"><div class="ttname"><a href="pin__mapping_8h.html#a73a4329f7f36b5b0cb41a39300e35b7f">PM_SENS_EXT_PIN</a></div><div class="ttdeci">#define PM_SENS_EXT_PIN</div><div class="ttdef"><b>Definition:</b> <a href="pin__mapping_8h_source.html#l00136">pin_mapping.h:136</a></div></div>
-<div class="ttc" id="dbprint_8c_html_ada27783fef89d9c9af4976baab87c477"><div class="ttname"><a href="dbprint_8c.html#ada27783fef89d9c9af4976baab87c477">dbwarnInt</a></div><div class="ttdeci">void dbwarnInt(char *message1, int32_t value, char *message2)</div><div class="ttdoc">Print a warning value surrounded by two strings (char array) to USARTx. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00596">dbprint.c:596</a></div></div>
+<div class="ttc" id="dbprint_8c_html_ada27783fef89d9c9af4976baab87c477"><div class="ttname"><a href="dbprint_8c.html#ada27783fef89d9c9af4976baab87c477">dbwarnInt</a></div><div class="ttdeci">void dbwarnInt(char *message1, int32_t value, char *message2)</div><div class="ttdoc">Print a warning value surrounded by two strings (char array) to USARTx. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00597">dbprint.c:597</a></div></div>
 <div class="ttc" id="lora__wrappers_8h_html_a5c46043c55ca0122df5edc3be05be34a"><div class="ttname"><a href="lora__wrappers_8h.html#a5c46043c55ca0122df5edc3be05be34a">sendStormDetected</a></div><div class="ttdeci">void sendStormDetected(bool stormDetected)</div><div class="ttdoc">Send a packet to the cloud using LoRaWAN to indicate that a storm has been detected. </div><div class="ttdef"><b>Definition:</b> <a href="lora__wrappers_8c_source.html#l00212">lora_wrappers.c:212</a></div></div>
 <div class="ttc" id="ADXL362_8h_html_aa74db830447eeb4e0a95091e585c36e4"><div class="ttname"><a href="ADXL362_8h.html#aa74db830447eeb4e0a95091e585c36e4">ADXL_getCounter</a></div><div class="ttdeci">uint16_t ADXL_getCounter(void)</div><div class="ttdoc">Getter for the ADXL_triggercounter static variable. </div><div class="ttdef"><b>Definition:</b> <a href="ADXL362_8c_source.html#l00177">ADXL362.c:177</a></div></div>
 <div class="ttc" id="ADXL362_8h_html_a3a32a4cf4d2f84835d7bd4a640fa66d6"><div class="ttname"><a href="ADXL362_8h.html#a3a32a4cf4d2f84835d7bd4a640fa66d6">ADXL_enableMeasure</a></div><div class="ttdeci">void ADXL_enableMeasure(bool enabled)</div><div class="ttdoc">Enable or disable measurement mode. </div><div class="ttdef"><b>Definition:</b> <a href="ADXL362_8c_source.html#l00309">ADXL362.c:309</a></div></div>
@@ -426,7 +461,7 @@ LoRaWAN sensor channels</h1>
 <div class="ttc" id="interrupt_8h_html_a7e35708d61d26e9fe559a5545cdad810"><div class="ttname"><a href="interrupt_8h.html#a7e35708d61d26e9fe559a5545cdad810">initGPIOwakeup</a></div><div class="ttdeci">void initGPIOwakeup(void)</div><div class="ttdoc">Initialize GPIO wake-up functionality. </div><div class="ttdef"><b>Definition:</b> <a href="interrupt_8c_source.html#l00091">interrupt.c:91</a></div></div>
 <div class="ttc" id="main_8c_html_ab40fc0ba415a81e5bc1f27bea0d991f8"><div class="ttname"><a href="main_8c.html#ab40fc0ba415a81e5bc1f27bea0d991f8">ADXL_RANGE</a></div><div class="ttdeci">#define ADXL_RANGE</div><div class="ttdef"><b>Definition:</b> <a href="main_8c_source.html#l00171">main.c:171</a></div></div>
 <div class="ttc" id="lora__wrappers_8h_html_a66be1f59b1529ebee2fb41b252c05a52"><div class="ttname"><a href="lora__wrappers_8h.html#a66be1f59b1529ebee2fb41b252c05a52">initLoRaWAN</a></div><div class="ttdeci">void initLoRaWAN(void)</div><div class="ttdoc">Initialize LoRaWAN functionality. </div><div class="ttdef"><b>Definition:</b> <a href="lora__wrappers_8c_source.html#l00091">lora_wrappers.c:91</a></div></div>
-<div class="ttc" id="dbprint_8c_html_ab517cdef3b6920aa62bb748109212433"><div class="ttname"><a href="dbprint_8c.html#ab517cdef3b6920aa62bb748109212433">dbprint_INIT</a></div><div class="ttdeci">void dbprint_INIT(USART_TypeDef *pointer, uint8_t location, bool vcom, bool interrupts)</div><div class="ttdoc">Initialize USARTx. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00146">dbprint.c:146</a></div></div>
+<div class="ttc" id="dbprint_8c_html_ab517cdef3b6920aa62bb748109212433"><div class="ttname"><a href="dbprint_8c.html#ab517cdef3b6920aa62bb748109212433">dbprint_INIT</a></div><div class="ttdeci">void dbprint_INIT(USART_TypeDef *pointer, uint8_t location, bool vcom, bool interrupts)</div><div class="ttdoc">Initialize USARTx. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00147">dbprint.c:147</a></div></div>
 <div class="ttc" id="lora__wrappers_8h_html_a900b2eed7f831b30011786316972c338"><div class="ttname"><a href="lora__wrappers_8h.html#a900b2eed7f831b30011786316972c338">sendStatus</a></div><div class="ttdeci">void sendStatus(uint8_t status)</div><div class="ttdoc">Send a packet to indicate a status. </div><div class="ttdef"><b>Definition:</b> <a href="lora__wrappers_8c_source.html#l00285">lora_wrappers.c:285</a></div></div>
 <div class="ttc" id="adc_8h_html_a8d24200decb8cc61e4c749c435e80926a33dfae05581973af118a10481e139aba"><div class="ttname"><a href="adc_8h.html#a8d24200decb8cc61e4c749c435e80926a33dfae05581973af118a10481e139aba">BATTERY_VOLTAGE</a></div><div class="ttdef"><b>Definition:</b> <a href="adc_8h_source.html#l00048">adc.h:48</a></div></div>
 <div class="ttc" id="delay_8h_html_a072ccec54e047acce2566984c28b0232"><div class="ttname"><a href="delay_8h.html#a072ccec54e047acce2566984c28b0232">RTC_clearWakeup</a></div><div class="ttdeci">void RTC_clearWakeup(void)</div><div class="ttdoc">Method to clear RTC_sleep_wakeup. </div><div class="ttdef"><b>Definition:</b> <a href="delay_8c_source.html#l00405">delay.c:405</a></div></div>
@@ -445,11 +480,80 @@ LoRaWAN sensor channels</h1>
 <div class="ttc" id="datatypes_8h_html_a68d90e0eaaa236e9664bbfc691bbd4d4a0cb1b2c6a7db1f1084886c98909a3f36"><div class="ttname"><a href="datatypes_8h.html#a68d90e0eaaa236e9664bbfc691bbd4d4a0cb1b2c6a7db1f1084886c98909a3f36">INIT</a></div><div class="ttdef"><b>Definition:</b> <a href="datatypes_8h_source.html#l00058">datatypes.h:58</a></div></div>
 <div class="ttc" id="structMeasurementData__t_html_a05ea65bcd1951501f9437451440174bd"><div class="ttname"><a href="structMeasurementData__t.html#a05ea65bcd1951501f9437451440174bd">MeasurementData_t::voltage</a></div><div class="ttdeci">int32_t voltage[6]</div><div class="ttdef"><b>Definition:</b> <a href="datatypes_8h_source.html#l00072">datatypes.h:72</a></div></div>
 <div class="ttc" id="delay_8h_html_a7bfbeaf084abaa0fc6baf77a1640b598"><div class="ttname"><a href="delay_8h.html#a7bfbeaf084abaa0fc6baf77a1640b598">RTC_checkWakeup</a></div><div class="ttdeci">bool RTC_checkWakeup(void)</div><div class="ttdoc">Method to check if the wakeup was caused by the RTC. </div><div class="ttdef"><b>Definition:</b> <a href="delay_8c_source.html#l00395">delay.c:395</a></div></div>
-<div class="ttc" id="dbprint_8c_html_aeac6ad47896a658b0753fa0ef8040e6c"><div class="ttname"><a href="dbprint_8c.html#aeac6ad47896a658b0753fa0ef8040e6c">dbprintln_color</a></div><div class="ttdeci">void dbprintln_color(char *message, dbprint_color_t color)</div><div class="ttdoc">Print a string (char array) to USARTx in a given color and go to the next line. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00478">dbprint.c:478</a></div></div>
+<div class="ttc" id="dbprint_8c_html_aeac6ad47896a658b0753fa0ef8040e6c"><div class="ttname"><a href="dbprint_8c.html#aeac6ad47896a658b0753fa0ef8040e6c">dbprintln_color</a></div><div class="ttdeci">void dbprintln_color(char *message, dbprint_color_t color)</div><div class="ttdoc">Print a string (char array) to USARTx in a given color and go to the next line. </div><div class="ttdef"><b>Definition:</b> <a href="dbprint_8c_source.html#l00479">dbprint.c:479</a></div></div>
 <div class="ttc" id="delay_8h_html_aae86f940455b5957441f4331cdc0828d"><div class="ttname"><a href="delay_8h.html#aae86f940455b5957441f4331cdc0828d">sleep</a></div><div class="ttdeci">void sleep(uint32_t sSleep)</div><div class="ttdoc">Sleep for a certain amount of seconds in EM2/3. </div><div class="ttdef"><b>Definition:</b> <a href="delay_8c_source.html#l00267">delay.c:267</a></div></div>
 <div class="ttc" id="util_8h_html_ae4f2649524bfb723543f0dc939cd0ddd"><div class="ttname"><a href="util_8h.html#ae4f2649524bfb723543f0dc939cd0ddd">led</a></div><div class="ttdeci">void led(bool enabled)</div><div class="ttdoc">Enable or disable the LED. </div><div class="ttdef"><b>Definition:</b> <a href="util_8c_source.html#l00102">util.c:102</a></div></div>
 <div class="ttc" id="DS18B20_8h_html_ac3219638734d78805b64daa2cad58867"><div class="ttname"><a href="DS18B20_8h.html#ac3219638734d78805b64daa2cad58867">readTempDS18B20</a></div><div class="ttdeci">int32_t readTempDS18B20(void)</div><div class="ttdoc">Get a temperature value from the DS18B20. </div><div class="ttdef"><b>Definition:</b> <a href="DS18B20_8c_source.html#l00112">DS18B20.c:112</a></div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a6ad7a5e3ee69cb6db6a6b9111ba898bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ad7a5e3ee69cb6db6a6b9111ba898bc">&#9670;&nbsp;</a></span>NMI_Handler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void NMI_Handler </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>NMI interrupt service routine. </p>
+<dl class="section note"><dt>Note</dt><dd>The <em>weak</em> definition for this method is located in <code>startup_gcc_efm32hg.h</code>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="main_8c_source.html#l00550">550</a> of file <a class="el" href="main_8c_source.html">main.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;{</div><div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;    <span class="keywordflow">while</span>(1);</div><div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;}</div></div><!-- fragment -->
+</div>
+</div>
+<a id="a6303e1f258cbdc1f970ce579cc015623"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6303e1f258cbdc1f970ce579cc015623">&#9670;&nbsp;</a></span>PendSV_Handler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PendSV_Handler </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>PendSV interrupt service routine. </p>
+<dl class="section note"><dt>Note</dt><dd>The <em>weak</em> definition for this method is located in <code>startup_gcc_efm32hg.h</code>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="main_8c_source.html#l00589">589</a> of file <a class="el" href="main_8c_source.html">main.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;{</div><div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;    <span class="keywordflow">while</span>(1);</div><div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;}</div></div><!-- fragment -->
+</div>
+</div>
+<a id="a3e5ddb3df0d62f2dc357e64a3f04a6ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e5ddb3df0d62f2dc357e64a3f04a6ce">&#9670;&nbsp;</a></span>SVC_Handler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SVC_Handler </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>SVC interrupt service routine. </p>
+<dl class="section note"><dt>Note</dt><dd>The <em>weak</em> definition for this method is located in <code>startup_gcc_efm32hg.h</code>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="main_8c_source.html#l00576">576</a> of file <a class="el" href="main_8c_source.html">main.c</a>.</p>
+<div class="fragment"><div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;{</div><div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;    <span class="keywordflow">while</span>(1);</div><div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
@@ -509,7 +613,7 @@ LoRaWAN sensor channels</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_952e9747e32fbb216a31eb66ba91adc1.html">EFM32HG-Embedded2-project</a></li><li class="navelem"><a class="el" href="dir_4be578414597071060019317d61cdf19.html">src</a></li><li class="navelem"><a class="el" href="main_8c.html">main.c</a></li>
-    <li class="footer">Generated on Tue Oct 1 2019 14:39:10 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Thu Oct 3 2019 20:25:31 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
