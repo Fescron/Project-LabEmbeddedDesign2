@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file cable.c
  * @brief Cable checking functionality.
- * @version 2.0
+ * @version 2.1
  * @author
  *   Matthias Alleman@n
  *   Modified by Brecht Van Eeckhoudt
@@ -18,6 +18,7 @@
  *   @li v1.5: Moved more functionality to this file.
  *   @li v2.0: Added functionality to also send taken measurements when a cable break is
  *             detected and updated version number.
+ *   @li v2.1: Updated documentation.
  *
  * ******************************************************************************
  *
@@ -141,6 +142,10 @@ bool checkCable (MeasurementData_t data)
  * @details
  *   This method enables the necessary GPIO clocks, sets the mode of the pins,
  *   checks the connection between them and also disables them at the end.
+ *
+ * @note
+ *   This is a static method because it's only internally used in this file
+ *   and called by other methods if necessary.
  *
  * @return
  *   @li `true` - The connection is still okay.

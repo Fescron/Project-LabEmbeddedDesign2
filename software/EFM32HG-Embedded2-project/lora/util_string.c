@@ -12,8 +12,8 @@
  *
  *         File: util.c
  *      Created: 2018-01-19
- *       Author: Guus Leenders
- *      Version: 1.0
+ *       Author: Guus Leenders - Modified by Brecht Van Eeckhoudt
+ *      Version: 1.1 (1.0 -> 1.1: Added comment about malloc)
  *
  *  Description: TODO
  */
@@ -38,6 +38,8 @@ bool HexToString(uint8_t * bin, uint8_t binsz, char **result ){
 	char hex_str[] = "0123456789abcdef";
 	uint8_t i;
 
+	// Hex to string/char aray: one value becomes two chars (*2)
+	//   +1 because of NULL termination
 	if (!(*result = (char *)malloc(binsz * 2 + 1))){
 		return (false);
 	}

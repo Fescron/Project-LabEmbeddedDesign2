@@ -342,7 +342,11 @@ RN2483_Status_t RN2483_TransmitUnconfirmed(uint8_t * data, uint8_t payloadSize, 
 		return (MAC_ERR);
 	}
 	//StringToHexString(data, payloadSize/2, &decodedPayload);
-	sprintf(commandBuffer, "mac tx uncnf 1 %s\r\n", encodedPayload); // TODO: this seemed to cause the "dbpointer" problem?
+
+	// Sprintf caused a problem where it would overwrite data when using long LoRaWAN packets because the malloc statement
+	//   in HexToString would create a too small buffer (according to RN2483_COMMANDBUFFER_SIZE, was 80 and increased to 160)
+	//   compared to the data of the converted LoRaWAN packet.
+	sprintf(commandBuffer, "mac tx uncnf 1 %s\r\n", encodedPayload);
 	free(encodedPayload);
 	return (RN2483_ProcessMacCommand(receiveBuffer, bufferSize, true));
 }
