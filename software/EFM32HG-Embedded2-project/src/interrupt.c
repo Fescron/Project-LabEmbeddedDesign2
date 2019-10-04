@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file interrupt.c
  * @brief Interrupt functionality.
- * @version 3.0
+ * @version 3.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -25,6 +25,7 @@
  *   @li v2.1: Disabled the RTC counter on a button push because it confused delays called in LoRaWAN code.
  *   @li v2.2: Changed error numbering.
  *   @li v3.0: Updated version number.
+ *   @li v3.1: Removed `static` before the local variables (not necessary).
  *
  * ******************************************************************************
  *
@@ -75,9 +76,8 @@
 
 
 /* Local variables */
-/* Volatile because they're modified by an interrupt service routine */
-static volatile bool PB0_triggered = false;
-static volatile bool PB1_triggered = false;
+volatile bool PB0_triggered = false; /* Volatile because it's modified by an interrupt service routine */
+volatile bool PB1_triggered = false; /* Volatile because it's modified by an interrupt service routine */
 
 
 /**************************************************************************//**
@@ -133,7 +133,7 @@ void initGPIOwakeup (void)
 
 /**************************************************************************//**
  * @brief
- *   Getter for the `PB0_triggered` and `PB1_triggered` static variables.
+ *   Getter for the `PB0_triggered` and `PB1_triggered` variables.
  *
  * @param[in] number
  *   @li `0` - `PB0_triggered` selected.
@@ -162,14 +162,14 @@ bool BTN_getTriggered (uint8_t number)
 
 /**************************************************************************//**
  * @brief
- *   Setter for the `PB0_triggered` and `PB1_triggered` static variable.
+ *   Setter for the `PB0_triggered` and `PB1_triggered` variable.
  *
  * @param[in] number
  *   @li `0` - `PB0_triggered selected`.
  *   @li `1` - `PB1_triggered selected`.
  *
  * @param[in] value
- *   The boolean value to set to the selected static variable.
+ *   The boolean value to set to the selected variable.
  *****************************************************************************/
 void BTN_setTriggered (uint8_t number, bool value)
 {

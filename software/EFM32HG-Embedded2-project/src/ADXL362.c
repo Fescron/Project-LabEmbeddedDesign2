@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file ADXL362.c
  * @brief All code for the ADXL362 accelerometer.
- * @version 3.0
+ * @version 3.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -27,6 +27,7 @@
  *   @li v2.4: Changed error numbering.
  *   @li v2.5: Updated ODR enum and changed masking logic for register settings.
  *   @li v3.0: Added functionality to exit methods after `error` call and updated version number.
+ *   @li v3.1: Removed `static` before the local variables (not necessary).
  *
  * ******************************************************************************
  *
@@ -100,11 +101,11 @@
 
 
 /* Local variables */
-static volatile bool ADXL_triggered = false; /* Volatile because it's modified by an interrupt service routine */
-static volatile uint16_t ADXL_triggercounter = 0; /* Volatile because it's modified by an interrupt service routine */
-static int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
-static ADXL_Range_t range;
-static bool ADXL_VDD_initialized = false;
+volatile bool ADXL_triggered = false; /* Volatile because it's modified by an interrupt service routine */
+volatile uint16_t ADXL_triggercounter = 0; /* Volatile because it's modified by an interrupt service routine */
+int8_t XYZDATA[3] = { 0x00, 0x00, 0x00 };
+ADXL_Range_t range;
+bool ADXL_VDD_initialized = false;
 
 
 /* Local prototypes */
@@ -169,7 +170,7 @@ void initADXL (void)
 
 /**************************************************************************//**
  * @brief
- *   Getter for the `ADXL_triggercounter` static variable.
+ *   Getter for the `ADXL_triggercounter` variable.
  *
  * @return
  *   The value of `ADXL_triggercounter`.
@@ -182,7 +183,7 @@ uint16_t ADXL_getCounter (void)
 
 /**************************************************************************//**
  * @brief
- *   Method to set the `ADXL_triggercounter` static variable back to zero.
+ *   Method to set the `ADXL_triggercounter` variable back to zero.
  *****************************************************************************/
 void ADXL_clearCounter (void)
 {
@@ -192,7 +193,7 @@ void ADXL_clearCounter (void)
 
 /**************************************************************************//**
  * @brief
- *   Setter for the `ADXL_triggered` static variable.
+ *   Setter for the `ADXL_triggered` variable.
  *
  * @param[in] triggered
  *    @li `true` - Set `ADXL_triggered` to `true`.
@@ -207,7 +208,7 @@ void ADXL_setTriggered (bool triggered)
 
 /**************************************************************************//**
  * @brief
- *   Getter for the `ADXL_triggered` static variable.
+ *   Getter for the `ADXL_triggered` variable.
  *
  * @return
  *   The value of `ADXL_triggered`.
@@ -224,7 +225,7 @@ bool ADXL_getTriggered (void)
  *
  * @details
  *   Read a certain register (necessary if the accelerometer is not in
- *   linked-loop mode) and clear the static variable.
+ *   linked-loop mode) and clear the variable.
  *****************************************************************************/
 void ADXL_ackInterrupt (void)
 {
@@ -925,7 +926,7 @@ static bool checkID_ADXL (void)
  *   Convert sensor value in +-g range to mg value.
  *
  * @note
- *   Info found at http://ozzmaker.com/accelerometer-to-g/
+ *   Info found at http://ozzmaker.com/accelerometer-to-g/ @n
  *   This is a static method because it's only internally used in this file
  *   and called by other methods if necessary.
  *

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file lora_wrappers.c
  * @brief LoRa wrapper methods
- * @version 2.3
+ * @version 2.4
  * @author
  *   Benjamin Van der Smissen@n
  *   Heavily modified by Brecht Van Eeckhoudt
@@ -21,6 +21,7 @@
  *   @li v2.1: Added extra dbprint debugging statements.
  *   @li v2.2: Fixed suboptimal buffer logic causing lockups after some runtime.
  *   @li v2.3: Chanced logic to clear the buffer before going to sleep.
+ *   @li v2.4: Removed `static` before the local variables (not necessary).
  *
  * ******************************************************************************
  *
@@ -79,9 +80,9 @@
 
 
 /* Local (application) variables */
-static LoRaSettings_t loraSettings = LORA_INIT_MY_DEVICE;
-static LoRaStatus_t loraStatus;
-static LPP_Buffer_t appData;
+LoRaSettings_t loraSettings = LORA_INIT_MY_DEVICE;
+LoRaStatus_t loraStatus;
+LPP_Buffer_t appData;
 
 
 /**************************************************************************//**

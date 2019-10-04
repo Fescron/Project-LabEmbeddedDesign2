@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file util.c
  * @brief Utility functionality.
- * @version 3.0
+ * @version 3.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -24,6 +24,7 @@
  *   @li v2.7: Added functionality to send error values using LoRaWAN.
  *   @li v2.8: Added the ability to enable/disable error forwarding to the cloud using a public definition and changed UART error color.
  *   @li v3.0: Updated version number.
+ *   @li v3.1: Removed `static` before the local variables (not necessary).
  *
  * ******************************************************************************
  *
@@ -80,8 +81,8 @@
 
 
 /* Local variables */
-static uint8_t errorNumber = 0;
-static bool LED_initialized = false;
+uint8_t errorNumber = 0;
+bool LED_initialized = false;
 
 
 /* Local prototype */

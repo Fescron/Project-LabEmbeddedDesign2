@@ -2,7 +2,7 @@
  * @file dbprint.c
  * @brief Homebrew println/printf replacement "DeBugPrint".
  * @details Originally designed for use on the Silicion Labs Happy Gecko EFM32 board (EFM32HG322 -- TQFP48).
- * @version 6.1
+ * @version 6.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -40,6 +40,7 @@
  *             (put some code in comments to maybe fix later if ever necessary)
  *   @li v6.1: Made `dbpointer` a local variable (removed `extern`).
  *             Removed `extern` from the documentation.
+ *   @li v6.2: Removed `static` before the local variables (not necessary).
  *
  * ******************************************************************************
  *
@@ -110,13 +111,13 @@
 
 
 /** Local variable to store the settings (pointer). */
-static USART_TypeDef* dbpointer;
+USART_TypeDef* dbpointer;
 
-/* Local variables to store data
- *   `volatile` because they're modified by an interrupt service routine. */
-static volatile bool dataReceived = false; /* true if there is a line of data received */
-static volatile char rx_buffer[DBPRINT_BUFFER_SIZE];
-static volatile char tx_buffer[DBPRINT_BUFFER_SIZE];
+/* Local variables to store data */
+/*   -> Volatile because it's modified by an interrupt service routine (@RAM) */
+volatile bool dataReceived = false; /* true if there is a line of data received */
+volatile char rx_buffer[DBPRINT_BUFFER_SIZE];
+volatile char tx_buffer[DBPRINT_BUFFER_SIZE];
 
 
 /* Local prototypes */

@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file DS18B20.c
  * @brief All code for the DS18B20 temperature sensor.
- * @version 3.0
+ * @version 3.1
  * @author
  *   Alec Vanderhaegen & Sarah Goossens@n
  *   Modified by Brecht Van Eeckhoudt
@@ -31,6 +31,7 @@
  *   @li v2.6: Updated code to don't execute code further if the first initialization failed.
  *   @li v3.0: Disabled initialized functionality before entering an `error` function, added
  *             functionality to exit methods after `error` call and updated version number.
+ *   @li v3.1: Removed `static` before the local variable (not necessary).
  *
  * ******************************************************************************
  *
@@ -84,7 +85,7 @@
 
 
 /* Local variable */
-static bool DS18B20_VDD_initialized = false;
+bool DS18B20_VDD_initialized = false;
 
 
 /* Local prototypes */

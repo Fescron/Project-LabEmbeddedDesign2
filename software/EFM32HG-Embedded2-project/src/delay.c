@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.c
  * @brief Delay functionality.
- * @version 3.0
+ * @version 3.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -27,6 +27,7 @@
  *   @li v2.5: Added functionality to the time spend sleeping.
  *   @li v3.0: Disabled peripheral clock before entering an `error` function, added
  *             functionality to exit methods after `error` call and updated version number.
+ *   @li v3.1: Removed `static` before some local variables (not necessary).
  *
  * ******************************************************************************
  *
@@ -88,13 +89,16 @@
 
 
 /* Local variables */
-static volatile uint32_t msTicks; /* Volatile because it's modified by an interrupt service routine */
-static volatile bool RTC_sleep_wakeup = false; /* Volatile because it's modified by an interrupt service routine */
-static bool sleeping = false;
-static bool RTC_initialized = false;
+/*   -> Volatile because it's modified by an interrupt service routine (@RAM)
+ *   -> Static so it's always kept in memory (@data segment, space provided during compile time) */
+static volatile uint32_t msTicks;
+static volatile bool RTC_sleep_wakeup = false;
+
+bool sleeping = false;
+bool RTC_initialized = false;
 
 #if SYSTICKDELAY == 1 /* SysTick delay selected */
-static bool SysTick_initialized = false;
+bool SysTick_initialized = false;
 #endif /* SysTick/RTC selection */
 
 

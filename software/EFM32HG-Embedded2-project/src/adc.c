@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file adc.c
  * @brief ADC functionality for reading the (battery) voltage and internal temperature.
- * @version 2.0
+ * @version 2.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -16,6 +16,7 @@
  *   @li v1.5: Refined timout functionality.
  *   @li v2.0: Disabled peripheral clock before entering an `error` function, added
  *             functionality to exit methods after `error` call and updated version number.
+ *   @li v2.1: Removed `static` before the local variables (not necessary).
  *
  * ******************************************************************************
  *
@@ -66,9 +67,9 @@
 
 
 /* Local variables */
-static volatile bool adcConversionComplete = false; /* Volatile because it's modified by an interrupt service routine */
-static ADC_Init_TypeDef       init       = ADC_INIT_DEFAULT;
-static ADC_InitSingle_TypeDef initSingle = ADC_INITSINGLE_DEFAULT;
+volatile bool adcConversionComplete = false; /* Volatile because it's modified by an interrupt service routine */
+ADC_Init_TypeDef       init       = ADC_INIT_DEFAULT;
+ADC_InitSingle_TypeDef initSingle = ADC_INITSINGLE_DEFAULT;
 
 
 /* Local prototype */
