@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file dbprint_documentation.h
  * @brief This file contains useful documentation closely related to dbprint.
- * @version 6.1
+ * @version 6.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
