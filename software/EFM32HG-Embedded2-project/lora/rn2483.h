@@ -23,7 +23,7 @@
 #include <stdint.h> /* (u)intXX_t */
 #include "lora.h"   /* LoRa functionality */
 
-#define RN2483_COMMANDBUFFER_SIZE 80
+#define RN2483_COMMANDBUFFER_SIZE 160 // Was "80" before but gave problems with long LoRaWAN packets to send
 #define RN2483_POWER_14DBM 1
 #define RN2483_POWER_11DBM 2
 #define RN2483_POWER_8DBM 3
