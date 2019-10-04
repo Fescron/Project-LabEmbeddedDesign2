@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file main.c
  * @brief The main file for Project 2 from Embedded System Design 2 - Lab.
- * @version 5.1
+ * @version 5.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -43,6 +43,7 @@
  *   @li v4.1: Added definitions to easily change the accelerometer's configuration settings.
  *   @li v5.0: Updated sleep logic when waking up using the accelerometer.
  *   @li v5.1: Added extra ISR handlers.
+ *   @li v5.2: Removed `static` before a local variable (not necessary).
  *
  * ******************************************************************************
  *
@@ -182,10 +183,10 @@
 
 /* Local variables */
 /** Keep the state of the state machine */
-static MCU_State_t MCUstate;
+static MCU_State_t MCUstate; /* Static so it's always kept in memory (@data segment, space provided during compile time) */
 
 /** Keep the measurement data */
-static MeasurementData_t data;
+MeasurementData_t data;
 
 
 /**************************************************************************//**
@@ -209,7 +210,7 @@ bool checkBTNinterrupts (void)
 
 		value = true;
 
-		BTN_setTriggered(0, false); /* Clear static variable */
+		BTN_setTriggered(0, false); /* Clear variable */
 	}
 
 
@@ -222,7 +223,7 @@ bool checkBTNinterrupts (void)
 
 		value = true;
 
-		BTN_setTriggered(1, false); /* Clear static variable */
+		BTN_setTriggered(1, false); /* Clear variable */
 	}
 
 	return (value);
@@ -475,7 +476,7 @@ int main (void)
 				/* Check if we woke up using the RTC sleep functionality and act accordingly */
 				if (RTC_checkWakeup())
 				{
-					RTC_clearWakeup(); /* Clear static variable */
+					RTC_clearWakeup(); /* Clear variable */
 
 					ADXL_clearCounter(); /* Clear the trigger counter because we woke up "normally" */
 					remainingSleeptime = 0; /* Reset passed sleeping time since it's an RTC wakeup */
