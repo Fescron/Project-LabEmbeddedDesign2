@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file delay.c
  * @brief Delay functionality.
- * @version 3.1
+ * @version 3.2
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -28,6 +28,7 @@
  *   @li v3.0: Disabled peripheral clock before entering an `error` function, added
  *             functionality to exit methods after `error` call and updated version number.
  *   @li v3.1: Removed `static` before some local variables (not necessary).
+ *   @li v3.2: Moved `msTicks` variable and systick handler in `#if` check.
  *
  * ******************************************************************************
  *
@@ -91,8 +92,12 @@
 /* Local variables */
 /*   -> Volatile because it's modified by an interrupt service routine (@RAM)
  *   -> Static so it's always kept in memory (@data segment, space provided during compile time) */
-static volatile uint32_t msTicks;
 static volatile bool RTC_sleep_wakeup = false;
+
+#if SYSTICKDELAY == 1 /* SysTick delay selected */
+static volatile uint32_t msTicks;
+#endif /* SysTick/RTC selection */
+
 
 bool sleeping = false;
 bool RTC_initialized = false;
@@ -502,6 +507,7 @@ static void initRTC (void)
 }
 
 
+#if SYSTICKDELAY == 1 /* SysTick delay selected */
 /**************************************************************************//**
  * @brief
  *   Interrupt Service Routine for system tick counter.
@@ -510,6 +516,7 @@ void SysTick_Handler (void)
 {
 	msTicks++; /* Increment counter necessary by SysTick delay functionality */
 }
+#endif /* SysTick/RTC selection */
 
 
 /**************************************************************************//**
