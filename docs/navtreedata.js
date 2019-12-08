@@ -11,9 +11,7 @@ var NAVTREE =
       [ "Watchdog and while loops", "index.html#WATCHDOG", null ],
       [ "Optimizing code", "index.html#OPTIMALISATIONS", null ],
       [ "RTCC (RTC calendar)", "index.html#RTCC", null ],
-      [ "Energy modes (EM1 and EM3)", "index.html#EM", [
-        [ "Extern", "index.html#Extern", null ]
-      ] ]
+      [ "Energy modes (EM1 and EM3)", "index.html#EM", null ]
     ] ],
     [ "Todo List", "todo.html", null ],
     [ "Deprecated List", "deprecated.html", null ],
@@ -43,7 +41,7 @@ var NAVTREEINDEX =
 [
 "ADXL362_8c.html",
 "documentation_8h_source.html",
-"lpp_8h.html#a63dbdd1d6d95bd6b8106404511ee326a"
+"lpp_8h.html#a5d23d042c9c93bf5be29100485a7f40e"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

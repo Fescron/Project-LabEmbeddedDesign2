@@ -175,16 +175,18 @@ More info about dbprint and VCOM</h1>
 Keywords</h1>
 <h2><a class="anchor" id="Volatile"></a>
 Volatile</h2>
-<p>The <code>volatile</code> type indicates to the compiler that the data is not normal memory, and could change at unexpected times. Hardware registers are often volatile, and so are variables which get changed in interrupts.</p>
-<h2><a class="anchor" id="Extern"></a>
-Extern</h2>
-<p>Declare the global variables in headers (and use the <code>extern</code> keyword there) and actually define them in the appropriate source file.</p>
+<p>The <code>volatile</code> type indicates to the compiler that the data is not normal memory, and could change at unexpected times. Hardware registers are often volatile, and so are variables which get changed in interrupts.<br />
+ Volatile variables are stored in <em>RAM</em>.</p>
 <h2><a class="anchor" id="Static"></a>
 Static</h2>
-<ul>
-<li><b>Static variable inside a function:</b> The variable keeps its value between invocations.</li>
-<li><b>Static global variable or function:</b> The variable or function is only "seen" in the file it's declared in.</li>
-</ul>
+<h3><a class="anchor" id="VARIABLE"></a>
+Static variable</h3>
+<p>During compile time (this is why we can't use variable length array's) memory gets reserved for this variable. The data itself gets put in the <em>data</em> segment of the memory (regular variables are put in the <em>stack</em> segment).<br />
+ It's best to keep the use of <code>static</code> variables to a minimum. One should ask himself the question if it's necessary to keep the variable constantly in the memory. If the answer is yes, a <code>static</code> variable is acceptable.<br />
+ A <b>static variable inside a function</b> keeps its value between invocations.</p>
+<h3><a class="anchor" id="FUNCTION"></a>
+Static global function</h3>
+<p>The function is only "seen" in the file it's declared in. This means <code>static</code> can be used for methods the same way <code>private</code> is used for certain methods in C++.</p>
 <hr/>
 <h1><a class="anchor" id="DATA"></a>
 Bits, bytes, nibbles and unsigned/signed integer value ranges</h1>
@@ -215,7 +217,7 @@ Bits, bytes, nibbles and unsigned/signed integer value ranges</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon Oct 7 2019 09:46:10 for Embedded System Design 2 - Project by
+    <li class="footer">Generated on Sun Dec 8 2019 14:48:10 for Embedded System Design 2 - Project by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
