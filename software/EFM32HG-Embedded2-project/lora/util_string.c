@@ -38,18 +38,23 @@ bool HexToString(uint8_t * bin, uint8_t binsz, char **result ){
 	char hex_str[] = "0123456789abcdef";
 	uint8_t i;
 
-	// Hex to string/char aray: one value becomes two chars (*2)
+	// ALLOCATE MEMORY
+	// Hex to string/char array: one value becomes two chars (*2)
 	//   +1 because of NULL termination
+	// "*result =" ~ Value at memory location gets changed
 	if (!(*result = (char *)malloc(binsz * 2 + 1))){
-		return (false);
+		return (false); // Returned when NULL
 	}
 
-	(*result)[binsz * 2] = 0;
+	// Add NULL termination
+	(*result)[binsz * 2] = 0; // Last memory location, "0" ~ '\0'
 
+	// CHECK MEMORY
 	if (!binsz){
-		return (false);
+		return (false); // Returned when NULL
 	}
 
+	// FILL WITH DATA
 	for (i = 0; i < binsz; i++){
 	  (*result)[i * 2 + 0] = hex_str[(bin[i] >> 4) & 0x0F];
 	  (*result)[i * 2 + 1] = hex_str[(bin[i]     ) & 0x0F];

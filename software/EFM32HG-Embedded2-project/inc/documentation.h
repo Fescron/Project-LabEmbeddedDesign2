@@ -1,7 +1,7 @@
 /***************************************************************************//**
  * @file documentation.h
  * @brief This file contains useful documentation about the project.
- * @version 3.0
+ * @version 3.1
  * @author Brecht Van Eeckhoudt
  *
  * ******************************************************************************
@@ -271,17 +271,25 @@
  *
  *   The `volatile` type indicates to the compiler that the data is not normal memory,
  *   and could change at unexpected times. Hardware registers are often volatile,
- *   and so are variables which get changed in interrupts.
- *
- *   @subsection Extern
- *
- *   Declare the global variables in headers (and use the `extern` keyword there)
- *   and actually define them in the appropriate source file.
+ *   and so are variables which get changed in interrupts.@n
+ *   Volatile variables are stored in *RAM*.
  *
  *   @subsection Static
  *
- *   - **Static variable inside a function:** The variable keeps its value between invocations.
- *   - **Static global variable or function:** The variable or function is only "seen" in the file it's declared in.
+ *   @subsubsection VARIABLE Static variable
+ *
+ *   During compile time (this is why we can't use variable length array's) memory
+ *   gets reserved for this variable. The data itself gets put in the *data* segment
+ *   of the memory (regular variables are put in the *stack* segment).@n
+ *   It's best to keep the use of `static` variables to a minimum. One should ask
+ *   himself the question if it's necessary to keep the variable constantly in the
+ *   memory. If the answer is yes, a `static` variable is acceptable.@n
+ *   A **static variable inside a function** keeps its value between invocations.
+ *
+ *   @subsubsection FUNCTION Static global function
+ *
+ *   The function is only "seen" in the file it's declared in. This means `static`
+ *   can be used for methods the same way `private` is used for certain methods in C++.
  *
  * ******************************************************************************
  *
